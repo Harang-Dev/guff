@@ -15,14 +15,14 @@ class FolderMapper:
     def read_id(self, folder_id: int, db: Session):
         return db.query(FolderVO).filter(FolderVO.folder_id == folder_id).first()
 
-    def read_location(self, location_id: int, db: Session):
-        return db.query(FolderVO).filter(FolderVO.location_id == location_id).all()
+    def read_location(self, location_name: str, db: Session):
+        return db.query(FolderVO).filter(FolderVO.location_name == location_name).all()
 
     def update(self, dto: FolderDTOinDB, db: Session):
         vo = FolderVO(**dto.model_dump())
         record = db.query(FolderVO).filter(FolderVO.folder_id == vo.folder_id).first()
         record.folder_name = vo.folder_name
-        record.location_id = vo.location_id
+        record.location_name = vo.location_name
         record.due_date = vo.due_date
         record.marks = vo.marks
         db.commit()
