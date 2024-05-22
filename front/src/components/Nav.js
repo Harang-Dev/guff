@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -29,6 +30,7 @@ const LogoContainer = styled.div`
     background-image: url('/media/logo.png');
     background-repeat: no-repeat;
     margin-left: 70px;
+    cursor: pointer;
 `;
 
 const MenuList = styled.ul`
@@ -46,7 +48,7 @@ function Nav(props) {
         <>
             <GlobalStyle />
             <NavContainer>
-                <LogoContainer />
+                <LogoContainer to="/" />
                 <MenuList>
                     <MenuItem>공지사항</MenuItem>
                     <MenuItem>한글 분석기</MenuItem>
