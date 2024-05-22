@@ -13,7 +13,7 @@ const CenteredContainer = styled.div`
 const TableHeader = styled.div`
     display: grid;
     width: 1595px;
-    height: 55px;
+    height: 40px;
     grid-template-columns: 114px 240px 247px 496px 498px;
     text-align: center;
     color: #7E8393;
@@ -24,6 +24,7 @@ const TableBodyContainer = styled.ul`
     border-radius: 15px;
     width: 1595px;
     padding: 0;
+    margin-bottom: 200px;
 `;
 
 const TableBody = styled.li`
@@ -80,7 +81,7 @@ const ModalWrapper = styled.div`
 
 const Modal = styled.div`
     position: fixed;
-    bottom: 0;
+    bottom: 30%;
     left: 50%;
     transform: translateX(-50%);
     width: 30vw;

@@ -19,7 +19,7 @@ function BatteryDB(props) {
             </GlobalContainer>
             <Footer />
         </div>
-    );
+    );  
 }
 
 export default BatteryDB;
