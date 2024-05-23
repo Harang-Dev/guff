@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const FooterContainer = styled.div`
     width: 1920px;
-    height: 132px;
+    height: 66px;
     border-top: 1px black solid;
     display: flex;
     justify-content: center;
