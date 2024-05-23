@@ -7,7 +7,7 @@ class FolderVO(BASE):
     __tablename__ = 'Folder'
     folder_id = Column(Integer, primary_key=True)
     folder_name = Column(String)
-    location_id = Column(Integer)
+    location_name = Column(String)
     due_date = Column(Date)
     marks = Column(String)
 
@@ -19,6 +19,6 @@ class FolderVO(BASE):
     #     self.marks = marks
 
     def __repr__(self):
-        return f"Folder(folder_id={self.folder_id}, folder_name={self.folder_name}, location_id={self.location_id}, due_date={self.due_date})>"
+        return f"Folder(folder_id={self.folder_id}, folder_name={self.folder_name}, location_id={self.location_name}, due_date={self.due_date})>"
 
 

@@ -4,7 +4,7 @@ from typing import Union, Optional
 
 class FolderDTO(BaseModel):
     folder_name: str
-    location_id: int
+    location_name: str
     due_date: Optional[datetime]
     marks: Optional[str]
 

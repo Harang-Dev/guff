@@ -3,4 +3,4 @@ from datetime import datetime
 from typing import Union, Optional
 
 class LocationDTO(BaseModel):
-    pass
+    location_name: str

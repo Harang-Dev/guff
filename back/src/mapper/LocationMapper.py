@@ -1,27 +1,26 @@
 from sqlalchemy.orm import Session
 from src.vo.LocationVO import LocationVO
+from src.dto.LocationDTO import *
 
 class LocationMapper:
-    def insert(self, vo: LocationVO, db: Session):
-        new_record = vo
+    def insert(self, dto: LocationDTO, db: Session):
+        new_record = LocationVO(**dto.model_dump())
         db.add(new_record)
         db.commit()
 
     def read_all(self, db: Session):
         return db.query(LocationVO).all()
 
-    def read_id(self, location_id: int, db: Session):
-        return db.query(LocationVO).filter(LocationVO.location_id == location_id).first()
-
     def read_name(self, location_name: str, db: Session):
-        return db.query(LocationVO).filter(LocationVO.location_name == location_name).all()
+        return db.query(LocationVO).filter(LocationVO.location_name == location_name).first()
 
-    def update(self, vo: LocationVO, db: Session):
-        record = db.query(LocationVO).filter(LocationVO.location_id == vo.location_id).first()
-        record.location_name = vo.location_name
+    def update(self, dto: LocationDTO, change_location: LocationDTO, db: Session):
+        vo = LocationVO(**dto.model_dump())
+        record = db.query(LocationVO).filter(LocationVO.location_name == vo.location_name).first()
+        record.location_name = change_location.location_name
         db.commit()
 
-    def delete(self, location_id: int, db: Session):
-        record = db.query(LocationVO).filter(LocationVO.location_id == location_id).first()
+    def delete(self, location_name: str, db: Session):
+        record = db.query(LocationVO).filter(LocationVO.location_name == location_name).first()
         db.delete(record)
         db.commit()
