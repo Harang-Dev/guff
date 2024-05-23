@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import initialData from '../components/dummy.json';
+import axios from "axios";
 
 const CenteredContainer = styled.div`
     margin: 0;
@@ -114,12 +114,25 @@ const Input = styled.input`
 `;
 
 function BatteryTable() {
-    const [data, setData] = useState(initialData); // 데이터를 상태로 관리
+    const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [visibleItems, setVisibleItems] = useState(10); // 초기 보여지는 아이템 수
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 상태
     const [isVisible, setIsVisible] = useState(false); // 모달의 가시성 상태
     const [editItem, setEditItem] = useState({}); // 수정 중인 아이템 데이터
+
+    useEffect(() => {
+        const getBatteryDB = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/battery/`);
+                setData(response.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        getBatteryDB();
+    }, []); // 컴포넌트가 마운트될 때 한 번만 실행
 
     const loadMore = () => {
         setVisibleItems(prev => prev + 5); // 더 보기 버튼 클릭 시 아이템 수를 5씩 증가
@@ -158,19 +171,19 @@ function BatteryTable() {
             <CenteredContainer>
                 <TableHeader>
                     <p>순번</p>
-                    <p>날짜</p>
-                    <p>진동 세기</p>
-                    <p>배터리 위치</p>
+                    <p>폴더명</p>
+                    <p>위치</p>
+                    <p>기한</p>
                     <p>특이사항</p>
                 </TableHeader>
                 <TableBodyContainer>
                     {data.slice(0, visibleItems).map(item => (
                         <TableBody key={item.id} onClick={() => openModal(item)}>
-                            <p>{item.id}</p>
-                            <p>{item.date}</p>
-                            <p>{item.vibration}</p>
-                            <p>{item.location}</p>
-                            <p>{item.remark}</p>
+                            <p>{item.folder_id}</p>
+                            <p>{item.folder_name}</p>
+                            <p>{item.location_name}</p>
+                            <p>{item.due_date}</p>
+                            <p>{item.marks}</p>
                         </TableBody>
                     ))}
                     {visibleItems < data.length && (
@@ -185,38 +198,38 @@ function BatteryTable() {
                         {selectedItem && (
                             <div>
                                 <p>
-                                    순번: 
+                                    폴더 ID: 
                                     <Input
                                         type="text"
-                                        name="id"
-                                        value={editItem.id}
+                                        name="folder_id"
+                                        value={editItem.folder_id}
                                         onChange={handleChange}
                                     />
                                 </p>
                                 <p>
-                                    날짜: 
+                                    폴더명: 
                                     <Input
                                         type="text"
-                                        name="date"
-                                        value={editItem.date}
+                                        name="folder_name"
+                                        value={editItem.folder_name}
                                         onChange={handleChange}
                                     />
                                 </p>
                                 <p>
-                                    진동 세기: 
+                                    위치: 
                                     <Input
                                         type="text"
-                                        name="vibration"
-                                        value={editItem.vibration}
+                                        name="location_name"
+                                        value={editItem.location_name}
                                         onChange={handleChange}
                                     />
                                 </p>
                                 <p>
-                                    배터리 위치: 
+                                    기한: 
                                     <Input
                                         type="text"
-                                        name="location"
-                                        value={editItem.location}
+                                        name="due_date"
+                                        value={editItem.due_date}
                                         onChange={handleChange}
                                     />
                                 </p>
@@ -224,8 +237,8 @@ function BatteryTable() {
                                     특이사항: 
                                     <Input
                                         type="text"
-                                        name="remark"
-                                        value={editItem.remark}
+                                        name="marks"
+                                        value={editItem.marks}
                                         onChange={handleChange}
                                     />
                                 </p>
