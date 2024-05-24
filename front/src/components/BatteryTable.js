@@ -122,7 +122,7 @@ function BatteryTable() {
     const [editItem, setEditItem] = useState({}); // 수정 중인 아이템 데이터
 
     useEffect(() => {
-        const getBatteryDB = async () => {
+        const fetchData = async () => {
             try {
                 const response = await axios.get(`http://127.0.0.1:8000/battery/`);
                 setData(response.data);
@@ -131,7 +131,7 @@ function BatteryTable() {
             }
         };
 
-        getBatteryDB();
+        fetchData();
     }, []); // 컴포넌트가 마운트될 때 한 번만 실행
 
     const loadMore = () => {
@@ -158,12 +158,14 @@ function BatteryTable() {
         setEditItem(prev => ({ ...prev, [name]: value }));
     };
 
-    const saveChanges = () => {
-        const updatedData = data.map(item =>
-            item.id === editItem.id ? editItem : item
-        );
-        setData(updatedData); // 수정된 데이터를 상태로 업데이트
-        closeModal();
+    const saveChanges = async () => {
+        try {
+            const response = await axios.put(`http://127.0.0.1:8000/battery/put/`, editItem);
+            alert("저장 되었습니다.");
+            closeModal();
+        } catch (error) {
+            console.error("Error updating data:", error);
+        }
     };
 
     return (
@@ -187,7 +189,8 @@ function BatteryTable() {
                         </TableBody>
                     ))}
                     {visibleItems < data.length && (
-                        <MoreButton onClick={loadMore}>더 보기</MoreButton>
+                        <MoreButton onClick={loadMore
+                        }>더 보기</MoreButton>
                     )}
                 </TableBodyContainer>
             </CenteredContainer>
