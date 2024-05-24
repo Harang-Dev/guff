@@ -9,6 +9,9 @@ const GlobalContainer = styled.div`
     background-color: #F5F6F7;
 `;
 
+
+
+
 function BatteryDB(props) {
     return (
         <div>
