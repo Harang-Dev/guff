@@ -9,6 +9,9 @@ const FooterContainer = styled.div`
     justify-content: center;
     align-items: center;
     text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 `;
 
 const StyledSpan = styled.span`

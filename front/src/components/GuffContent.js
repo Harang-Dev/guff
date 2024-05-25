@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const HeaderContainer = styled.div`
     width: 1920px;
@@ -35,19 +36,34 @@ const ButtonContainer = styled.div`
     text-align: center;
 `;
 
-const GuffContentButton = styled.div`
+const GuffContentButton = styled(Link)`
     width: 177px;
     height: 177px;
     border-radius: 20px;
-    background-color: ${props => props.color || 'blue'};
+    background-color: ${props => props.color};
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: border 0.1s ease;
+
+    &:hover {
+        border: 2px solid ${props => {
+            if (props.color === '#E8F7F2') return '#188BA7';
+            if (props.color === '#F5EDFF') return '#6500C2';
+            return props.color;
+        }};
+    }
 `;
 
 const StyledSpan = styled.span`
     font-size: 20px;
     font-weight: 500;
+    color: #000000;
 `;
 
-function GuffContent(props) {
+function GuffContent() {
     return (
         <div>
             <HeaderContainer>
@@ -55,11 +71,11 @@ function GuffContent(props) {
             </HeaderContainer>
             <ContentContainer>
                 <ButtonContainer>
-                    <GuffContentButton color="#E8F7F2" />
+                    <GuffContentButton color="#E8F7F2" to='/Analyze' />
                     <StyledSpan>한글분석기</StyledSpan>
                 </ButtonContainer>
                 <ButtonContainer>
-                    <GuffContentButton color="#F5EDFF" />
+                    <GuffContentButton color="#F5EDFF" to='/BatteryDB' />
                     <StyledSpan>배터리 DB</StyledSpan>
                 </ButtonContainer>
             </ContentContainer>

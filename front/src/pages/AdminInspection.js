@@ -1,6 +1,4 @@
 import React from 'react';
-import AdminNav from '../components/AdminNav';
-import AdminFooter from '../components/AdminFooter';
 import styled from 'styled-components';
 
 const CenteredContainer = styled.div`
@@ -54,7 +52,6 @@ const InspectButton = styled.button`
 function AdminInspection(props) {
     return (
         <div>
-            <AdminNav />
             <CenteredContainer>
                 <InspectionContainer>
                     <ImageContainer />
@@ -66,7 +63,6 @@ function AdminInspection(props) {
                     <InspectButton>점검 시작하기</InspectButton>
                 </InspectionContainer>
             </CenteredContainer>
-            <AdminFooter />
         </div>
     );
 }

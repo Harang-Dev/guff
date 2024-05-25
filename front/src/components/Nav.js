@@ -24,7 +24,7 @@ const NavContainer = styled.div`
     z-index: 1000;
 `;
 
-const LogoContainer = styled.div`
+const LogoContainer = styled(Link)`
     width: 120px;
     height: 43px;
     background-image: url('/media/logo.png');

@@ -1,6 +1,4 @@
 import React from 'react';
-import AdminNav from '../components/AdminNav';
-import AdminFooter from '../components/AdminFooter';
 import LoginForm from '../components/LoginForm';
 import { createGlobalStyle } from 'styled-components';
 
@@ -19,9 +17,7 @@ function AdminLogin(props) {
     return (
         <div>
             <GlobalStyle />
-            <AdminNav />
             <LoginForm />
-            <AdminFooter />
         </div>
     );
 }
