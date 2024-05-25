@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 const HeaderContainer = styled.div`
     text-align: center;
-    margin-top: 54px;
 `;
 
 const Title = styled.h1`
