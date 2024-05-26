@@ -3,13 +3,11 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import styled from 'styled-components';
 
-import Nav from '../components/Nav';
 import Header from '../components/Header';
 import GuffContent from '../components/GuffContent';
 import GMECInfo from '../components/GMECInfo';
 import GMECPR from '../components/GMECPR';
 import GMECAsk from '../components/GMECAsk';
-import Footer from '../components/Footer';
 
 const StyledSection = styled.div`
     &[data-aos="fade-up"] {
@@ -31,7 +29,6 @@ function Home(props) {
 
     return (
         <div>
-            <Nav />
             <Header />
             <GuffContent />
             <StyledSection data-aos="fade-up">
@@ -43,7 +40,6 @@ function Home(props) {
             <StyledSection data-aos="fade-up">
                 <GMECAsk />
             </StyledSection>
-            <Footer />
         </div>
     );
 }

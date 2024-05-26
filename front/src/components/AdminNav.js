@@ -7,6 +7,7 @@ const GlobalStyle = createGlobalStyle`
         padding-top: 102px;
         margin: 0;
         box-sizing: border-box;
+        background-color: #2B2D31;
     }
 `;
 
@@ -16,15 +17,14 @@ const NavContainer = styled.div`
     left: 0;
     width: 1920px;
     height: 102px;
-    border-bottom: 1px solid black;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: white;
+    background-color: #33353A;
     z-index: 1000;
 `;
 
-const LogoContainer = styled(Link)`
+const LogoContainer = styled.div`
     width: 120px;
     height: 43px;
     background-image: url('/media/logo.png');
