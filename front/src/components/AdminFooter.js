@@ -10,7 +10,7 @@ const FooterContainer = styled.div`
     justify-content: center;
     align-items: center;
     text-align: center;
-    position: fixed;
+    position: sticky;
     bottom: 0;
     left: 0;
 `;
