@@ -160,7 +160,7 @@ function BatteryTable() {
 
     const saveChanges = async () => {
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/battery/${editItem.id}/`, editItem);
+            const response = await axios.put(`http://127.0.0.1:8000/battery/put/`, editItem);
             alert("저장 되었습니다.");
             closeModal();
         } catch (error) {
