@@ -1,14 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 const fadeIn = keyframes`
     from {
         opacity: 0;
@@ -93,6 +85,13 @@ const EditModalContainer = styled(BaseModalContainer)`
     justify-content: flex-start;
 `;
 
+const AddModalContainer = styled(BaseModalContainer)`
+    width: 25vw;
+    background-color: #f9f9f9;
+    flex-direction: column;
+    justify-content: flex-start;
+`;
+
 export const Modal = ({ isVisible, onClose, onEdit }) => (
     <ModalWrapper isVisible={isVisible}>
         <ModalContainer>
@@ -140,5 +139,46 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                 <ModalButton onClick={onClose}>취소</ModalButton>
             </div>
         </EditModalContainer>
+    </ModalWrapper>
+);
+
+export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => (
+    <ModalWrapper isVisible={isVisible}>
+        <AddModalContainer>
+            <h2>추가 하기</h2>
+            <ReadOnlyField>{addItem.folder_id}</ReadOnlyField>
+            <Input
+                type="text"
+                name="folder_name"
+                value={addItem.folder_name}
+                onChange={handleChange}
+                placeholder="폴더명"
+            />
+            <Input
+                type="text"
+                name="location_name"
+                value={addItem.location_name}
+                onChange={handleChange}
+                placeholder="위치"
+            />
+            <Input
+                type="text"
+                name="due_date"
+                value={addItem.due_date}
+                onChange={handleChange}
+                placeholder="기한"
+            />
+            <Input
+                type="text"
+                name="marks"
+                value={addItem.marks}
+                onChange={handleChange}
+                placeholder="특이사항"
+            />
+            <div>
+                <ModalButton onClick={onAdd}>저장</ModalButton>
+                <ModalButton onClick={onClose}>취소</ModalButton>
+            </div>
+        </AddModalContainer>
     </ModalWrapper>
 );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from "axios";
-import { Modal, EditModal } from './Modal';
+import { Modal, EditModal, AddModal } from './Modal';
 
 const CenteredContainer = styled.div`
     margin: 0;
@@ -26,7 +26,6 @@ const TableBodyContainer = styled.ul`
     border-radius: 15px;
     width: 1595px;
     padding: 0;
-    margin-bottom: 200px;
 `;
 
 const TableBody = styled.li`
@@ -54,6 +53,25 @@ const MoreButton = styled.button`
     border-bottom-right-radius: 15px;
 `;
 
+const AddButtonContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const AddButton = styled.button`
+    width: 100px;
+    height: 61px;
+    border-radius: 23px;
+    background-color: #BE35FF;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bolder;
+    margin: 30px 0 200px;
+
+    cursor: pointer;
+`;
 
 function BatteryTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
@@ -61,13 +79,18 @@ function BatteryTable() {
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
     const [isModalOpen, setIsModalOpen] = useState(false); // 첫 번째 모달 열림 상태
     const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 두 번째 모달 열림 상태
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // 추가 모달 열림 상태
     const [editItem, setEditItem] = useState({}); // 수정 중인 아이템 데이터
+    const [addItem, setAddItem] = useState({}); // 추가 중인 아이템 데이터
+    const [nextFolderId, setNextFolderId] = useState(null); // 다음 순번
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/battery/`);
+                const response = await axios.get('http://127.0.0.1:8000/battery/');
                 setData(response.data);
+                const maxId = Math.max(...response.data.map(item => item.folder_id));
+                setNextFolderId(maxId + 1);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -99,9 +122,26 @@ function BatteryTable() {
         setIsEditModalOpen(false);
     };
 
+    const openAddModal = async () => {
+        const response = await axios.get('http://127.0.0.1:8000/battery/');
+        const maxId = Math.max(...response.data.map(item => item.folder_id));
+        setNextFolderId(maxId + 1);
+        setAddItem(prev => ({ ...prev, folder_id: maxId + 1 }));
+        setIsAddModalOpen(true);
+    };
+
+    const closeAddModal = () => {
+        setIsAddModalOpen(false);
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditItem(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddChange = (e) => {
+        const { name, value } = e.target;
+        setAddItem(prev => ({ ...prev, [name]: value }));
     };
 
     const saveChanges = async () => {
@@ -109,13 +149,27 @@ function BatteryTable() {
             await axios.put(`http://127.0.0.1:8000/battery/put/`, editItem);
             alert("저장 되었습니다.");
 
-            const response = await axios.get(`http://127.0.0.1:8000/battery/`);
+            const response = await axios.get('http://127.0.0.1:8000/battery/');
             setData(response.data);
 
             closeEditModal();
             closeModal();
         } catch (error) {
             console.error("Error updating data:", error);
+        }
+    };
+
+    const addChanges = async () => {
+        try {
+            await axios.post('http://127.0.0.1:8000/battery/add/', addItem);
+            alert("추가 되었습니다.");
+
+            const response = await axios.get('http://127.0.0.1:8000/battery/');
+            setData(response.data);
+
+            closeAddModal();
+        } catch (error) {
+            console.error("Error adding data:", error);
         }
     };
 
@@ -142,7 +196,11 @@ function BatteryTable() {
                     {visibleItems < data.length && (
                         <MoreButton onClick={loadMore}>더 보기</MoreButton>
                     )}
+
                 </TableBodyContainer>
+                <AddButtonContainer>
+                    <AddButton onClick={openAddModal}><span>추가</span></AddButton>
+                </AddButtonContainer>
             </CenteredContainer>
             <Modal
                 isVisible={isModalOpen}
@@ -155,6 +213,13 @@ function BatteryTable() {
                 handleChange={handleChange}
                 onSave={saveChanges}
                 onClose={closeEditModal}
+            />
+            <AddModal
+                isVisible={isAddModalOpen}
+                addItem={addItem}
+                handleChange={handleAddChange}
+                onAdd={addChanges}
+                onClose={closeAddModal}
             />
         </div>
     );
