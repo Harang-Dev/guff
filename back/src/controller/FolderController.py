@@ -28,7 +28,7 @@ def read_location(location_name: str = None, db: Session = Depends(get_db)):
     data = mapper.read_location(location_name, db)
     return data
 
-@battery.get("/log", tags=['battery'], response_model=list[ReplacementDTOinDB])
+@battery.get("/log/{folder_id}", tags=['battery'], response_model=list[ReplacementDTOinDB])
 def read_log(folder_id: int, db: Session = Depends(get_db)):
     data = Rmapper.read_folder(folder_id, db)
     return data
