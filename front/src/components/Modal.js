@@ -48,7 +48,8 @@ const BaseModalContainer = styled.div`
 
 const ModalButton = styled.button`
     margin: 5px;
-    padding: 10px 30px;
+    width: 100px;
+    height: 50px;
     border: none;
     cursor: pointer;
     color: white;
@@ -92,10 +93,11 @@ const AddModalContainer = styled(BaseModalContainer)`
     justify-content: flex-start;
 `;
 
-export const Modal = ({ isVisible, onClose, onEdit }) => (
+export const Modal = ({ isVisible, onClose, onEdit, deleteDB }) => (
     <ModalWrapper isVisible={isVisible}>
         <ModalContainer>
             <ModalButton onClick={onEdit}>수정</ModalButton>
+            <ModalButton onClick={deleteDB}>삭제</ModalButton>
             <ModalButton onClick={onClose}>취소</ModalButton>
         </ModalContainer>
     </ModalWrapper>

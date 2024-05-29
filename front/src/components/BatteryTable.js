@@ -73,6 +73,12 @@ const AddButton = styled.button`
     cursor: pointer;
 `;
 
+const DueDate = styled.p`
+    color: ${props => props.isWithinNextSixDays  ? '#BE35FF' : 'black'};
+    font-size: ${props => props.isWithinNextSixDays  ? 'bolder' : 'normal'};
+`;
+
+
 function BatteryTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [visibleItems, setVisibleItems] = useState(10); // 초기 보여지는 아이템 수
@@ -173,6 +179,38 @@ function BatteryTable() {
         }
     };
 
+    /* eslint-disable no-restricted-globals */
+    const deleteDB = async (item) => {
+        if (confirm("삭제하시겠습니까?")) {
+            try {
+                await axios.delete(`http://127.0.0.1:8000/battery/delete/${selectedItem.folder_id}`);
+                alert("정상적으로 삭제되었습니다.");
+
+                const response = await axios.get('http://127.0.0.1:8000/battery/');
+                setData(response.data);
+
+                closeModal();
+
+            } catch (error) {
+                console.error("Error deleting data:", error);
+            }
+        }
+    };
+/* eslint-disable no-restricted-globals */
+
+
+const isDateWithinNextSixDays = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const endOfPeriod = new Date(now);
+    endOfPeriod.setDate(now.getDate() + 6);
+
+    now.setHours(0, 0, 0, 0);
+    endOfPeriod.setHours(23, 59, 59, 999);
+
+    return date >= now && date <= endOfPeriod;
+};
+
     return (
         <div>
             <CenteredContainer>
@@ -189,7 +227,7 @@ function BatteryTable() {
                             <p>{item.folder_id}</p>
                             <p>{item.folder_name}</p>
                             <p>{item.location_name}</p>
-                            <p>{item.due_date}</p>
+                            <DueDate isWithinNextSixDays={isDateWithinNextSixDays(item.due_date)}>{item.due_date}</DueDate>
                             <p>{item.marks}</p>
                         </TableBody>
                     ))}
@@ -206,6 +244,8 @@ function BatteryTable() {
                 isVisible={isModalOpen}
                 onClose={closeModal}
                 onEdit={openEditModal}
+                deleteDB={deleteDB}
+                selectedItem={selectedItem}
             />
             <EditModal
                 isVisible={isEditModalOpen}
