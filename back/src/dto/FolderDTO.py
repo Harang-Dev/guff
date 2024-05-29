@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import date
 from typing import Union, Optional
 
+
 class FolderDTO(BaseModel):
     folder_name: str
     location_name: str

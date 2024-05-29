@@ -1,37 +1,20 @@
 import React from 'react';
-import styled from 'styled-components';
-import BatteryHeader from '../components/BatteryHeader';
+import styled, { createGlobalStyle } from 'styled-components';
 import BatteryTable from '../components/BatteryTable';
 
-const GlobalContainer = styled.div`
+const GlobalStyle = createGlobalStyle`
+  body {
     background-color: #F5F6F7;
+  }
 `;
 
-
-
-
 function BatteryDB(props) {
-    const getBetterDB = async () => {
-        try {
-            const response = await axios.get(
-                `http://127.0.0.1:8000/battery/`
-            );
-            console.log(response.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-    
-    getBetterDB(); 
-
     return (
         <div>
-            <GlobalContainer>
-                {/* <BatteryHeader /> */}
-                <BatteryTable />
-            </GlobalContainer>
+            <GlobalStyle />
+            <BatteryTable />
         </div>
-    );  
+    );
 }
 
 export default BatteryDB;
