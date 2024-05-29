@@ -14,9 +14,6 @@ class ReplacementMapper:
     def read_id(self, replacement_date_id: int, db: Session):
         return db.query(ReplacementVO).filter(ReplacementVO.replacement_date_id == replacement_date_id).first()
 
-    def read_date(self, replaced_date, db: Session):
-        return db.query(ReplacementVO).filter(ReplacementVO.replaced_date == replaced_date).all()
-
     def read_folder(self, folder_id: int, db: Session):
         return db.query(ReplacementVO).filter(ReplacementVO.folder_id == folder_id).all()
 
