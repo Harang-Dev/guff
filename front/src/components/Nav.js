@@ -53,6 +53,7 @@ function Nav(props) {
                     <MenuItem>공지사항</MenuItem>
                     <MenuItem>한글 분석기</MenuItem>
                     <MenuItem>배터리 DB</MenuItem>
+                    <MenuItem>계측기 관리</MenuItem>
                 </MenuList>
             </NavContainer>
         </>
