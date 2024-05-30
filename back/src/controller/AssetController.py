@@ -20,9 +20,9 @@ def read_id(asset_id: int, db: Session = Depends(get_db)):
     data = mapper.read_id(asset_id, db)
     return data
 
-@asset.get("/brand/{brand_name}", tags=['asset'], response_model=list[AssetDTO])
+@asset.get("/brand/{brand_name}", tags=['asset'], response_model=list[AssetDTOinDB])
 def read_brand(brand_name: str = None, db: Session = Depends(get_db)):
-    data = mapper.read_location(brand_name, db)
+    data = mapper.read_brand(brand_name, db)
     return data
 
 # 로그 처리 컨트롤러

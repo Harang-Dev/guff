@@ -14,10 +14,10 @@ class AssetDTO(BaseModel):
     location_name: Optional[str]
     start_date: Optional[date]
     end_date: Optional[date]
-    marks: str
+    marks: Optional[str]
 
 class AssetDTOinDB(AssetDTO):
-    Asset_id: int
+    asset_id: int
 
 class InsertAssetDTO(AssetDTO):
     pass
