@@ -5,11 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.controller.FolderController import battery
 from src.controller.LocationController import location
 from src.controller.AssetController import asset
+from src.controller.BrandController import brand
 
 app = FastAPI()
 app.include_router(battery)
 app.include_router(location)
 app.include_router(asset)
+app.include_router(brand)
 
 app.add_middleware(
     CORSMiddleware,
