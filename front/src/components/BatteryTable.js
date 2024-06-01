@@ -103,7 +103,8 @@ function BatteryTable() {
         };
 
         fetchData();
-    }, []); // 컴포넌트가 마운트될 때 한 번만 실행
+    }, []);
+
 
     const loadMore = () => {
         setVisibleItems(prev => prev + 5); // 더 보기 버튼 클릭 시 아이템 수를 5씩 증가

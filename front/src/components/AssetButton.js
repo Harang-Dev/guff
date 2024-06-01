@@ -25,15 +25,17 @@ const StyledButton = styled.button`
     cursor: pointer;
 `;
 
+function AssetButton({ onClickFilter }) {
+    const handleClick = (filter) => {
+        onClickFilter(filter); // 클릭된 버튼의 필터링 조건을 부모 컴포넌트에 전달
+    };
 
-
-function AssetButton(props) {
     return (
         <div>
             <ButtonContainer>
-                <StyledButton>제조 회사</StyledButton>
-                <StyledButton>hb</StyledButton>
-                <StyledButton>instantel</StyledButton>
+                <StyledButton onClick={() => handleClick(null)}>전체 보기</StyledButton>
+                <StyledButton onClick={() => handleClick('NeoBlast')}>NeoBlast</StyledButton>
+                <StyledButton onClick={() => handleClick('Instantel')}>instantel</StyledButton>
             </ButtonContainer>
         </div>
     );

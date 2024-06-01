@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import Select from 'react-select'
+import axios from 'axios';
 
 const fadeIn = keyframes`
     from {
@@ -93,6 +95,33 @@ const AddModalContainer = styled(BaseModalContainer)`
     justify-content: flex-start;
 `;
 
+const customStyles = {
+    control: (provided, state) => ({
+        ...provided,
+        width: `480px`,
+        height: `auto`,
+        backgroundColor: '#F5F6F7',
+        color: 'black',
+        cursor: 'pointer',
+        outline: 'none',
+        border: '2px black solid',
+
+        textAlign: 'left'
+    }),
+    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (provided, state) => ({ ...provided, color: '#333' }),
+    option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isSelected ? '#7FB3FA' : '#FFFFFF',
+        color: state.isSelected ? '#FFFFFF' : '#333',
+        cursor: 'pointer',
+        ':hover': {
+            backgroundColor: state.isSelected ? '#7FB3FA' : '#EFEFEF'
+        }
+    })
+};
+
+
 export const Modal = ({ isVisible, onClose, onEdit, deleteDB }) => (
     <ModalWrapper isVisible={isVisible}>
         <ModalContainer>
@@ -144,43 +173,70 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
     </ModalWrapper>
 );
 
-export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => (
-    <ModalWrapper isVisible={isVisible}>
-        <AddModalContainer>
-            <h2>추가 하기</h2>
-            <ReadOnlyField>{addItem.folder_id}</ReadOnlyField>
-            <Input
-                type="text"
-                name="folder_name"
-                value={addItem.folder_name}
-                onChange={handleChange}
-                placeholder="폴더명"
-            />
-            <Input
-                type="text"
-                name="location_name"
-                value={addItem.location_name}
-                onChange={handleChange}
-                placeholder="위치"
-            />
-            <Input
-                type="text"
-                name="due_date"
-                value={addItem.due_date}
-                onChange={handleChange}
-                placeholder="기한"
-            />
-            <Input
-                type="text"
-                name="marks"
-                value={addItem.marks}
-                onChange={handleChange}
-                placeholder="특이사항"
-            />
-            <div>
-                <ModalButton onClick={onAdd}>저장</ModalButton>
-                <ModalButton onClick={onClose}>취소</ModalButton>
-            </div>
-        </AddModalContainer>
-    </ModalWrapper>
-);
+export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        fetchLocations();
+    }, []);
+
+    const handleSelectChange = (selectedOption) => {
+        setSelectedOption(selectedOption);
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
+    return (
+        <ModalWrapper isVisible={isVisible}>
+            <AddModalContainer>
+                <h2>추가 하기</h2>
+                <ReadOnlyField>{addItem.folder_id}</ReadOnlyField>
+                <Input
+                    type="text"
+                    name="folder_name"
+                    value={addItem.folder_name}
+                    onChange={handleChange}
+                    placeholder="폴더명"
+                />
+                <Select
+                    options={options}
+                    styles={customStyles}
+                    placeholder="위치 선택"
+                    value={selectedOption}
+                    onChange={handleSelectChange}
+                />
+                <Input
+                    type="text"
+                    name="due_date"
+                    value={addItem.due_date}
+                    onChange={handleChange}
+                    placeholder="기한"
+                />
+                <Input
+                    type="text"
+                    name="marks"
+                    value={addItem.marks}
+                    onChange={handleChange}
+                    placeholder="특이사항"
+                />
+                <div>
+                    <ModalButton onClick={onAdd}>저장</ModalButton>
+                    <ModalButton onClick={onClose}>취소</ModalButton>
+                </div>
+            </AddModalContainer>
+        </ModalWrapper>
+    );
+};
