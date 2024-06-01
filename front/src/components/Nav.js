@@ -56,7 +56,7 @@ function Nav(props) {
                 <LogoContainer to="/" />
                 <MenuList>
                     <MenuItem><Link to="/">공지사항</Link></MenuItem>
-                    <MenuItem><Link to="/">한글 분석기</Link></MenuItem>
+                    <MenuItem><Link to="/Analyze">한글 분석기</Link></MenuItem>
                     <MenuItem><Link to="/BatteryDB">배터리 DB</Link></MenuItem>
                     <MenuItem><Link to="/Asset">계측기 관리</Link></MenuItem>
                 </MenuList>
