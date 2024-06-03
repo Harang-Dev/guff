@@ -10,6 +10,8 @@ import Nav from "./components/Nav";
 import AdminNav from "./components/AdminNav";
 import Footer from "./components/Footer";
 import AdminFooter from "./components/AdminFooter";
+import Asset from "./pages/Asset";
+import Analyze from "./pages/Analyze";
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -49,6 +51,8 @@ function App() {
           <Route path="/AdminLogin" element={<AdminLogin />} />
           <Route path="/AdminInspection" element={<AdminInspection />} />
           <Route path="/AdminNotice" element={<AdminNotice />} />
+          <Route path="/Asset" element={<Asset />} />
+          <Route path="/Analyze" element={<Analyze />} />
         </Routes>
       </div>
       <Footers />

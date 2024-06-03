@@ -41,6 +41,11 @@ const MenuItem = styled.li`
     margin-right: 70px;
     list-style: none;
     color: #7D7D7D;
+    cursor: pointer;
+
+    a {
+        text-decoration: none;
+    }
 `;
 
 function Nav(props) {
@@ -50,9 +55,10 @@ function Nav(props) {
             <NavContainer>
                 <LogoContainer to="/" />
                 <MenuList>
-                    <MenuItem>공지사항</MenuItem>
-                    <MenuItem>한글 분석기</MenuItem>
-                    <MenuItem>배터리 DB</MenuItem>
+                    <MenuItem><Link to="/">공지사항</Link></MenuItem>
+                    <MenuItem><Link to="/Analyze">한글 분석기</Link></MenuItem>
+                    <MenuItem><Link to="/BatteryDB">배터리 DB</Link></MenuItem>
+                    <MenuItem><Link to="/Asset">계측기 관리</Link></MenuItem>
                 </MenuList>
             </NavContainer>
         </>
