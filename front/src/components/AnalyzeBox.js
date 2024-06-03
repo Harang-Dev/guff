@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Select from 'react-select'
+import Select from 'react-select';
+import axios from 'axios';
 
 const CenteredContainer = styled.div`
     width: 1920px;
@@ -121,8 +122,25 @@ const FileInputDescription = styled.p`
     font-size: 14px;
 `;
 
+const UploadButton = styled.button`
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #7FB3FA;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+`;
+
 function AnalyzeBox(props) {
     const [isActive, setActive] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const handleDragEnter = (e) => {
         e.preventDefault();
@@ -141,6 +159,37 @@ function AnalyzeBox(props) {
     const handleDrop = (e) => {
         e.preventDefault();
         setActive(false);
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.hwp')) {
+            setSelectedFile(file);
+        } else {
+            alert('올바른 파일 형태를 입력해 주세요 (.hwp 파일만 사용 가능).');
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.name.endsWith('.hwp')) {
+            setSelectedFile(file);
+        } else {
+            alert('올바른 파일 형태를 입력해 주세요 (.hwp 파일만 사용 가능).');
+        }
+    };
+
+    const handleFileUpload = async () => {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/test', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log(response);
+        } catch (error) {
+            console.error('Error uploading file', error);
+        }
     };
 
     return (
@@ -178,7 +227,7 @@ function AnalyzeBox(props) {
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
                         >
-                            <FileInput />
+                            <FileInput onChange={handleFileChange} />
                             <Logo />
                             <FileInputLabel isActive={isActive}>
                                 클릭 혹은 파일을 이곳에 드롭하세요.
@@ -186,6 +235,11 @@ function AnalyzeBox(props) {
                             <FileInputDescription>파일당 최대 3MB</FileInputDescription>
                         </FileInputContainer>
                     </UploadBox>
+                    {selectedFile && (
+                        <UploadButton onClick={handleFileUpload}>
+                            업로드
+                        </UploadButton>
+                    )}
                 </AnalyzeContainer>
             </CenteredContainer>
         </div>
