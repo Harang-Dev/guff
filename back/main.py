@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, APIRouter
+from fastapi import FastAPI, Depends, APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],  # 허용할 HTTP 헤더
 )
 
-@app.get("/")
-def read_root():
-    a = {'text': "Hello"}
-    return JSONResponse(content=a)
+@app.post("/test")
+def upload_test(file: UploadFile = File(...)):
+    return f'File Name: {file.filename}'
+
