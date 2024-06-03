@@ -132,46 +132,77 @@ export const Modal = ({ isVisible, onClose, onEdit, deleteDB }) => (
     </ModalWrapper>
 );
 
-export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }) => (
-    <ModalWrapper isVisible={isVisible}>
-        <EditModalContainer>
-            <h2>수정 하기</h2>
-            <ReadOnlyField>{editItem.folder_id}</ReadOnlyField>
-            <Input
-                type="text"
-                name="folder_name"
-                value={editItem.folder_name}
-                onChange={handleChange}
-                placeholder="폴더명"
-            />
-            <Input
-                type="text"
-                name="location_name"
-                value={editItem.location_name}
-                onChange={handleChange}
-                placeholder="위치"
-            />
-            <Input
-                type="text"
-                name="due_date"
-                value={editItem.due_date}
-                onChange={handleChange}
-                placeholder="기한"
-            />
-            <Input
-                type="text"
-                name="marks"
-                value={editItem.marks}
-                onChange={handleChange}
-                placeholder="특이사항"
-            />
-            <div>
-                <ModalButton onClick={onSave}>저장</ModalButton>
-                <ModalButton onClick={onClose}>취소</ModalButton>
-            </div>
-        </EditModalContainer>
-    </ModalWrapper>
-);
+export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+
+                // Set initial selected option if editItem has location_name
+                const initialOption = locationOptions.find(option => option.value === editItem.location_name);
+                setSelectedOption(initialOption);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        fetchLocations();
+    }, [editItem.location_name]);
+
+    const handleSelectChange = (selectedOption) => {
+        setSelectedOption(selectedOption);
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
+    return (
+        <ModalWrapper isVisible={isVisible}>
+            <EditModalContainer>
+                <h2>수정 하기</h2>
+                <ReadOnlyField>{editItem.folder_id}</ReadOnlyField>
+                <Input
+                    type="text"
+                    name="folder_name"
+                    value={editItem.folder_name}
+                    onChange={handleChange}
+                    placeholder="폴더명"
+                />
+                <Select
+                    options={options}
+                    styles={customStyles}
+                    placeholder="위치 선택"
+                    value={selectedOption}
+                    onChange={handleSelectChange}
+                />
+                <Input
+                    type="text"
+                    name="due_date"
+                    value={editItem.due_date}
+                    onChange={handleChange}
+                    placeholder="기한"
+                />
+                <Input
+                    type="text"
+                    name="marks"
+                    value={editItem.marks}
+                    onChange={handleChange}
+                    placeholder="특이사항"
+                />
+                <div>
+                    <ModalButton onClick={onSave}>저장</ModalButton>
+                    <ModalButton onClick={onClose}>취소</ModalButton>
+                </div>
+            </EditModalContainer>
+        </ModalWrapper>
+    );
+};
 
 export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => {
     const [options, setOptions] = useState([]);
