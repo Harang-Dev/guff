@@ -1,39 +1,62 @@
-import os
-from tkinter import filedialog
+from fastapi import APIRouter, UploadFile, File
+from pathlib import Path
+import os, tempfile
 
+from src.service.ParseService import ParseService
 from src.service.HwpService import HwpService
-from src.exception.CustomException import HwpOpenError, HwpObjectNotFoundError, NotFoundKeyWordError
+from src.service.SimpleParser import SimpleParser
+from src.service.ComplicatedParser import ComplicatedParser
+from src.service.ProperParser import ProperParser
 
+PARSER_VERSION = {'간단이': SimpleParser() , '복잡이': ComplicatedParser(), '어중이떠중이': ProperParser()}
 
-class HwpController:
-    # 의존성 주입을 통한 클래스 생성자 정의
-    def __init__(self):
-        self.service = HwpService()
-        self.__table_list = None
+parser = APIRouter(prefix='/parser')
+service = HwpService()
+serailize_data = {}
 
-    def get_table_list(self, file_name: str, title: str):
-        xml = self.service.hwp2xml(file_name)
-        # target_tag는 별 문제 없음
-        target_tag = self.service.set_target_tag(xml, title)
+@parser.post('/', tags=['parser'])
+async def parsing(file: UploadFile = File(...), version: str = None, search_text: str = None):    
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        contents = await file.read()
+        tmp_file.write(contents)
+        tmp_file_path = tmp_file.name
 
-        # section_tag도 별 문제 없음
-        column_tag = []
-        for item in target_tag:
-            column_tag.append(self.service.set_column_tag(item))
-        
-        if len(list(set(column_tag))) == 1:
-            column_tag = [column_tag[0]]
-            target_tag = [target_tag[0]]      
+    try:
+        xml_path = service.hwp2xml(tmp_file_path)
+        if not xml_path:
+            return {"error": "HWP to XML conversion failed"}
+        # os.remove(xml_path)  # 변환된 XML 파일 삭제
+    finally:
+        os.unlink(tmp_file_path)  # 임시 HWP 파일 삭제
 
-        table_cell = []
-        for index in range(len(column_tag)):
-            table_cell.extend(self.service.set_table_cell(column_tag[index], target_tag[index]))
+    # 만약 target_tag가 2개면 column_tag도 2개 그럴 땐 어떡하지? 
+    target_tag = service.set_target_tag(xml_path, search_text)
 
-        self.__table_list = table_cell
-        
-        os.remove(xml)
+    column_tag = []
+    for item in target_tag:
+        column_tag.append(service.set_column_tag(item))
 
-    def get_list(self):
-        return self.__table_list
+    if len(list(set(column_tag))) == 1:
+        column_tag = [column_tag[0]]
+        target_tag = [target_tag[0]]
 
+    table_cell = []
+    for index in range(len(column_tag)):
+        table_cell.extend(service.set_table_cell(column_tag[index], target_tag[index]))
 
+    os.remove(xml_path)
+    serialize_data = select_and_parsing(version, table_cell)
+
+    return f'{serialize_data}'
+
+def select_and_parsing(version, table_cell):
+    selected_parser = PARSER_VERSION[version]
+    
+    table_data = selected_parser.delete_non_target_data(table_cell)
+    columns = selected_parser.extract_columns(table_data)
+    dict_list = selected_parser.extract_non_column_data(table_data, columns)
+
+    group_list = selected_parser.update_merge_data(selected_parser.group_by_date(dict_list))
+    serialize_dict = selected_parser.serialize_to_dict(group_list, columns)
+
+    return serialize_dict

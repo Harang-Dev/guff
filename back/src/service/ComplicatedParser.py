@@ -4,7 +4,7 @@ from itertools import takewhile
 from src.service.ParseService import ParseService
 
 
-class ComplicatedParser:
+class ComplicatedParser(ParseService):
     def delete_non_target_data(self, table_data):
         """
         한글 표에서 원하지 않은 부분까지 나온 데이터를 정리하여 리스트로 반환합니다.
