@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Select from 'react-select'
+import axios from 'axios';
 
 const fadeIn = keyframes`
     from {
@@ -131,7 +132,51 @@ export const Modal = ({ isVisible, onClose, onEdit, deleteDB }) => (
 );
 
 export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }) => {
-    const handleSelectChange = (selectedOption) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [brandOptions, setBrandOptions] = useState([]);
+    const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+                const initialOption = locationOptions.find(option => option.value === editItem.location_name);
+                setSelectedOption(initialOption);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        const fetchBrands = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/brand/');
+                const brandOptions = response.data.map(brand => ({
+                    value: brand.brand_name,
+                    label: brand.brand_name
+                }));
+                setBrandOptions(brandOptions);
+                const initialBrandOption = brandOptions.find(option => option.value === editItem.brand_name);
+                setSelectedBrandOption(initialBrandOption);
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        fetchLocations();
+        fetchBrands();
+    }, [editItem.location_name, editItem.brand_name]);
+
+    const handleLocationChange = (selectedOption) => {
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
+    const handleStateChange = (selectedOption) => {
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
             handleChange({ target: { name: 'location_name', value: null } });
@@ -141,6 +186,10 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
         }
     };
 
+    const handleBrandChange = (selectedOption) => {
+        handleChange({ target: { name: 'brand_name', value: selectedOption.value } });
+    };
+
     const isDisabled = editItem.state === 'N';
 
     return (
@@ -148,12 +197,12 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
             <EditModalContainer>
                 <h2>수정 하기</h2>
                 <ReadOnlyField>{editItem.asset_id}</ReadOnlyField>
-                <Input
-                    type="text"
-                    name="brand_name"
-                    value={editItem.brand_name}
-                    onChange={handleChange}
-                    placeholder="제조 회사"
+                <Select
+                    options={brandOptions}
+                    styles={customStyles}
+                    placeholder="제조 회사 선택"
+                    value={selectedBrandOption}
+                    onChange={handleBrandChange}
                 />
                 <Input
                     type="text"
@@ -169,17 +218,17 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     ]}
                     placeholder="사용 여부"
                     value={{ value: editItem.state, label: editItem.state }}
-                    onChange={handleSelectChange}
+                    onChange={handleStateChange}
                     styles={customStyles}
                 />
                 {isDisabled ? null : (
                     <>
-                        <Input
-                            type="text"
-                            name="location_name"
-                            value={editItem.location_name}
-                            onChange={handleChange}
-                            placeholder="현장"
+                        <Select
+                            options={options}
+                            styles={customStyles}
+                            placeholder="위치 선택"
+                            value={selectedOption}
+                            onChange={handleLocationChange}
                         />
                         <Input
                             type="text"
@@ -215,6 +264,49 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
 
 
 export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [brandOptions, setBrandOptions] = useState([]);
+    const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+                const initialOption = locationOptions.find(option => option.value === addItem.location_name);
+                setSelectedOption(initialOption);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        const fetchBrands = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/brand/');
+                const brandOptions = response.data.map(brand => ({
+                    value: brand.brand_name,
+                    label: brand.brand_name
+                }));
+                setBrandOptions(brandOptions);
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        fetchLocations();
+        fetchBrands();
+    }, [addItem.location_name]);
+
+    const handleLocationChange = (selectedOption) => {
+        setSelectedOption(selectedOption);
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
     const handleStateChange = (selectedOption) => {
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
@@ -225,17 +317,22 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
         }
     };
 
+    const handleBrandChange = (selectedOption) => {
+        setSelectedBrandOption(selectedOption);
+        handleChange({ target: { name: 'brand_name', value: selectedOption.value } });
+    };
+
     return (
         <ModalWrapper isVisible={isVisible}>
             <AddModalContainer>
                 <h2>추가 하기</h2>
                 <ReadOnlyField>{addItem.asset_id}</ReadOnlyField>
-                <Input
-                    type="text"
-                    name="brand_name"
-                    value={addItem.brand_name}
-                    onChange={handleChange}
-                    placeholder="회사 이름"
+                <Select
+                    options={brandOptions}
+                    styles={customStyles}
+                    placeholder="회사 이름 선택"
+                    value={selectedBrandOption}
+                    onChange={handleBrandChange}
                 />
                 <Input
                     type="text"
@@ -256,12 +353,12 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
                 />
                 {addItem.state === 'Y' ? (
                     <>
-                        <Input
-                            type="text"
-                            name="location_name"
-                            value={addItem.location_name}
-                            onChange={handleChange}
-                            placeholder="현장"
+                        <Select
+                            options={options}
+                            styles={customStyles}
+                            placeholder="위치 선택"
+                            value={selectedOption}
+                            onChange={handleLocationChange}
                         />
                         <Input
                             type="text"
