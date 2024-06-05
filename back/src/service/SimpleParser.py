@@ -1,4 +1,3 @@
-import numpy as np
 from src.service.ParseService import ParseService
 
 class SimpleParser(ParseService):
@@ -116,7 +115,7 @@ class SimpleParser(ParseService):
                         'col': item['col'],
                         'colspan': item['colspan'],
                         'rowspan': item['rowspan'],
-                        'text': f'{item['text']} {t}'
+                        'text': f"{item['text']} {t}"
                     }
                     cached_columns.append(data)
             else:

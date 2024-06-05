@@ -1,6 +1,3 @@
-import pandas as pd
-import numpy as np
-
 from src.exception.CustomException import NoneException
 from src.service.PandasService import PandasService
 

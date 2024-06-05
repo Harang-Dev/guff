@@ -1,5 +1,4 @@
 import re, uuid
-import numpy as np
 from itertools import takewhile
 from src.service.ParseService import ParseService
 
