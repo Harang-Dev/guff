@@ -14,6 +14,7 @@ class AssetDTO(BaseModel):
     location_name: Optional[str]
     start_date: Optional[date]
     end_date: Optional[date]
+    rent_state: bool
     marks: Optional[str]
 
 class AssetDTOinDB(AssetDTO):

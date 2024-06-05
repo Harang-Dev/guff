@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, Date, Enum
+from sqlalchemy import Column, Integer, String, Date, Enum, Boolean
 
 BASE = declarative_base()
 
@@ -13,6 +13,7 @@ class AssetVO(BASE):
     location_name = Column(String)
     start_date = Column(Date)
     end_date = Column(Date)
+    rent_state = Column(Boolean)
     marks = Column(String)
 
     # def __init__(self, folder_name, location_id, due_date, marks, folder_id=None):
