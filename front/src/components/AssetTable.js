@@ -222,10 +222,10 @@ function AssetTable() {
                 <TableHeader>
                     <p>순번</p>
                     <p>제조 회사</p>
-                    <p>계측기 이름</p>
+                    <p>기기 번호</p>
                     <p>사용 여부</p>
                     <p>현장</p>
-                    <p>사용기간</p>
+                    <p>교정일 / 차기교정일</p>
                     <p>비고</p>
                 </TableHeader>
                 <TableBodyContainer>
@@ -236,7 +236,7 @@ function AssetTable() {
                             <p>{item.asset_name}</p>
                             <p>{item.state}</p>
                             <p>{item.location_name}</p>
-                            <p>{item.start_date} ~ {item.end_date}</p>
+                            <p>{item.start_date} / {item.end_date}</p>
                             <p>{item.marks}</p>
                         </TableBody>
                     ))}

@@ -179,9 +179,7 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
     const handleStateChange = (selectedOption) => {
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
-            handleChange({ target: { name: 'location_name', value: null } });
-            handleChange({ target: { name: 'start_date', value: null } });
-            handleChange({ target: { name: 'end_date', value: null } });
+            handleChange({ target: { name: 'location_name', value: '사무실' } });
             handleChange({ target: { name: 'marks', value: null } });
         }
     };
@@ -209,7 +207,7 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     name="asset_name"
                     value={editItem.asset_name}
                     onChange={handleChange}
-                    placeholder="계측기 이름"
+                    placeholder="기기 번호"
                 />
                 <Select
                     options={[
@@ -221,6 +219,20 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     onChange={handleStateChange}
                     styles={customStyles}
                 />
+                <Input
+                    type="text"
+                    name="start_date"
+                    value={editItem.start_date}
+                    onChange={handleChange}
+                    placeholder="교정일"
+                />
+                <Input
+                    type="text"
+                    name="end_date"
+                    value={editItem.end_date}
+                    onChange={handleChange}
+                    placeholder="차기교정일"
+                />
                 {isDisabled ? null : (
                     <>
                         <Select
@@ -229,20 +241,6 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                             placeholder="위치 선택"
                             value={selectedOption}
                             onChange={handleLocationChange}
-                        />
-                        <Input
-                            type="text"
-                            name="start_date"
-                            value={editItem.start_date}
-                            onChange={handleChange}
-                            placeholder="시작 날짜"
-                        />
-                        <Input
-                            type="text"
-                            name="end_date"
-                            value={editItem.end_date}
-                            onChange={handleChange}
-                            placeholder="종료 날짜"
                         />
                         <Input
                             type="text"
@@ -261,7 +259,6 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
         </ModalWrapper>
     );
 };
-
 
 export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => {
     const [options, setOptions] = useState([]);
@@ -311,8 +308,6 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
             handleChange({ target: { name: 'location_name', value: null } });
-            handleChange({ target: { name: 'start_date', value: null } });
-            handleChange({ target: { name: 'end_date', value: null } });
             handleChange({ target: { name: 'marks', value: null } });
         }
     };
@@ -339,7 +334,7 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
                     name="asset_name"
                     value={addItem.asset_name}
                     onChange={handleChange}
-                    placeholder="계측기 이름"
+                    placeholder="기기 번호"
                 />
                 <Select
                     options={[
@@ -351,6 +346,20 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
                     onChange={handleStateChange}
                     styles={customStyles}
                 />
+                <Input
+                    type="text"
+                    name="start_date"
+                    value={addItem.start_date}
+                    onChange={handleChange}
+                    placeholder="교정일"
+                />
+                <Input
+                    type="text"
+                    name="end_date"
+                    value={addItem.end_date}
+                    onChange={handleChange}
+                    placeholder="차기교정일"
+                />
                 {addItem.state === 'Y' ? (
                     <>
                         <Select
@@ -359,20 +368,6 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
                             placeholder="위치 선택"
                             value={selectedOption}
                             onChange={handleLocationChange}
-                        />
-                        <Input
-                            type="text"
-                            name="start_date"
-                            value={addItem.start_date}
-                            onChange={handleChange}
-                            placeholder="시작 날짜"
-                        />
-                        <Input
-                            type="text"
-                            name="end_date"
-                            value={addItem.end_date}
-                            onChange={handleChange}
-                            placeholder="종료 날짜"
                         />
                         <Input
                             type="text"
