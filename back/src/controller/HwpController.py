@@ -48,7 +48,7 @@ async def parsing(file: UploadFile = File(...), version: str = None, search_text
     global serialize_data
     serialize_data = select_and_parsing(version, table_cell)
 
-    return f'{serialize_data}'
+    return serialize_data
 
 @parser.get('/location/{location_name}', tags=['parser'])
 def filter_location(location_name: str, version: str = None):
