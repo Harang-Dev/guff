@@ -136,6 +136,7 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
     const [selectedOption, setSelectedOption] = useState(null);
     const [brandOptions, setBrandOptions] = useState([]);
     const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+    const [isChecked, setIsChecked] = useState(); // 체크박스 상태 설정
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -170,7 +171,8 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
 
         fetchLocations();
         fetchBrands();
-    }, [editItem.location_name, editItem.brand_name]);
+        setIsChecked(editItem.rent_state); // 초기 체크박스 상태 설정
+    }, [editItem.location_name, editItem.brand_name, editItem.rent_state]);
 
     const handleLocationChange = (selectedOption) => {
         handleChange({ target: { name: 'location_name', value: selectedOption.value } });
@@ -188,7 +190,18 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
         handleChange({ target: { name: 'brand_name', value: selectedOption.value } });
     };
 
+    const handleCheckboxChange = () => {
+        const newCheckedState = !isChecked; // 체크 상태를 반전시킴
+        setIsChecked(newCheckedState); // 상태 업데이트
+        handleChange({ target: { name: 'rent_state', value: newCheckedState } });
+        console.log(newCheckedState);
+    };
+
     const isDisabled = editItem.state === 'N';
+
+    const handleSave = () => {
+        onSave();
+    };
 
     return (
         <ModalWrapper isVisible={isVisible}>
@@ -233,6 +246,7 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     onChange={handleChange}
                     placeholder="차기교정일"
                 />
+
                 {isDisabled ? null : (
                     <>
                         <Select
@@ -252,7 +266,18 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     </>
                 )}
                 <div>
-                    <ModalButton onClick={onSave}>저장</ModalButton>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="rent_state"
+                            checked={isChecked}
+                            onChange={handleCheckboxChange}
+                        />
+                        체크박스 레이블
+                    </label>
+                </div>
+                <div>
+                    <ModalButton onClick={handleSave}>저장</ModalButton>
                     <ModalButton onClick={onClose}>취소</ModalButton>
                 </div>
             </EditModalContainer>

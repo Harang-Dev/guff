@@ -136,9 +136,11 @@ function AssetTable() {
         try {
             await axios.put(`http://127.0.0.1:8000/asset/put/`, editItem);
             alert("저장 되었습니다.");
+            console.log(editItem);
 
             const response = await axios.get('http://127.0.0.1:8000/asset/');
             setData(response.data);
+            console.log(response.data);
 
             closeEditModal();
             closeModal();

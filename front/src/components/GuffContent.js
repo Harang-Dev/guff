@@ -52,6 +52,7 @@ const GuffContentButton = styled(Link)`
         border: 2px solid ${props => {
             if (props.color === '#E8F7F2') return '#188BA7';
             if (props.color === '#F5EDFF') return '#6500C2';
+            if (props.color === '#CEF3FF') return '#33CEFF';
             return props.color;
         }};
     }
@@ -77,6 +78,10 @@ function GuffContent() {
                 <ButtonContainer>
                     <GuffContentButton color="#F5EDFF" to='/BatteryDB' />
                     <StyledSpan>배터리 DB</StyledSpan>
+                </ButtonContainer>
+                <ButtonContainer>
+                    <GuffContentButton color="#CEF3FF" to='/BatteryDB' />
+                    <StyledSpan>계측기 관리</StyledSpan>
                 </ButtonContainer>
             </ContentContainer>
         </div>
