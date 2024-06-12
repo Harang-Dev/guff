@@ -47,7 +47,7 @@ function App() {
     <Router>
       <GlobalStyle />
       <Navigation />
-      <div className="App">
+      <div className="Content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/BatteryDB" element={<BatteryDB />} />

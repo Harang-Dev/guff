@@ -204,7 +204,15 @@ function AnalyzeBox(props) {
             });
             setData(response.data);
             console.log('Upload response data:', response.data);
-            navigate('/AnalyzeSimple', { state: { data: response.data } });
+    
+            // 조건에 따라 다른 경로로 navigate
+            if (version === '간단이') {
+                navigate('/AnalyzeSimple', { state: { data: response.data, version } });
+            } else if (version === '어중이떠중이') {
+                navigate('/AnalyzeMid', { state: { data: response.data, version } });
+            } else if (version === '복잡이') {
+                navigate('/AnalyzeCompl', { state: { data: response.data, version } });
+            }
         } catch (error) {
             console.error('Error uploading file', error);
         }

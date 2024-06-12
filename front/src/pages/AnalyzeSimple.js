@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const CenteredContainer = styled.div`
     margin: 0;
     padding: 0;
-    display: grid;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    padding-bottom: 66px;
+    background: linear-gradient(to bottom, #CEF3FF 50%, #FFFFFF 50%);
 `;
 
 const Header = styled.div`
-    width: 1920px;
-    height: 518px;
-    background-color: #CEF3FF;
-    display: grid;
-    justify-content: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
 `;
 
 const TableHeader = styled.div`
     display: grid;
-    width: 1493px;
+    width: 1595px;
     height: 40px;
-    grid-template-columns: repeat(7, 1fr); /* 수정 */
+    grid-template-columns: 181px 223px 241px 223px 247px 177px 201px;
     text-align: center;
     color: #7E8393;
     margin-top: 40px;
@@ -31,13 +35,15 @@ const TableHeader = styled.div`
 const TableBodyContainer = styled.ul`
     background-color: #fff;
     border-radius: 15px;
-    width: 1595px;
+    width: 100%;
+    max-width: 1595px;
     padding: 0;
+    margin-bottom: 20px;
 `;
 
 const TableBody = styled.li`
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 수정 */
+    grid-template-columns: 181px 223px 241px 223px 247px 177px 201px;
     text-align: center;
     color: black;
     list-style: none;
@@ -46,20 +52,90 @@ const TableBody = styled.li`
     overflow: hidden;  
 `;
 
+const MoreButton = styled.button`
+    width: 100%;
+    max-width: 1595px;
+    height: 60px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    color: #8991EE;
+    font-weight: bold;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+`;
+
+const TabMenu = styled.div`
+    display: flex;
+    margin-bottom: 20px;
+`;
+
+const TabButton = styled.button`
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: ${({ active }) => (active ? '#CEF3FF' : '#fff')};
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: ${({ active }) => (active ? '#333' : '#7E8393')};
+`;
+
 const AnalyzeSimple = () => {
     const location = useLocation();
     const [data, setData] = useState([]);
+    const [visibleItems, setVisibleItems] = useState(10);
+    const [activeTab, setActiveTab] = useState('');
+    const [version, setVersion] = useState([]);
 
     useEffect(() => {
-        if (location.state && location.state.data) {
-            console.log('Received data in AnalyzeSimple:', location.state.data);
-            const responseData = Array.isArray(location.state.data) ? location.state.data : [];
-            setData(responseData);
+        const fetchTabData = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/parser/locations/${location.state.version}`);
+                setVersion(response.data);
+
+                // Automatically select the first tab menu item on load
+                if (response.data.length > 0) {
+                    handleClick(response.data[0]);
+                }
+            } catch (error) {
+                console.error('Error fetching tab data:', error);
+            }
+        };
+
+        fetchTabData();
+    }, [location.state.version]);
+
+    const handleClick = async (item) => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/parser/location/${item.location_name}?version=${location.state.version}`);
+            setData(response.data);
+            console.log(response.data);
+            setActiveTab(item.location_name);
+        } catch (error) {
+            console.error('Error fetching tab data:', error);
         }
-    }, [location.state]);
+    };
+
+    const loadMore = () => {
+        setVisibleItems(prev => prev + 5);
+    }
+
+    // const handleShowAll = () => {
+    //     setData(location.state.data);
+    //     setActiveTab('all');
+    // };
 
     return (
         <CenteredContainer>
+            <TabMenu>
+                {/* <TabButton onClick={handleShowAll} active={activeTab === 'all'}>전체 보기</TabButton> */}
+                {version.map((item, index) => (
+                    <TabButton key={index} onClick={() => handleClick(item)} active={activeTab === item.location_name}>
+                        {item.location_name}
+                    </TabButton>
+                ))}
+            </TabMenu>
             <Header>
                 <TableHeader>
                     <p>일시</p>
@@ -70,24 +146,23 @@ const AnalyzeSimple = () => {
                     <p>소음 최저치</p>
                     <p>소음 최고치</p>
                 </TableHeader>
-                <TableBodyContainer>
-                    {data.length > 0 ? data.map((item, index) => (
-                        <TableBody key={index}>
-                            <p>{item['일시']}</p>
-                            <p>{item['진동속도(cm/s) 최저치']}</p>
-                            <p>{item['진동속도(cm/s) 최고치']}</p>
-                            <p>{item['진동레벨[dB(V)] 최저치']}</p>
-                            <p>{item['진동레벨[dB(V)] 최고치']}</p>
-                            <p>{item['소음[dB(A)] 최저치']}</p>
-                            <p>{item['소음[dB(A)] 최고치']}</p>
-                        </TableBody>
-                    )) : (
-                        <TableBody>
-                            <p>데이터가 없습니다.</p> {/* 수정 */}
-                        </TableBody>
-                    )}
-                </TableBodyContainer>
             </Header>
+            <TableBodyContainer>
+                {data.slice(0, visibleItems).map((item, index) => (
+                    <TableBody key={index}>
+                        <p>{item['일시']}</p>
+                        <p>{item['진동속도(cm/s) 최저치']}</p>
+                        <p>{item['진동속도(cm/s) 최고치']}</p>
+                        <p>{item['진동레벨[dB(V)] 최저치']}</p>
+                        <p>{item['진동레벨[dB(V)] 최고치']}</p>
+                        <p>{item['소음[dB(A)] 최저치']}</p>
+                        <p>{item['소음[dB(A)] 최고치']}</p>
+                    </TableBody>
+                ))}
+                {visibleItems < data.length && (
+                    <MoreButton onClick={loadMore}>더 보기</MoreButton>
+                )}
+            </TableBodyContainer>
         </CenteredContainer>
     );
 }
