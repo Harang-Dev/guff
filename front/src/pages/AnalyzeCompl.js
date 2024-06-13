@@ -50,6 +50,10 @@ const TableBody = styled.li`
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;  
+    
+    &:hover {
+        background-color: #F9FBFB;
+    }
 `;
 
 const MoreButton = styled.button`

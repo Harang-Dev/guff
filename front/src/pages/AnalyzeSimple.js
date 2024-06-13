@@ -50,6 +50,9 @@ const TableBody = styled.li`
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;  
+    &:hover {
+        background-color: #F9FBFB;
+    }
 `;
 
 const MoreButton = styled.button`
@@ -119,17 +122,13 @@ const AnalyzeSimple = () => {
 
     const loadMore = () => {
         setVisibleItems(prev => prev + 5);
-    }
+    };
 
-    // const handleShowAll = () => {
-    //     setData(location.state.data);
-    //     setActiveTab('all');
-    // };
+    const allItemsLoaded = visibleItems >= data.length;
 
     return (
         <CenteredContainer>
             <TabMenu>
-                {/* <TabButton onClick={handleShowAll} active={activeTab === 'all'}>전체 보기</TabButton> */}
                 {version.map((item, index) => (
                     <TabButton key={index} onClick={() => handleClick(item)} active={activeTab === item.location_name}>
                         {item.location_name}
@@ -159,12 +158,34 @@ const AnalyzeSimple = () => {
                         <p>{item['소음[dB(A)] 최고치']}</p>
                     </TableBody>
                 ))}
-                {visibleItems < data.length && (
+                {allItemsLoaded && (
+                    <>
+                        <TableBody>
+                            <p>Min</p>
+                            <p>1</p>
+                            <p>2</p>
+                            <p>3</p>
+                            <p>4</p>
+                            <p>5</p>
+                            <p>6</p>
+                        </TableBody>
+                        <TableBody>
+                            <p>Max</p>
+                            <p>1</p>
+                            <p>2</p>
+                            <p>3</p>
+                            <p>4</p>
+                            <p>5</p>
+                            <p>6</p>
+                        </TableBody>
+                    </>
+                )}
+                {!allItemsLoaded && (
                     <MoreButton onClick={loadMore}>더 보기</MoreButton>
                 )}
             </TableBodyContainer>
         </CenteredContainer>
     );
-}
+};
 
 export default AnalyzeSimple;

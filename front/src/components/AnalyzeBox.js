@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Select from 'react-select';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
 
 const CenteredContainer = styled.div`
     width: 1920px;
@@ -145,6 +146,7 @@ function AnalyzeBox(props) {
     const [selectedValue, setSelectedValue] = useState(null);
     const [selectedText, setSelectedText] = useState(null);
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleDragEnter = (e) => {
@@ -190,6 +192,7 @@ function AnalyzeBox(props) {
     };
 
     const handleFileUpload = async () => {
+        setLoading(true);  // 파일 업로드 시작 시 로딩 상태를 true로 설정
         const formData = new FormData();
         formData.append('file', selectedFile);
     
@@ -204,8 +207,7 @@ function AnalyzeBox(props) {
             });
             setData(response.data);
             console.log('Upload response data:', response.data);
-    
-            // 조건에 따라 다른 경로로 navigate
+
             if (version === '간단이') {
                 navigate('/AnalyzeSimple', { state: { data: response.data, version } });
             } else if (version === '어중이떠중이') {
@@ -215,11 +217,14 @@ function AnalyzeBox(props) {
             }
         } catch (error) {
             console.error('Error uploading file', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
+        <div>   
+             {loading && <Loading />}
             <CenteredContainer>
                 <AnalyzeContainer>
                     <AnalyzeHeader>
