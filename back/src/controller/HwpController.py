@@ -1,6 +1,9 @@
 from fastapi import APIRouter, UploadFile, File
+from fastapi.responses import FileResponse
 from pathlib import Path
+
 import os, tempfile
+import pandas as pd
 
 from src.service.ParseService import ParseService
 from src.service.HwpService import HwpService
@@ -58,7 +61,22 @@ def filter_location(location_name: str, version: str = None):
     find_word = {'간단이' : '구분', '복잡이' : '측정위치', '어중이떠중이' : '계측위치'}
     
     global serialize_data
-    return [item for item in serialize_data if item[find_word[version]] == location_name]
+    classification_data = [item for item in serialize_data if item[find_word[version]] == location_name]
+    statistics_data = [{item: parse_float(items[item]) for item in items} for items in classification_data ]
+
+    min_data = {list(classification_data[0].keys())[0]: 'Min'}
+    max_data = {list(classification_data[0].keys())[0]: 'Max'}
+    
+    for i in pd.DataFrame(statistics_data).columns:
+        if i not in ['허용기준', '비고'] and i not in min_data.keys():
+            values = [parse_float(item[i]) for item in statistics_data if parse_float(item[i]) is not None]
+            min_data[i] = min(values) if values else '-'
+            max_data[i] = max(values) if values else '-'
+
+    classification_data.append(min_data)
+    classification_data.append(max_data)
+
+    return classification_data
 
 
 @parser.get('/locations/{version}', tags=['parser'])
@@ -73,6 +91,25 @@ def get_locations(version: str = None):
     unique_locations = [{'location_name': item} for item in list(set(locations))]
 
     return unique_locations
+    
+@parser.post('/download', tags=['parser'])
+def download_excel():
+    data = pd.DataFrame(serialize_data)
+
+    # 특정 열이 존재하는지 확인하고 제거
+    for col in ['허용기준', '비고']:
+        if col in data.columns:
+            data = data.drop(columns=[col])
+
+    return data
+
+##################################################################################################
+
+def parse_float(value):
+    try:
+        return float(value)
+    except:
+        return None
 
 def select_and_parsing(version, table_cell):
     selected_parser = PARSER_VERSION[version]
@@ -85,3 +122,19 @@ def select_and_parsing(version, table_cell):
     serialize_dict = selected_parser.serialize_to_dict(group_list, columns)
 
     return serialize_dict
+
+# def classification_evening_data(data_frame: pd.DataFrame, parser_name: str,):
+#     new_columns = []
+
+#     if not parser_name == "간단이":
+#         for index, item in enumerate(list(data_frame.index)):
+#             time = int(data_frame.loc[item, '발파시간'].split(" ")[1].split(':')[0])
+#             if time >= 18:
+#                 new_columns.append(data_frame.loc[item, '소음레벨dB(A)'])
+#                 data_frame.loc[item, '소음레벨dB(A)'] = None
+#             else:
+#                 new_columns.append(None)
+
+#         data_frame['Atfter 18:00'] = new_columns
+
+#     return data_frame.to_dict()
