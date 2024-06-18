@@ -90,7 +90,7 @@ def get_locations(version: str = None):
 
     return unique_locations
     
-@parser.post('/download', tags=['parser'])
+@parser.get('/download', tags=['parser'])
 def download_excel(version: str = None):
     df = pd.DataFrame(serialize_data)
 
