@@ -23,7 +23,4 @@ app.add_middleware(
     allow_headers=["*"],  # 허용할 HTTP 헤더
 )
 
-@app.post("/test")
-def upload_test(file: UploadFile = File(...)):
-    return f'File Name: {file.filename}'
 
