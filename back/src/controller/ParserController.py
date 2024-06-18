@@ -1,5 +1,3 @@
-import pandas as pd
-
 from src.exception.CustomException import ParseException
 from src.service.ParseService import ParseService
 

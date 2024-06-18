@@ -1,6 +1,7 @@
 import os
 import lxml.etree as ET
-import re
+
+from hwp5.hwp5proc import main
 
 class HwpService:
     def hwp2xml(self, file_path: str):
