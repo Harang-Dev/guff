@@ -12,6 +12,8 @@ from src.service.ComplicatedParser import ComplicatedParser
 from src.service.ProperParser import ProperParser
 
 PARSER_VERSION = {'간단이': SimpleParser() , '복잡이': ComplicatedParser(), '어중이떠중이': ProperParser()}
+FIND_WORD = {'간단이' : '구분', '복잡이' : '측정위치', '어중이떠중이' : '계측위치'}
+
 
 parser = APIRouter(prefix='/parser')
 service = HwpService()
@@ -57,11 +59,9 @@ async def parsing(file: UploadFile = File(...), version: str = None, search_text
 def filter_location(location_name: str, version: str = None):
     if not version:
         return {'Error' : 'Not input version data'}
-
-    find_word = {'간단이' : '구분', '복잡이' : '측정위치', '어중이떠중이' : '계측위치'}
     
     global serialize_data
-    classification_data = [item for item in serialize_data if item[find_word[version]] == location_name]
+    classification_data = [item for item in serialize_data if item[FIND_WORD[version]] == location_name]
     statistics_data = [{item: parse_float(items[item]) for item in items} for items in classification_data ]
 
     min_data = {list(classification_data[0].keys())[0]: 'Min'}
@@ -84,24 +84,33 @@ def get_locations(version: str = None):
     if not version:
         return {'Error' : 'Not input version data'}
 
-    find_word = {'간단이' : '구분', '복잡이' : '측정위치', '어중이떠중이' : '계측위치'}
-
     global serialize_data
-    locations = [item[find_word[version]] for item in serialize_data]
+    locations = [item[FIND_WORD[version]] for item in serialize_data]
     unique_locations = [{'location_name': item} for item in list(set(locations))]
 
     return unique_locations
     
 @parser.post('/download', tags=['parser'])
-def download_excel():
-    data = pd.DataFrame(serialize_data)
+def download_excel(version: str = None):
+    df = pd.DataFrame(serialize_data)
 
     # 특정 열이 존재하는지 확인하고 제거
     for col in ['허용기준', '비고']:
-        if col in data.columns:
-            data = data.drop(columns=[col])
+        if col in df.columns:
+            df = df.drop(columns=[col])
 
-    return data
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
+        excel_file_path = tmp.name
+        with pd.ExcelWriter('output.xlsx') as writer:
+            for location, group in df.groupby(FIND_WORD[version]):
+                group.to_excel(writer, sheet_name=location, index=False)
+
+    response = FileResponse(excel_file_path, filename="output.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    def on_close():
+        os.remove(excel_file_path)
+
+    return response
 
 ##################################################################################################
 
