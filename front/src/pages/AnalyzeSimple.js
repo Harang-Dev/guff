@@ -124,6 +124,25 @@ const AnalyzeSimple = () => {
         setVisibleItems(prev => prev + 5);
     };
 
+    const download = async (item) => {
+        try{
+            const res = await fetch(`http://127.0.0.1:8000/parser/download?version=${location.state.version}`, {method: 'GET'});
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+
+            console.log('res: ',res);
+
+            a.href = url;
+            a.download = 'output.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }catch(error) {
+            console.error('Error', error);
+        }
+    }
+
     const allItemsLoaded = visibleItems >= data.length;
 
     return (
@@ -184,6 +203,7 @@ const AnalyzeSimple = () => {
                     <MoreButton onClick={loadMore}>더 보기</MoreButton>
                 )}
             </TableBodyContainer>
+            <MoreButton onClick={download}>다운로드</MoreButton>
         </CenteredContainer>
     );
 };

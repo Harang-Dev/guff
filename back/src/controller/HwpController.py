@@ -99,15 +99,11 @@ def download_excel(version: str = None):
         if col in df.columns:
             df = df.drop(columns=[col])
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
-        excel_file_path = tmp.name
-        with pd.ExcelWriter('output.xlsx') as writer:
-            for location, group in df.groupby(FIND_WORD[version]):
-                group.to_excel(writer, sheet_name=location, index=False)
-            
-        response = FileResponse(excel_file_path, filename="output.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    
-    os.remove(excel_file_path)
+    with pd.ExcelWriter('output.xlsx') as writer:
+        for location, group in df.groupby(FIND_WORD[version]):
+            group.to_excel(writer, sheet_name=location, index=False)
+
+    response = FileResponse('./output.xlsx', filename="output.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
     return response
 
