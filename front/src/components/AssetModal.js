@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Select from 'react-select'
+import axios from 'axios';
 
 const fadeIn = keyframes`
     from {
@@ -131,36 +132,95 @@ export const Modal = ({ isVisible, onClose, onEdit, deleteDB }) => (
 );
 
 export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }) => {
-    const handleSelectChange = (selectedOption) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [brandOptions, setBrandOptions] = useState([]);
+    const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+    const [isChecked, setIsChecked] = useState(); // 체크박스 상태 설정
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+                const initialOption = locationOptions.find(option => option.value === editItem.location_name);
+                setSelectedOption(initialOption);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        const fetchBrands = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/brand/');
+                const brandOptions = response.data.map(brand => ({
+                    value: brand.brand_name,
+                    label: brand.brand_name
+                }));
+                setBrandOptions(brandOptions);
+                const initialBrandOption = brandOptions.find(option => option.value === editItem.brand_name);
+                setSelectedBrandOption(initialBrandOption);
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        fetchLocations();
+        fetchBrands();
+        setIsChecked(editItem.rent_state); // 초기 체크박스 상태 설정
+    }, [editItem.location_name, editItem.brand_name, editItem.rent_state]);
+
+    const handleLocationChange = (selectedOption) => {
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
+    const handleStateChange = (selectedOption) => {
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
-            handleChange({ target: { name: 'location_name', value: null } });
-            handleChange({ target: { name: 'start_date', value: null } });
-            handleChange({ target: { name: 'end_date', value: null } });
+            handleChange({ target: { name: 'location_name', value: '사무실' } });
             handleChange({ target: { name: 'marks', value: null } });
         }
     };
 
+    const handleBrandChange = (selectedOption) => {
+        handleChange({ target: { name: 'brand_name', value: selectedOption.value } });
+    };
+
+    const handleCheckboxChange = () => {
+        const newCheckedState = !isChecked; // 체크 상태를 반전시킴
+        setIsChecked(newCheckedState); // 상태 업데이트
+        handleChange({ target: { name: 'rent_state', value: newCheckedState } });
+        console.log(newCheckedState);
+    };
+
     const isDisabled = editItem.state === 'N';
+
+    const handleSave = () => {
+        onSave();
+    };
 
     return (
         <ModalWrapper isVisible={isVisible}>
             <EditModalContainer>
                 <h2>수정 하기</h2>
                 <ReadOnlyField>{editItem.asset_id}</ReadOnlyField>
-                <Input
-                    type="text"
-                    name="brand_name"
-                    value={editItem.brand_name}
-                    onChange={handleChange}
-                    placeholder="제조 회사"
+                <Select
+                    options={brandOptions}
+                    styles={customStyles}
+                    placeholder="제조 회사 선택"
+                    value={selectedBrandOption}
+                    onChange={handleBrandChange}
                 />
                 <Input
                     type="text"
                     name="asset_name"
                     value={editItem.asset_name}
                     onChange={handleChange}
-                    placeholder="계측기 이름"
+                    placeholder="기기 번호"
                 />
                 <Select
                     options={[
@@ -169,31 +229,32 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     ]}
                     placeholder="사용 여부"
                     value={{ value: editItem.state, label: editItem.state }}
-                    onChange={handleSelectChange}
+                    onChange={handleStateChange}
                     styles={customStyles}
                 />
+                <Input
+                    type="text"
+                    name="start_date"
+                    value={editItem.start_date}
+                    onChange={handleChange}
+                    placeholder="교정일"
+                />
+                <Input
+                    type="text"
+                    name="end_date"
+                    value={editItem.end_date}
+                    onChange={handleChange}
+                    placeholder="차기교정일"
+                />
+
                 {isDisabled ? null : (
                     <>
-                        <Input
-                            type="text"
-                            name="location_name"
-                            value={editItem.location_name}
-                            onChange={handleChange}
-                            placeholder="현장"
-                        />
-                        <Input
-                            type="text"
-                            name="start_date"
-                            value={editItem.start_date}
-                            onChange={handleChange}
-                            placeholder="시작 날짜"
-                        />
-                        <Input
-                            type="text"
-                            name="end_date"
-                            value={editItem.end_date}
-                            onChange={handleChange}
-                            placeholder="종료 날짜"
+                        <Select
+                            options={options}
+                            styles={customStyles}
+                            placeholder="위치 선택"
+                            value={selectedOption}
+                            onChange={handleLocationChange}
                         />
                         <Input
                             type="text"
@@ -205,7 +266,18 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
                     </>
                 )}
                 <div>
-                    <ModalButton onClick={onSave}>저장</ModalButton>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="rent_state"
+                            checked={isChecked}
+                            onChange={handleCheckboxChange}
+                        />
+                        체크박스 레이블
+                    </label>
+                </div>
+                <div>
+                    <ModalButton onClick={handleSave}>저장</ModalButton>
                     <ModalButton onClick={onClose}>취소</ModalButton>
                 </div>
             </EditModalContainer>
@@ -213,16 +285,61 @@ export const EditModal = ({ isVisible, editItem, handleChange, onSave, onClose }
     );
 };
 
-
 export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) => {
+    const [options, setOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [brandOptions, setBrandOptions] = useState([]);
+    const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/location');
+                const locationOptions = response.data.map(loc => ({
+                    value: loc.location_name,
+                    label: loc.location_name
+                }));
+                setOptions(locationOptions);
+                const initialOption = locationOptions.find(option => option.value === addItem.location_name);
+                setSelectedOption(initialOption);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+            }
+        };
+
+        const fetchBrands = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/brand/');
+                const brandOptions = response.data.map(brand => ({
+                    value: brand.brand_name,
+                    label: brand.brand_name
+                }));
+                setBrandOptions(brandOptions);
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        fetchLocations();
+        fetchBrands();
+    }, [addItem.location_name]);
+
+    const handleLocationChange = (selectedOption) => {
+        setSelectedOption(selectedOption);
+        handleChange({ target: { name: 'location_name', value: selectedOption.value } });
+    };
+
     const handleStateChange = (selectedOption) => {
         handleChange({ target: { name: 'state', value: selectedOption.value } });
         if (selectedOption.value === 'N') {
             handleChange({ target: { name: 'location_name', value: null } });
-            handleChange({ target: { name: 'start_date', value: null } });
-            handleChange({ target: { name: 'end_date', value: null } });
             handleChange({ target: { name: 'marks', value: null } });
         }
+    };
+
+    const handleBrandChange = (selectedOption) => {
+        setSelectedBrandOption(selectedOption);
+        handleChange({ target: { name: 'brand_name', value: selectedOption.value } });
     };
 
     return (
@@ -230,19 +347,19 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
             <AddModalContainer>
                 <h2>추가 하기</h2>
                 <ReadOnlyField>{addItem.asset_id}</ReadOnlyField>
-                <Input
-                    type="text"
-                    name="brand_name"
-                    value={addItem.brand_name}
-                    onChange={handleChange}
-                    placeholder="회사 이름"
+                <Select
+                    options={brandOptions}
+                    styles={customStyles}
+                    placeholder="회사 이름 선택"
+                    value={selectedBrandOption}
+                    onChange={handleBrandChange}
                 />
                 <Input
                     type="text"
                     name="asset_name"
                     value={addItem.asset_name}
                     onChange={handleChange}
-                    placeholder="계측기 이름"
+                    placeholder="기기 번호"
                 />
                 <Select
                     options={[
@@ -254,28 +371,28 @@ export const AddModal = ({ isVisible, addItem, handleChange, onAdd, onClose }) =
                     onChange={handleStateChange}
                     styles={customStyles}
                 />
+                <Input
+                    type="text"
+                    name="start_date"
+                    value={addItem.start_date}
+                    onChange={handleChange}
+                    placeholder="교정일"
+                />
+                <Input
+                    type="text"
+                    name="end_date"
+                    value={addItem.end_date}
+                    onChange={handleChange}
+                    placeholder="차기교정일"
+                />
                 {addItem.state === 'Y' ? (
                     <>
-                        <Input
-                            type="text"
-                            name="location_name"
-                            value={addItem.location_name}
-                            onChange={handleChange}
-                            placeholder="현장"
-                        />
-                        <Input
-                            type="text"
-                            name="start_date"
-                            value={addItem.start_date}
-                            onChange={handleChange}
-                            placeholder="시작 날짜"
-                        />
-                        <Input
-                            type="text"
-                            name="end_date"
-                            value={addItem.end_date}
-                            onChange={handleChange}
-                            placeholder="종료 날짜"
+                        <Select
+                            options={options}
+                            styles={customStyles}
+                            placeholder="위치 선택"
+                            value={selectedOption}
+                            onChange={handleLocationChange}
                         />
                         <Input
                             type="text"

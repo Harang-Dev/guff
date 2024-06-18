@@ -12,6 +12,9 @@ import Footer from "./components/Footer";
 import AdminFooter from "./components/AdminFooter";
 import Asset from "./pages/Asset";
 import Analyze from "./pages/Analyze";
+import AnalyzeSimple from "./pages/AnalyzeSimple";
+import AnalyzeMid from "./pages/AnalyzeMid";
+import AnalyzeCompl from "./pages/AnalyzeCompl";
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -44,7 +47,7 @@ function App() {
     <Router>
       <GlobalStyle />
       <Navigation />
-      <div className="App">
+      <div className="Content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/BatteryDB" element={<BatteryDB />} />
@@ -53,6 +56,9 @@ function App() {
           <Route path="/AdminNotice" element={<AdminNotice />} />
           <Route path="/Asset" element={<Asset />} />
           <Route path="/Analyze" element={<Analyze />} />
+          <Route path="/AnalyzeSimple" element={<AnalyzeSimple />} />
+          <Route path="/AnalyzeMid" element={<AnalyzeMid />} />
+          <Route path="/AnalyzeCompl" element={<AnalyzeCompl />} />
         </Routes>
       </div>
       <Footers />

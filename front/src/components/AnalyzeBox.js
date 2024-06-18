@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
 
 const CenteredContainer = styled.div`
     width: 1920px;
@@ -141,6 +143,11 @@ const UploadButton = styled.button`
 function AnalyzeBox(props) {
     const [isActive, setActive] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedValue, setSelectedValue] = useState(null);
+    const [selectedText, setSelectedText] = useState(null);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleDragEnter = (e) => {
         e.preventDefault();
@@ -176,45 +183,70 @@ function AnalyzeBox(props) {
         }
     };
 
+    const handleVersionChange = (selectedOption) => {
+        setSelectedValue(selectedOption.value);
+    };
+
+    const handleSearchTextChange = (selectedOption) => {
+        setSelectedText(selectedOption.value);
+    };
+
     const handleFileUpload = async () => {
+        setLoading(true);  // 파일 업로드 시작 시 로딩 상태를 true로 설정
         const formData = new FormData();
         formData.append('file', selectedFile);
-
+    
+        const version = selectedValue;
+        const text = selectedText;
+    
         try {
-            const response = await axios.post('http://127.0.0.1:8000/parser', formData, {
+            const response = await axios.post(`http://localhost:8000/parser/?version=${version}&search_text=${text}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
                 },
             });
-            console.log(response);
+            setData(response.data);
+            console.log('Upload response data:', response.data);
+
+            if (version === '간단이') {
+                navigate('/AnalyzeSimple', { state: { data: response.data, version } });
+            } else if (version === '어중이떠중이') {
+                navigate('/AnalyzeMid', { state: { data: response.data, version } });
+            } else if (version === '복잡이') {
+                navigate('/AnalyzeCompl', { state: { data: response.data, version } });
+            }
         } catch (error) {
             console.error('Error uploading file', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
+        <div>   
+             {loading && <Loading />}
             <CenteredContainer>
                 <AnalyzeContainer>
                     <AnalyzeHeader>
                         <SelectContainer>
                             <Select
                                 options={[
-                                    { value: '버전', label: '버전1' },
-                                    { value: '버전', label: '버전2' },
-                                    { value: '버전', label: '버전3' }
+                                    { value: '간단이', label: '간단이' },
+                                    { value: '어중이떠중이', label: '어중이떠중이' },
+                                    { value: '복잡이', label: '복잡이' }
                                 ]}
                                 placeholder="버전 선택"
                                 styles={customStyles}
+                                onChange={handleVersionChange}
                             />
                             <Select
                                 options={[
-                                    { value: '문장', label: '질문은' },
-                                    { value: '문장', label: '계속돼' },
-                                    { value: '문장', label: '아오에' }
+                                    { value: '일자별 계측 현황', label: '일자별 계측 현황' },
+                                    { value: '일자별 발파 및 계측 현황', label: '일자별 발파 및 계측 현황' }
                                 ]}
                                 placeholder="찾을 문장 선택"
                                 styles={customStyles}
+                                onChange={handleSearchTextChange}
                             />
                         </SelectContainer>
                         <AnalyzeTitle>한글 분석기</AnalyzeTitle>
