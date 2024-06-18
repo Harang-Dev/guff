@@ -181,7 +181,7 @@ function AnalyzeBox(props) {
         formData.append('file', selectedFile);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/test', formData, {
+            const response = await axios.post('http://127.0.0.1:8000/parser', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

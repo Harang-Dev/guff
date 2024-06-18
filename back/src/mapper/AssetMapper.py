@@ -27,6 +27,7 @@ class AssetMapper:
         record.location_name = vo.location_name
         record.start_date = vo.start_date
         record.end_date = vo.end_date
+        record.rent_state = vo.rent_state
         record.marks = vo.marks
         db.commit()
 
