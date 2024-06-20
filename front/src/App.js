@@ -10,7 +10,7 @@ import Nav from "./components/Nav";
 import AdminNav from "./components/AdminNav";
 import Footer from "./components/Footer";
 import AdminFooter from "./components/AdminFooter";
-import Asset from "./pages/Asset";
+import Asset from "./pages/asset/Asset";
 import Analyze from "./pages/Analyze";
 import AnalyzeSimple from "./pages/AnalyzeSimple";
 import AnalyzeMid from "./pages/AnalyzeMid";

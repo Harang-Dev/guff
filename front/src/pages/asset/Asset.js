@@ -1,5 +1,5 @@
 import React from 'react';
-import AssetTable from '../components/AssetTable';
+import AssetTable from '../../components/asset/AssetTable';
 
 function Asset(props) {
     return (

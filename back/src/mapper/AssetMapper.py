@@ -18,6 +18,9 @@ class AssetMapper:
     def read_brand(self, brand_name: str, db: Session):
         return db.query(AssetVO).filter(AssetVO.brand_name == brand_name).all()
 
+    def read_location(self, location_name: str, db: Session):
+        return db.query(AssetVO).filter(AssetVO.location_name == location_name).all()
+
     def update(self, dto: AssetDTOinDB, db: Session):
         vo = AssetVO(**dto.model_dump())
         record = db.query(AssetVO).filter(AssetVO.asset_id == vo.asset_id).first()

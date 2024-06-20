@@ -20,10 +20,14 @@ def read_id(asset_id: int, db: Session = Depends(get_db)):
     data = mapper.read_id(asset_id, db)
     return data
 
-@asset.get("/brand/{brand_name}", tags=['asset'], response_model=list[AssetDTOinDB])
-def read_brand(brand_name: str = None, db: Session = Depends(get_db)):
-    data = mapper.read_brand(brand_name, db)
-    return data
+# @asset.get("/filter/", tags=['asset'], response_model=list[AssetDTOinDB])
+# def read_brand(brand_name: Optional[str] = None, location_name: Optional[str] = None, db: Session = Depends(get_db)):
+#     if location_name:
+#         data = mapper.read_location(location_name, db)
+#     if brand_name:
+#         data = mapper.read_brand(brand_name, db)
+
+#     return data
 
 # 로그 처리 컨트롤러
 # @asset.get("/log/{folder_id}", tags=['battery'], response_model=list[ReplacementDTOinDB])

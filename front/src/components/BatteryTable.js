@@ -204,7 +204,7 @@ const isDateWithinNextSixDays = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const endOfPeriod = new Date(now);
-    endOfPeriod.setDate(now.getDate() + 6);
+    endOfPeriod.setDate(now.getDate() + 7);
 
     now.setHours(0, 0, 0, 0);
     endOfPeriod.setHours(23, 59, 59, 999);
