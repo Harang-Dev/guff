@@ -169,6 +169,17 @@ function AssetTable() {
             dataIndex: 'state',
             key: 'state',
             align: 'center',
+            filters: [
+                { text: '사용', value: 'Y' },
+                { text: '미사용', value: 'N' },
+            ],
+            onFilter: (value, record) => record.state == value,
+            render: (text, record) => {
+                const state_badge = record.state === 'Y' ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
+                return (
+                    state_badge
+                );
+            }
         },
         {
             title: '현장',
@@ -208,6 +219,11 @@ function AssetTable() {
             dataIndex: 'rent_state',
             key: 'rent_state',
             align: 'center',
+            filters: [
+                { text: '임대', value: true },
+                { text: '비임대', value: false },
+            ],
+            onFilter: (value, record) => record.rent_state == value,
             render: (text, record) => {
                 const rent_badge = record.rent_state === true ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
                 return (
