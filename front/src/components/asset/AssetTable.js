@@ -1,9 +1,17 @@
 import styled from 'styled-components';
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
-import AssetButton from './AssetButton';
-import { Table, Button, Form, Input, Badge, DatePicker } from 'antd';
-import AssetModal from './AssetModal';
+import { SearchOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
+
+import { Table, Button, Form, Badge, Popconfirm, notification, Layout, Space } from 'antd';
+import AssetUpdateModal from './AssetUpdateModal';
+import AssetReadModal from './AssetReadModal';
+import AssetCreateModal from './AssetCreateModal';
+
+/* eslint-disable no-restricted-globals */
+
+const { Header, Content, Footer, Sider } = Layout;
+
 
 const CenteredContainer = styled.div`
     margin: 0;
@@ -21,8 +29,6 @@ const MoreButton = styled.button`
     cursor: pointer;
     color: #8991EE;
     font-weight: bold;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
 `;
 
 const EllipsisText = styled.div`
@@ -36,42 +42,31 @@ function AssetTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [visibleItems, setVisibleItems] = useState(10); // 초기 보여지는 아이템 수
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
-    const [isModalOpen, setIsModalOpen] = useState(false); // 첫 번째 모달 열림 상태
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 두 번째 모달 열림 상태
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // 추가 모달 열림 상태
-    const [editItem, setEditItem] = useState({}); // 수정 중인 아이템 데이터
-    const [addItem, setAddItem] = useState({}); // 추가 중인 아이템 데이터
-    const [nextFolderId, setNextFolderId] = useState(null);
-    const [filteredData, setFilteredData] = useState([]);
+
+    // Assetpage에 필요한 상태 관리
     const [brandFilters, setBrandFilters] = useState(null);
     const [locationFilters, setLocationFilters] = useState(null);
 
+    // 모달 관련 상태 관리
+    const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+    const [isReadModalVisible, setReadModalVisible] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
- 
+    const [api, contextHolder] = notification.useNotification();
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+    // 처음 렌더링 할 때 필요한 데이터들 API에 요청해주는 상태 관리 함수
     useEffect(() => {
-        const fetchFilters = async () => {
+        const fetchData = async () => {
             try {
+                const response = await axios.get('http://127.0.0.1:8000/asset/');
                 const brandResponse = await axios.get('http://127.0.0.1:8000/brand/'); // 브랜드 API
                 const locationResponse = await axios.get('http://127.0.0.1:8000/location/'); // 위치 API
 
                 setBrandFilters(brandResponse.data.map(brand => ({ text: brand.brand_name, value: brand.brand_name })));
                 setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
-            } catch (error) {
-                console.error("Error fetching filters:", error);
-            }
-        };
 
-        fetchFilters();
-    }, []);
-
-    /* eslint-disable no-restricted-globals */
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:8000/asset/');
                 setData(response.data);
-                setFilteredData(response.data); // 초기 데이터로 filteredData 상태를 설정
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -80,43 +75,94 @@ function AssetTable() {
         fetchData();
     }, []);
 
+    // 더 보기 함수
     const loadMore = () => {
         setVisibleItems(prev => prev + 5); // 더 보기 버튼 클릭 시 아이템 수를 5씩 증가
     };
 
+    // 수정 모달 창 실행 함수
     const showModal = (record) => {
         setSelectedItem(record);
         setIsModalVisible(true);
     };
 
+    // 조회 모달 창 실행 함수
+    const showReadModal = (record) => {
+        setSelectedItem(record);
+        setReadModalVisible(true);
+    }
+
+    // 조회 모달 창 실행 함수
+    const showCreateModal = () => {
+        setCreateModalVisible(true);
+    }
+
+    // 수정 모달 창 종료 함수
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    // 조회 모달 창 종료 함수
+    const handleReadModalCancel = () => {
+        setReadModalVisible(false);
+    };
+
+    // 추가 모달 창 종료 함수
+    const handleCreateModalCancel = () => {
+        setCreateModalVisible(false);
+    };
+
+    // 메세지를 보내서 알림 창 띄우는 함수
+    const handleNotification = (message) => {
+        api.info({
+            message: '알림',
+            description: message,
+        });
+    };
+
+    // 데이터 수정을 위한 API 요청 함수
     const handleOk = async (values) => {
         try {
             const updatedItem = await form.validateFields();
-
-            console.log(values);
             await axios.put(`http://127.0.0.1:8000/asset/put/`, values);
             const response = await axios.get('http://127.0.0.1:8000/asset/');
             setData(response.data);
             setIsModalVisible(false);
+
+            handleNotification('자산 현황 데이터를 수정했습니다.');
         } catch (error) {
             console.error("Error updating data:", error);
         }
     };
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
+    // 데이터 삭제를 위한 API 요청 함수
     const handleDelete = async (id) => {
         try{
             await axios.delete(`http://127.0.0.1:8000/asset/delete/${id}`);
             const response = await axios.get('http://127.0.0.1:8000/asset/');
             setData(response.data);
+
+            handleNotification('자산 현황 데이터를 삭제했습니다.');
         } catch(error) {
             console.error('Error delete data: ', error);
         }
     };
 
+    // 데이터 추가를 위한 API 요청 함수
+    const handleCreate = async (item) => {
+        try {
+            await axios.post(`http://127.0.0.1:8000/asset/add/`, item);
+            const response = await axios.get('http://127.0.0.1:8000/asset/');
+            setData(response.data);
+            setCreateModalVisible(false);
+
+            handleNotification('자산 현황 데이터를 추가했습니다.');
+        } catch(error) {
+            console.error('Error create data: ', error);
+        }
+    }
+
+    // 교정일 차기 교정일을 년 월 일 로 출력하기 위한 함수
     const formatDate = (dateString) => {
         if(!dateString) {
             return '';
@@ -127,6 +173,7 @@ function AssetTable() {
         return `${year}년 ${month}월 ${day}일`;
       };
 
+    // 현재 날짜 기준 교정일, 차기교정일 하이라이팅 함수
     const isDateWithinNextSevenDays = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -143,27 +190,14 @@ function AssetTable() {
         }
     };
 
+    // 표 속성 정해주는 변수
     const columns = [
-        {
-            title: '순번',
-            dataIndex: 'asset_id',
-            key: 'asset_id',
-            align: 'center',
-        },
-        {
-            title: '제조 회사',
-            dataIndex: 'brand_name',
-            key: 'brand_name',
-            align: 'center',
-            filters: brandFilters,
-            onFilter: ( value, record ) => record.brand_name === value,
-        },
-        {
-            title: '기기 번호',
-            dataIndex: 'asset_name',
-            key: 'asset_name',
-            align: 'center',
-        },
+        // {
+        //     title: '순번',
+        //     dataIndex: 'asset_id',
+        //     key: 'asset_id',
+        //     align: 'center',
+        // },
         {
             title: '사용 여부',
             dataIndex: 'state',
@@ -182,25 +216,42 @@ function AssetTable() {
             }
         },
         {
-            title: '현장',
-            dataIndex: 'location_name',
-            key: 'location_name',
+            title: '제조 회사',
+            dataIndex: 'brand_name',
+            key: 'brand_name',
             align: 'center',
-            filters: locationFilters,
-            onFilter: ( value, record ) => record.location_name === value,
+            filters: brandFilters,
+            onFilter: ( value, record ) => record.brand_name === value,
         },
         {
-            title: '교정일 / 차기교정일',
-            key: 'due_date',
+            title: '기기 번호',
+            dataIndex: 'asset_name',
+            key: 'asset_name',
+            align: 'center',
+        },
+        {
+            title: '교정일',
+            key: 'start_date',
             align: 'center',
             render: (text, record) => {
                 const isStartDateWithinNextSevenDays = isDateWithinNextSevenDays(record.start_date);
-                const isEndDateWithinNextSevenDays = isDateWithinNextSevenDays(record.end_date);
 
                 const startDateStyle = {
                     color: isStartDateWithinNextSevenDays ? '#BE35FF' : 'black',
                     fontWeight: isStartDateWithinNextSevenDays ? 'bold' : 'normal'
                 };
+
+                return (
+                    <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                );
+            },
+        },
+        {
+            title: '차기교정일',
+            key: 'end_date',
+            align: 'center',
+            render: (text, record) => {
+                const isEndDateWithinNextSevenDays = isDateWithinNextSevenDays(record.end_date);
 
                 const endDateStyle = {
                     color: isEndDateWithinNextSevenDays ? '#BE35FF' : 'black',
@@ -208,11 +259,17 @@ function AssetTable() {
                 };
 
                 return (
-                    <span>
-                        <span style={startDateStyle}>{formatDate(record.start_date)}</span> / <span style={endDateStyle}>{formatDate(record.end_date)}</span>
-                    </span>
+                    <span style={endDateStyle}>{formatDate(record.end_date)}</span>
                 );
             },
+        },
+        {
+            title: '현장',
+            dataIndex: 'location_name',
+            key: 'location_name',
+            align: 'center',
+            filters: locationFilters,
+            onFilter: ( value, record ) => record.location_name === value,
         },
         {
             title: '임대',
@@ -246,8 +303,16 @@ function AssetTable() {
             align: 'center',
             render: (text, record) => (
                 <div>
-                    <Button onClick={() => showModal(record)} style={{ marginRight: 8 }}>수정</Button>
-                    <Button onClick={() => handleDelete(record.asset_id)} danger>삭제</Button>
+                    <Button onClick={(e) => { e.stopPropagation(); showModal(record); }} style={{ marginRight: 8 }} primary>수정</Button>
+                    <Popconfirm
+                        title="자산 현황 삭제"
+                        description="정말 자산 현황 정보를 삭제하겠습니까?"
+                        onConfirm={(e) => { e.stopPropagation(); handleDelete(record.asset_id) }}
+                        okText="네"
+                        cancelText="아니오"
+                    >
+                        <Button onClick={(e) => { e.stopPropagation(); }} danger>삭제</Button>
+                    </Popconfirm>
                 </div>
             ),
         },
@@ -255,22 +320,37 @@ function AssetTable() {
       
     return (
         <div>
-            <AssetButton/>
-            <CenteredContainer>
-                <Table
-                    columns={columns}
-                    dataSource={data.slice(0, visibleItems)}
-                    rowKey="id"
-                    pagination={false}
-                />
-                {visibleItems < data.length && ( <MoreButton onClick={loadMore}>더보기</MoreButton>)}
-                <AssetModal
-                    open={isModalVisible}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    selectItem={selectedItem}
-                />
-            </CenteredContainer>
+            {contextHolder}
+            <Space>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
+            </Space>
+            <Table
+                columns={columns}
+                dataSource={data.slice(0, visibleItems)}
+                rowKey="id"
+                pagination={false}
+                onRow={(record) => ({
+                    onClick: () => showReadModal(record),
+                    style: { cursor: 'pointer'},
+                })}
+            />
+            {visibleItems < data.length && ( <MoreButton onClick={loadMore}>더보기</MoreButton>)}
+            <AssetCreateModal
+                open={isCreateModalVisible}
+                onOk={handleCreate}
+                onCancel={handleCreateModalCancel}
+            />
+            <AssetUpdateModal
+                open={isModalVisible}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                selectItem={selectedItem}
+            />
+            <AssetReadModal
+                open={isReadModalVisible}
+                onCancel={handleReadModalCancel}
+                selectItem={selectedItem}
+            />
         </div>
     );
 }

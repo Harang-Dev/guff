@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { Modal, Button, Input, Form, Select, Radio, DatePicker } from 'antd';
+import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
-const AssetModal = ({open, onOk, onCancel, selectItem }) => {
+const { TextArea } = Input;
+
+const AssetCreateModal = ({open, onOk, onCancel }) => {
     const [form] = Form.useForm();
     const [brands, setBrands] = useState([]);
     const [locations, setLocations] = useState([]);
@@ -32,26 +35,6 @@ const AssetModal = ({open, onOk, onCancel, selectItem }) => {
         fetchBrands();
         fetchLocations();
     }, []);
-
-    useEffect(() => {
-        if (selectItem) {
-            // selectItem에 넘어오는 date 값들은 String으로 이루어져있음
-            // 근데 DatePicker는 moment 객체로 받아들여야해서 date.isValid에서 에러가 발생한다고함
-            // 이를 해결하기 위해서 moment객체로 타입 변환을 해주면 된다함
-            form.setFieldsValue({
-                ...selectItem,
-                start_date: selectItem.start_date ? dayjs(selectItem.start_date) : null,
-                end_date: selectItem.end_date ? dayjs(selectItem.end_date) : null,
-            });
-            console.log(form.getFieldsValue());
-            if (selectItem.state === "N") {
-                setIsLocationDisabled(true);
-                form.setFieldValue({location_name: "사무실"});
-            } else {
-                setIsLocationDisabled(false);
-            }
-        }
-    }, [selectItem, form]);
 
     const handleStateChange = (value) => {
         if (value === "N") {
@@ -125,27 +108,36 @@ const AssetModal = ({open, onOk, onCancel, selectItem }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="start_date" label="교정일">
-                    <DatePicker format='YYYY-MM-DD'/>
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={8}>
+                        <Form.Item name="start_date" label="교정일">
+                            <DatePicker format='YYYY-MM-DD' />
+                        </Form.Item>
+                    </Col>
 
-                <Form.Item name="end_date" label="차기교정일">
-                    <DatePicker format='YYYY-MM-DD'/>
-                </Form.Item>
+                    <Col span={8}>
+                        <Form.Item name="end_date" label="차기교정일">
+                            <DatePicker format='YYYY-MM-DD' />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="rent_state" label="임대 여부" >
+                            <Radio.Group buttonStyle="solid" disabled={isLocationDisabled}>
+                                <Radio.Button value={true}>임대</Radio.Button>
+                                <Radio.Button value={false}>비임대</Radio.Button>
+                            </Radio.Group>
+                        </Form.Item> 
+                    </Col>
+                </Row>
 
                 <Form.Item name="marks" label="비고">
-                    <Input />
+                    <TextArea rows={4} placeholder='비고를 작성해주세요'/>
                 </Form.Item>
 
-                <Form.Item name="rent_state" label="임대 여부" >
-                    <Radio.Group buttonStyle="solid" disabled={isLocationDisabled}>
-                        <Radio.Button value={true}>임대</Radio.Button>
-                        <Radio.Button value={false}>비임대</Radio.Button>
-                    </Radio.Group>
-                </Form.Item> 
             </Form>
         </Modal>
     );
 };
 
-export default AssetModal;
+export default AssetCreateModal;
