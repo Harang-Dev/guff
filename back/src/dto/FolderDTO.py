@@ -5,7 +5,9 @@ from typing import Union, Optional
 
 class FolderDTO(BaseModel):
     folder_name: str
+    product_name: str
     location_name: str
+    state: bool
     due_date: Optional[date]
     marks: Optional[str]
 

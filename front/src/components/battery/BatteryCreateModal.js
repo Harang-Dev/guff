@@ -1,25 +1,24 @@
-
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
+import { Modal, Input, Form, Radio, DatePicker, Button, Select } from 'antd';
 import { Option } from 'antd/es/mentions';
 
 const { TextArea } = Input;
 
-const AssetCreateModal = ({open, onOk, onCancel }) => {
+const BatteryCreateModal = ({open, onOk, onCancel }) => {
     const [form] = Form.useForm();
-    const [brands, setBrands] = useState([]);
+    const [products, setProducts] = useState([]);
     const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
-        const fetchBrands = async () => {
+        const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/brand/');
-                setBrands(response.data);
+                const response = await axios.get('http://127.0.0.1:8000/product/');
+                setProducts(response.data);
             } catch(error) {
-                console.error('Error fetching brands: ', error);
+                console.error('Error fetching products: ', error);
             }
         };
     
@@ -32,19 +31,17 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
             }
         };
     
-        fetchBrands();
+        fetchProducts();
         fetchLocations();
     }, []);
 
     const handleStateChange = (value) => {
-        if (value === "N") {
+        if (value === false) {
             setIsLocationDisabled(true);
             form.setFieldsValue({ location_name: "사무실" });
-            form.setFieldsValue({ rent_state: false });
         } else {
             setIsLocationDisabled(false);
             form.setFieldsValue({ location_name: null });
-            form.setFieldsValue({ rent_state: false });
         }
     };
 
@@ -55,9 +52,9 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                 // moment 객체를 문자열로 변환
                 const formattedValues = {
                     ...values,
-                    start_date: values.start_date ? values.start_date.format('YYYY-MM-DD') : null,
-                    end_date: values.end_date ? values.end_date.format('YYYY-MM-DD') : null,
+                    due_date: values.due_date ? values.due_date.format('YYYY-MM-DD') : null,
                 };
+                console.log(values);
                 form.resetFields();
                 onOk(formattedValues);
             })
@@ -77,26 +74,22 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
             }}>
 
             <Form form={form} layout="vertical">
-                <Form.Item name="asset_id" label="Asset ID">
+                <Form.Item name="folder_id" label="순번">
                     <Input disabled />
                 </Form.Item>
 
-                <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
-                    <Select placeholder="Select a brand">
-                        {brands.map(brand => (
-                            <Option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</Option>
+                <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
+                    <Select placeholder="Select a product">
+                        {products.map(product => (
+                            <Option key={product.product_name} value={product.product_name}>{product.product_name} ({product.brand_name})</Option>
                         ))}
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="asset_name" label="기기번호" rules={[{ required: true, message: '계측기 시리얼번호를 입력해주세요!'}]}>
-                    <Input />
-                </Form.Item>
-
-                <Form.Item name="state" label="State" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
+                <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '배터리 사용여부를 선택해주세요!'}]}>
                     <Select placeholder="Select a state" onChange={handleStateChange}>
-                        <Option value="Y">Y</Option>
-                        <Option value="N">N</Option>
+                        <Option value={true}>Y</Option>
+                        <Option value={false}>N</Option>
                     </Select>
                 </Form.Item>
 
@@ -108,28 +101,13 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                     </Select>
                 </Form.Item>
 
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="start_date" label="교정일">
-                            <DatePicker format='YYYY-MM-DD' />
-                        </Form.Item>
-                    </Col>
+                <Form.Item name="folder_name" label="폴더 이름" >
+                    <Input placeholder='Input folder name' disabled={isLocationDisabled}/>
+                </Form.Item>
 
-                    <Col span={8}>
-                        <Form.Item name="end_date" label="차기교정일">
-                            <DatePicker format='YYYY-MM-DD' />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                        <Form.Item name="rent_state" label="임대 여부" >
-                            <Radio.Group buttonStyle="solid" disabled={isLocationDisabled}>
-                                <Radio.Button value={true}>임대</Radio.Button>
-                                <Radio.Button value={false}>비임대</Radio.Button>
-                            </Radio.Group>
-                        </Form.Item> 
-                    </Col>
-                </Row>
+                <Form.Item name="due_date" label="교체일">
+                    <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
+                </Form.Item>
 
                 <Form.Item name="marks" label="비고">
                     <TextArea rows={4} placeholder='비고를 작성해주세요'/>
@@ -140,4 +118,4 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     );
 };
 
-export default AssetCreateModal;
+export default BatteryCreateModal;

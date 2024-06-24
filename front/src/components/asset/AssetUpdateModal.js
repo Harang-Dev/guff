@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
+
 import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
@@ -130,13 +131,13 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 <Row gutter={16}>
                     <Col span={8}>
                         <Form.Item name="start_date" label="교정일">
-                            <DatePicker format='YYYY-MM-DD' />
+                            <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="end_date" label="차기교정일">
-                            <DatePicker format='YYYY-MM-DD' />
+                            <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
                         </Form.Item>
                     </Col>
 

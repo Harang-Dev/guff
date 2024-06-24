@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { SearchOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
-
 import { Table, Button, Form, Badge, Popconfirm, notification, Layout, Space } from 'antd';
+
 import AssetUpdateModal from './AssetUpdateModal';
 import AssetReadModal from './AssetReadModal';
 import AssetCreateModal from './AssetCreateModal';
@@ -54,6 +54,9 @@ function AssetTable() {
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
     const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     // 처음 렌더링 할 때 필요한 데이터들 API에 요청해주는 상태 관리 함수
     useEffect(() => {
@@ -112,6 +115,13 @@ function AssetTable() {
         setCreateModalVisible(false);
     };
 
+    const handleTableChange = (pagination) => {
+        setCurrentPage(pagination.current);
+        setPageSize(pagination.pageSize);
+    }
+
+    const currentData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
     // 메세지를 보내서 알림 창 띄우는 함수
     const handleNotification = (message) => {
         api.info({
@@ -140,9 +150,15 @@ function AssetTable() {
         try{
             await axios.delete(`http://127.0.0.1:8000/asset/delete/${id}`);
             const response = await axios.get('http://127.0.0.1:8000/asset/');
-            setData(response.data);
+            const updatedData = response.data;
+            const totalPages = Math.ceil(updatedData.length / pageSize);
+    
+            if (currentPage > totalPages) {
+                setCurrentPage(totalPages);
+            }
 
-            handleNotification('자산 현황 데이터를 삭제했습니다.');
+            setData(updatedData);
+            handleNotification('배터리 현황 데이터를 삭제했습니다.');
         } catch(error) {
             console.error('Error delete data: ', error);
         }
@@ -321,20 +337,25 @@ function AssetTable() {
     return (
         <div>
             {contextHolder}
-            <Space>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
+            <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}} danger>데이터 등록</Button>
             </Space>
             <Table
                 columns={columns}
-                dataSource={data.slice(0, visibleItems)}
+                dataSource={currentData}
                 rowKey="id"
-                pagination={false}
                 onRow={(record) => ({
                     onClick: () => showReadModal(record),
                     style: { cursor: 'pointer'},
                 })}
+                pagination={{
+                    current: currentPage,
+                    pageSize: pageSize,
+                    total: data.length,
+                    showSizeChanger: true,
+                }}
+                onChange={handleTableChange}
             />
-            {visibleItems < data.length && ( <MoreButton onClick={loadMore}>더보기</MoreButton>)}
             <AssetCreateModal
                 open={isCreateModalVisible}
                 onOk={handleCreate}

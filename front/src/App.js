@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
-import BatteryDB from "./pages/BatteryDB";
+import BatteryDB from "./pages/battery/BatteryDB";
 import AdminLogin from "./pages/AdminLogin";
 import AdminInspection from "./pages/AdminInspection";
 import AdminNotice from "./pages/AdminNotice";
@@ -11,11 +11,9 @@ import AdminNav from "./components/AdminNav";
 import Footer from "./components/Footer";
 import AdminFooter from "./components/AdminFooter";
 import Asset from "./pages/asset/Asset";
-import Analyze from "./pages/Analyze";
-import AnalyzeSimple from "./pages/AnalyzeSimple";
-import AnalyzeMid from "./pages/AnalyzeMid";
-import AnalyzeCompl from "./pages/AnalyzeCompl";
-import { createGlobalStyle } from 'styled-components';
+import Analyze from "./pages/analyze/Analyze";
+import AnalyzeResult from "./pages/analyze/AnalyzeResult";
+import { createGlobalStyle } from 'styled-components'; 
 
 
 const GlobalStyle = createGlobalStyle`
@@ -50,15 +48,15 @@ function App() {
       <div className="Content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/BatteryDB" element={<BatteryDB />} />
-          <Route path="/AdminLogin" element={<AdminLogin />} />
-          <Route path="/AdminInspection" element={<AdminInspection />} />
-          <Route path="/AdminNotice" element={<AdminNotice />} />
-          <Route path="/Asset" element={<Asset />} />
-          <Route path="/Analyze" element={<Analyze />} />
-          <Route path="/AnalyzeSimple" element={<AnalyzeSimple />} />
-          <Route path="/AnalyzeMid" element={<AnalyzeMid />} />
-          <Route path="/AnalyzeCompl" element={<AnalyzeCompl />} />
+          <Route path="/battery-asset" element={<BatteryDB />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin-inspection" element={<AdminInspection />} />
+          <Route path="/admin-notice" element={<AdminNotice />} />
+          <Route path="/asset" element={<Asset />} />
+          <Route path="/analyze" element={<Analyze />} />
+          <Route path="/analyze/success" element={<AnalyzeResult />} />
+          {/* <Route path="/AnalyzeMid" element={<AnalyzeMid />} />
+          <Route path="/AnalyzeCompl" element={<AnalyzeCompl />} /> */}
         </Routes>
       </div>
     </Router>

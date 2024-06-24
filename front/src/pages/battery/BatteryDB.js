@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import BatteryTable from '../components/BatteryTable';
+import BatteryTable from '../../components/battery/BatteryTable';
 
 const GlobalStyle = createGlobalStyle`
   body {

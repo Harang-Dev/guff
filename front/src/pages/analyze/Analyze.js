@@ -1,12 +1,10 @@
 import React from 'react';
-import AnalyzeBox from '../components/AnalyzeBox';
-import AnalyzeUse from '../components/AnalyzeUse';
+import AnalyzeBox from '../../components/analyze/AnalyzeBox';
 
 function Analyze(props) {
     return (
         <div>
             <AnalyzeBox />
-            <AnalyzeUse />
         </div>
     );
 }

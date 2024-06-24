@@ -7,6 +7,7 @@ from src.controller.LocationController import location
 from src.controller.AssetController import asset
 from src.controller.BrandController import brand
 from src.controller.HwpController import parser
+from src.controller.ProductController import product
 
 app = FastAPI()
 app.include_router(battery)
@@ -14,6 +15,7 @@ app.include_router(location)
 app.include_router(asset)
 app.include_router(brand)
 app.include_router(parser)
+app.include_router(product)
 
 app.add_middleware(
     CORSMiddleware,
