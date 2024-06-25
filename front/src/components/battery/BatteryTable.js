@@ -8,28 +8,7 @@ import BatteryUpdateModal from './BatteryUpdateModal';
 import BatteryCreateModal from './BatteryCreateModal';
 import BatteryReadModal from './BatteryReadModal';
 
-
 /* eslint-disable no-restricted-globals */
-
-const CenteredContainer = styled.div`
-    margin: 0;
-    padding: 0;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-`;
-
-const MoreButton = styled.button`
-    width: 1595px;
-    height: 60px;
-    background-color: white;
-    border: none;
-    cursor: pointer;
-    color: #8991EE;
-    font-weight: bold;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-`;
 
 const EllipsisText = styled.div`
     white-space: nowrap;
@@ -153,12 +132,12 @@ function BatteryTable() {
         setIsReadModalVisible(false);
     };
 
-    const handleTableChange = (pagination) => {
-        setCurrentPage(pagination.current);
-        setPageSize(pagination.pageSize);
-    }
+    // const handleTableChange = (pagination) => {
+    //     setCurrentPage(pagination.current);
+    //     setPageSize(pagination.pageSize);
+    // }
 
-    const currentData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    // const currentData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     const handleNotification = (message) => {
         api.info({
@@ -294,26 +273,18 @@ function BatteryTable() {
     return (
         <div>
             {contextHolder}
-            <CenteredContainer>
                 <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
                     <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}} danger>데이터 등록</Button>
                 </Space>
                 <Table 
                     columns={columns}
-                    dataSource={currentData}
+                    dataSource={data}
                     onRow={(record) => ({
                         onClick: () => showReadModal(record),
                         style: { cursor: 'pointer'},
                     })}
-                    pagination={{
-                        current: currentPage,
-                        pageSize: pageSize,
-                        total: data.length,
-                        showSizeChanger: true,
-                    }}
-                    onChange={handleTableChange}
+
                 />
-            </CenteredContainer>
             <BatteryUpdateModal
                 open={isUpdateModalVisible}
                 onOk={handleUpdate}

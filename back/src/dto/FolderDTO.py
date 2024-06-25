@@ -4,7 +4,7 @@ from typing import Union, Optional
 
 
 class FolderDTO(BaseModel):
-    folder_name: str
+    folder_name: Optional[str]
     product_name: str
     location_name: str
     state: bool

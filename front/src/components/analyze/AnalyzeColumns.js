@@ -79,13 +79,6 @@ export const SimpleColumns = (locData) => [
     },
 ];
 
-// export const SimpleDes = () => [
-//     {
-//         key: '1',
-//         label: ''
-//     }
-// ]
-
 export const ComplicatedColumns = (locData) => [
     {
         title: '일시',

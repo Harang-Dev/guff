@@ -37,7 +37,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     }, []);
 
     const handleStateChange = (value) => {
-        if (value === "N") {
+        if (value === false) {
             setIsLocationDisabled(true);
             form.setFieldsValue({ location_name: "사무실" });
             form.setFieldsValue({ rent_state: false });
@@ -57,6 +57,8 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                     ...values,
                     start_date: values.start_date ? values.start_date.format('YYYY-MM-DD') : null,
                     end_date: values.end_date ? values.end_date.format('YYYY-MM-DD') : null,
+                    marks: values.marks || null,
+
                 };
                 form.resetFields();
                 onOk(formattedValues);
@@ -77,10 +79,6 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
             }}>
 
             <Form form={form} layout="vertical">
-                <Form.Item name="asset_id" label="Asset ID">
-                    <Input disabled />
-                </Form.Item>
-
                 <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
                     <Select placeholder="Select a brand">
                         {brands.map(brand => (
@@ -95,8 +93,8 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
 
                 <Form.Item name="state" label="State" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
                     <Select placeholder="Select a state" onChange={handleStateChange}>
-                        <Option value="Y">Y</Option>
-                        <Option value="N">N</Option>
+                        <Option value={true}>사용</Option>
+                        <Option value={false}>미사용</Option>
                     </Select>
                 </Form.Item>
 

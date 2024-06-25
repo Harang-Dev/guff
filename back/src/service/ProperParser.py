@@ -62,7 +62,7 @@ class ProperParser(ParseService):
         cached_head_data = []
         
         for idx, items in enumerate(group_list):
-            head_data = [data for data in items if int(data['col']) == 0 and int(data['rowspan']) > 1]
+            head_data = [data for data in items if int(data['col']) == 0]
             merge_data = [data for data in items if int(data['col']) != 0 and int(data['rowspan']) > 1]
             
             if head_data:

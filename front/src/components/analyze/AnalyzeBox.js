@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../Loading';
 
 import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload, Select, Form, } from 'antd';
@@ -54,7 +53,7 @@ function AnalyzeBox(props) {
     // CenteredContainer를 지우면 반응형으로 잘 동작함! 사이즈 줄이면 잘 반응함
     // 근데 있으면 왜 반응하지 못하지? 병123신인가봐 ㅠㅠ
     return (
-        <CenteredContainer>
+        <div>
             <Form>
                 <Form.Item label="버전" >
                     <Select placeholder="Select Version" onChange={setVersion}>
@@ -81,7 +80,7 @@ function AnalyzeBox(props) {
                     </Dragger>
                 </Form.Item>
             </Form>
-        </CenteredContainer>
+        </div>
     );
 }
 

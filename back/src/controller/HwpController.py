@@ -21,8 +21,6 @@ serialize_data = {}
 
 @parser.post('/', tags=['parser'])
 async def parsing(file: UploadFile = File(...), version: str = Form(...), search_text: str = Form(...)):    
-    print(version, search_text)
-
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         contents = await file.read()
         tmp_file.write(contents)
@@ -122,7 +120,9 @@ def select_and_parsing(version, table_cell):
     selected_parser = PARSER_VERSION[version]
     
     table_data = selected_parser.delete_non_target_data(table_cell)
+
     columns = selected_parser.extract_columns(table_data)
+
     dict_list = selected_parser.extract_non_column_data(table_data, columns)
 
     group_list = selected_parser.update_merge_data(selected_parser.group_by_date(dict_list))

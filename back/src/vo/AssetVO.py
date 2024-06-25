@@ -9,7 +9,7 @@ class AssetVO(BASE):
     asset_id = Column(Integer, primary_key=True)
     brand_name = Column(String)
     asset_name = Column(String)
-    state = Column(Enum('Y', 'N'))
+    state = Column(Boolean)
     location_name = Column(String)
     start_date = Column(Date)
     end_date = Column(Date)

@@ -53,8 +53,15 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
                 const formattedValues = {
                     ...values,
                     due_date: values.due_date ? values.due_date.format('YYYY-MM-DD') : null,
+                    folder_name: values.folder_name || null,
+                    marks: values.marks || null,
                 };
-                console.log(values);
+
+                // const payload = Object.fromEntries(
+                //     Object.entries(formattedValues).map(([key, value]) => [key, value || null])
+                // );
+
+                console.log(formattedValues);
                 form.resetFields();
                 onOk(formattedValues);
             })
@@ -74,10 +81,6 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
             }}>
 
             <Form form={form} layout="vertical">
-                <Form.Item name="folder_id" label="순번">
-                    <Input disabled />
-                </Form.Item>
-
                 <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
                     <Select placeholder="Select a product">
                         {products.map(product => (

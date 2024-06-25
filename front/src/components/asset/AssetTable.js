@@ -12,25 +12,6 @@ import AssetCreateModal from './AssetCreateModal';
 
 const { Header, Content, Footer, Sider } = Layout;
 
-
-const CenteredContainer = styled.div`
-    margin: 0;
-    padding: 0;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-`;
-
-const MoreButton = styled.button`
-    width: 1595px;
-    height: 60px;
-    background-color: white;
-    border: none;
-    cursor: pointer;
-    color: #8991EE;
-    font-weight: bold;
-`;
-
 const EllipsisText = styled.div`
     white-space: nowrap;
     overflow: hidden;
@@ -77,11 +58,6 @@ function AssetTable() {
 
         fetchData();
     }, []);
-
-    // 더 보기 함수
-    const loadMore = () => {
-        setVisibleItems(prev => prev + 5); // 더 보기 버튼 클릭 시 아이템 수를 5씩 증가
-    };
 
     // 수정 모달 창 실행 함수
     const showModal = (record) => {
@@ -167,7 +143,22 @@ function AssetTable() {
     // 데이터 추가를 위한 API 요청 함수
     const handleCreate = async (item) => {
         try {
-            await axios.post(`http://127.0.0.1:8000/asset/add/`, item);
+            console.log(item);
+            const tesmp = {
+                "brand_name": "NeoBlast",
+                "asset_name": "test",
+                "state": true,
+                "location_name": "사무실",
+                "start_date": "2024-06-25",
+                "end_date": "2024-06-25",
+                "rent_state": true,
+                "marks": null
+            };
+
+            console.log(tesmp);
+            console.log(item);
+            await axios.post('http://127.0.0.1:8000/asset/add/', item);
+            
             const response = await axios.get('http://127.0.0.1:8000/asset/');
             setData(response.data);
             setCreateModalVisible(false);
@@ -220,12 +211,12 @@ function AssetTable() {
             key: 'state',
             align: 'center',
             filters: [
-                { text: '사용', value: 'Y' },
-                { text: '미사용', value: 'N' },
+                { text: '사용', value: true },
+                { text: '미사용', value: false },
             ],
             onFilter: (value, record) => record.state == value,
             render: (text, record) => {
-                const state_badge = record.state === 'Y' ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
+                const state_badge = record.state === true ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
                 return (
                     state_badge
                 );
@@ -342,19 +333,12 @@ function AssetTable() {
             </Space>
             <Table
                 columns={columns}
-                dataSource={currentData}
+                dataSource={data}
                 rowKey="id"
                 onRow={(record) => ({
                     onClick: () => showReadModal(record),
                     style: { cursor: 'pointer'},
                 })}
-                pagination={{
-                    current: currentPage,
-                    pageSize: pageSize,
-                    total: data.length,
-                    showSizeChanger: true,
-                }}
-                onChange={handleTableChange}
             />
             <AssetCreateModal
                 open={isCreateModalVisible}
