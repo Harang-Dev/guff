@@ -60,23 +60,25 @@ class ProperParser(ParseService):
         """
         cached_merge_data = []
         cached_head_data = []
-        
+
         for idx, items in enumerate(group_list):
-            head_data = [data for data in items if int(data['col']) == 0]
-            merge_data = [data for data in items if int(data['col']) != 0 and int(data['rowspan']) > 1]
-            
+            clean_item = [data for data in items if data['text']]
+
+            head_data = [data for data in clean_item if int(data['col']) == 0 and data['text']] 
+            merge_data = [data for data in clean_item if int(data['col']) != 0 and int(data['rowspan']) > 1]
+
             if head_data:
-                cached_head_data = head_data
+                cached_head_data = head_data        
             if merge_data:
                 cached_merge_data = merge_data
 
             new_items = []
-            if any(data not in items for data in cached_head_data):
+            if any(data not in clean_item for data in cached_head_data):
                 new_items.extend(cached_head_data)
-            if any(data not in items for data in cached_merge_data):
+            if any(data not in clean_item for data in cached_merge_data):
                 new_items.extend(cached_merge_data)
 
-            group_list[idx] = new_items + items
+            group_list[idx] = new_items + clean_item
         
         return group_list
     
@@ -86,8 +88,15 @@ class ProperParser(ParseService):
         컬럼 리스트에 대응하는 값들을 그룹 리스트에서 찾아서 추가해주는 작업을 수행합니다.
         """
         serialize_list = []
-
         columns = [item for item in columns if int(item['colspan']) <= 1]
+        max_col_item = max(columns, key=lambda x: int(x['col']))
+
+        if int(max_col_item['rowspan']) > 1:
+            # 해당 항목을 리스트에서 제거하고
+            columns.remove(max_col_item)
+            # 리스트의 끝에 추가합니다.
+            columns.append(max_col_item)
+
         for items in group_list:
             data = {column['text']: item['text'] for column, item in zip(columns, items) if column != '발파횟수'}
             serialize_list.append(data)

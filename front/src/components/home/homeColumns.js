@@ -28,11 +28,13 @@ export const aColumn = (Item) => [
     },
     {
         title: '교정일',
+        dataIndex: 'start_date',
         key: 'start_date',
         align: 'center',
     },
     {
         title: '차기교정일',
+        dataIndex: 'end_date',
         key: 'end_date',
         align: 'center',
     },

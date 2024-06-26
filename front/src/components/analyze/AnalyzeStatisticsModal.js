@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, message, Form, Descriptions, Divider } from 'antd';
 
 
-const AnalyzeStatisticsModal = ({open, onCancel, item }) => {
+const AnalyzeStatisticsModal = ({open, onCancel, item, version }) => {
     const [form] = Form.useForm();
+    const blastColumn = [ 'cm/s', 'dB' ];
 
     return (
         <Modal
@@ -25,14 +26,14 @@ const AnalyzeStatisticsModal = ({open, onCancel, item }) => {
             >
             <Divider />
             {Object.keys(item).map((locName, index) => (
-                <Descriptions title={locName} key={index} column={12}>
-                    <Descriptions.Item span={12}>Min</Descriptions.Item>
+                <Descriptions title={locName} key={index} column={version === '간단이' ? 2 : 12}>
+                    <Descriptions.Item span={version === '간단이' ? 2 : 12}>Min</Descriptions.Item>
                     {Object.keys(item[locName].Min).map((key) => (
-                        item[locName].Min[key] == '-' ? null : <Descriptions.Item key={`MIN-${key}`} label={key} span={4}>{item[locName].Min[key]}</Descriptions.Item>
+                        blastColumn.some(keyword => key.includes(keyword)) ? <Descriptions.Item key={`MIN-${key}`} label={key} span={version === '간단이' ? 1 : 4}>{item[locName].Min[key]}</Descriptions.Item> : null
                     ))}
-                    <Descriptions.Item span={12}>Max</Descriptions.Item>
+                    <Descriptions.Item span={version === '간단이' ? 2 : 12}>Max</Descriptions.Item>
                     {Object.keys(item[locName].Max).map((key) => (
-                        item[locName].Max[key] == '-' ? null : <Descriptions.Item key={`Max-${key}`} label={key} span={4}>{item[locName].Max[key]}</Descriptions.Item>
+                        blastColumn.some(keyword => key.includes(keyword)) ? <Descriptions.Item key={`Max-${key}`} label={key} span={version === '간단이' ? 1 : 4}>{item[locName].Max[key]}</Descriptions.Item> : null
                     ))}
                 </Descriptions>
 

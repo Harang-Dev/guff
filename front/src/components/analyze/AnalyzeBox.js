@@ -33,7 +33,7 @@ function AnalyzeBox(props) {
         formData.append('search_text', findText);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/parser/', formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
+            const response = await axios.post('http://192.168.0.102:8000/parser/', formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
             console.log('upload successful: ',  response.data);
             message.success('Upload Successful');
 

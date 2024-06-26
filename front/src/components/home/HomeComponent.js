@@ -13,7 +13,7 @@ const HomeComponent = () => {
     useEffect(() => {
         const fetchBattery = async () =>  {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/battery/');
+                const response = await axios.get('http://192.168.0.102:8000/battery/');
                 const filteredData = filterAndSortData(response.data);
                 setBatteryItem(filteredData);
             } catch(error) {
@@ -23,7 +23,9 @@ const HomeComponent = () => {
 
         const fetchAsset = async() => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/asset/');
+                const response = await axios.get('http://192.168.0.102:8000/asset/');
+                console.log(response.data);
+
                 const filteredAssetItem = filterAndSortData(response.data);
                 setAssetItem(filteredAssetItem);
             } catch(error) {
@@ -32,6 +34,7 @@ const HomeComponent = () => {
         }
 
         fetchBattery();
+        console.log(batteryItem);
         fetchAsset();
     }, []);
 
@@ -39,42 +42,42 @@ const HomeComponent = () => {
         return dayjs(dateStr, 'YYYY-MM-DD', true).isValid();
       };
 
-    const filterAndSortData = (data) => {
+      const filterAndSortData = (data) => {
         const today = dayjs();
         const oneWeekFromNow = today.add(7, 'day');
-
-        // Find the date fields dynamically
+    
+        // 날짜 필드를 동적으로 찾기
         const dateFields = Object.keys(data[0]).filter(key => isValidDate(data[0][key]));
-        console.log(dateFields);
-        // Filter and sort the data
+    
+        // 데이터 필터링 및 정렬
         return data
-            .filter(item => {
-                // Check if any date field matches the criteria
-                return dateFields.some(field => {
-                    const date = dayjs(item[field]);
-                    return (date.isSame(today) || date.isAfter(today)) && date.isBefore(oneWeekFromNow);
-                });
-            })
-            .map(item => {
-            // Find the closest date field
+          .filter(item => {
+            // 날짜 필드 중 하나라도 조건을 만족하는지 확인
+            return dateFields.some(field => {
+              const date = dayjs(item[field]);
+              return (date.isSame(today) || date.isAfter(today)) && date.isBefore(oneWeekFromNow);
+            });
+          })
+          .map(item => {
+            // 가장 가까운 날짜 필드 찾기
             const closestDateField = dateFields
-                .map(field => ({ field, date: dayjs(item[field]) }))
-                .filter(({ date }) => (date.isSame(today) || date.isAfter(today)) && date.isBefore(oneWeekFromNow))
-                .sort((a, b) => a.date - b.date)[0];
-
+              .map(field => ({ field, date: dayjs(item[field]) }))
+              .filter(({ date }) => (date.isSame(today) || date.isAfter(today)) && date.isBefore(oneWeekFromNow))
+              .sort((a, b) => a.date - b.date)[0];
+    
             return { ...item, closestDate: closestDateField.date };
-            })
-            .sort((a, b) => a.closestDate - b.closestDate)
-            .slice(0, 5); // 상위 5개 항목 선택
-    };
-
+          })
+          .sort((a, b) => a.closestDate - b.closestDate)
+          .slice(0, 5); // 상위 5개 항목 선택
+      };
+    
     return (
         <Row gutter={16}>
             <Divider />
 
 
             <Col span={12}>
-                <Card title={`배터리 현황 ${batteryItem.length}건`} bordered={true}>
+                <Card title="배터리 현황" bordered={true}>
                     {batteryItem ? <Table columns={bColumn(batteryItem)} dataSource={batteryItem} rowKey="id" size='small' pagination={false} /> : <Empty />}
                 </Card>
             </Col>

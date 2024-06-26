@@ -15,7 +15,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/product/');
+                const response = await axios.get('http://192.168.0.102:8000/product/');
                 setProducts(response.data);
             } catch(error) {
                 console.error('Error fetching products: ', error);
@@ -24,7 +24,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/location/');
+                const response = await axios.get('http://192.168.0.102:8000/location/');
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);

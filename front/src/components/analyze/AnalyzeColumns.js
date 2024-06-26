@@ -79,84 +79,15 @@ export const SimpleColumns = (locData) => [
     },
 ];
 
-export const ComplicatedColumns = (locData) => [
-    {
-        title: '일시',
-        dataIndex: '일시',
-        key: '일시',
-        align: 'center',
-    },
-    {
-        title: '발파시간',
-        dataIndex: '시간',
-        key: '시간',
-        align: 'center',
-    },
-    {
-        title: '계측위치',
-        dataIndex: '측정위치',
-        key: '측정위치',
-        align: 'center',
-        filters: transLocData(locData),
-        onFilter: ( value, record ) => record.측정위치 === value, 
-    },
-    {
-        title: '진동속도(cm/s)',
-        dataIndex: '발파진동(cm/s)',
-        key: '발파진동(cm/s)',
-        align: 'center',
-    },
-    {
-        title: '진동레벨[dB(V)]',
-        dataIndex: '진동레벨dB(V)',
-        key: '진동레벨dB(V)',
-        align: 'center',
-    },
-    {
-        title: '소음[dB(A)]',
-        dataIndex: '소음레벨dB(A)',
-        key: '소음레벨dB(A)',
-        align: 'center',
-    },
-];
+export const ProperColumns = ({data, locData}) => {
+    const locationFields = [ '계측위치', '구분', '측정위치']
 
-export const ProperColumns = (locData) => [
-    {
-        title: '일시',
-        dataIndex: '일자',
-        key: '일자',
+    return Object.keys(data[0]).map(key => ({
+        title: key,
+        dataIndex: key,
+        key: key,
         align: 'center',
-    },
-    {
-        title: '발파시간',
-        dataIndex: '발파시간',
-        key: '발파시간',
-        align: 'center',
-    },
-    {
-        title: '계측위치',
-        dataIndex: '계측위치',
-        key: '계측위치',
-        align: 'center',
-        filters: transLocData(locData),
-        onFilter: ( value, record ) => record.계측위치 === value, 
-    },
-    {
-        title: '진동속도(cm/s)',
-        dataIndex: '진동속도(cm/s)',
-        key: '진동속도(cm/s)',
-        align: 'center',
-    },
-    {
-        title: '진동레벨[dB(V)]',
-        dataIndex: '진동레벨(dB(V))',
-        key: '진동레벨[dB(V)]',
-        align: 'center',
-    },
-    {
-        title: '소음[dB(A)]',
-        dataIndex: '소음레벨(dB(A))',
-        key: '소음레벨[dB(A)]',
-        align: 'center',
-    },
-];
+        filters: locationFields.includes(key) ? transLocData(locData) : undefined,
+        onFilter: locationFields.includes(key) ? (value, record) => record[key] === value : undefined,
+      }));
+};
