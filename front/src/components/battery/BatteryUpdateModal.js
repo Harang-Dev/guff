@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
+import { Modal, Input, Form, Select, DatePicker } from 'antd';
 import { Option } from 'antd/es/mentions';
 
+const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
 const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
@@ -15,7 +16,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/product/');
+                const response = await axios.get(`http://${API_URL}:8000/product/`);
                 setProducts(response.data);
             } catch(error) {
                 console.error('Error fetching products: ', error);
@@ -24,7 +25,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/location/');
+                const response = await axios.get(`http://${API_URL}:8000/location/`);
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);
@@ -74,6 +75,8 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 const formattedValues = {
                     ...values,
                     due_date: values.due_date ? values.due_date.format('YYYY-MM-DD') : null,
+                    folder_name: values.folder_name || null,
+                    marks: values.marks || null,
                 };
                 console.log(values);
                 form.resetFields();
@@ -122,7 +125,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="folder_name" label="폴더 이름" rules={[{ required: true, message: '폴더명을 입력해주세요!' }]}>
+                <Form.Item name="folder_name" label="폴더 이름">
                     <Input placeholder='Input folder name' disabled={isLocationDisabled}/>
                 </Form.Item>
 

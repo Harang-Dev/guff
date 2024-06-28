@@ -3,14 +3,16 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
 import { PlusOutlined } from '@ant-design/icons';
-import { Space, Table, message, Button, Pagination } from 'antd';
+import { Space, Table, message, Button } from 'antd';
 
 import { SimpleColumns, ProperColumns } from './AnalyzeColumns';
 import AnalyzeStatisticsModal from './AnalyzeStatisticsModal';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function AnalyzeResult(props) {
     const location = useLocation();
-    const { version, findText, data } = location.state || {};
+    const { version , data } = location.state || {};
     const [ sData, setData ] = useState([]);
     const [ locData, setLocData ] = useState([]);
     const [ statisticsModalVisible, setStatisticsModalVisible ] = useState(false);
@@ -18,7 +20,7 @@ function AnalyzeResult(props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://192.168.0.102:8000/parser/${version}`);
+                const response = await axios.get(`http://${API_URL}:8000/parser/${version}`);
                 setLocData(response.data);
             } catch (error) {
                 message.error('위치 데이터 불러오기 실패');
@@ -32,7 +34,7 @@ function AnalyzeResult(props) {
     const showStatisticsModal = () => {
         const statistics = async () => {
             try {
-                const response = await axios.post(`http://192.168.0.102:8000/parser/statistics/`, {
+                const response = await axios.post(`http://${API_URL}:8000/parser/statistics/`, {
                     version: version,
                     location: locData,
                 });
@@ -53,7 +55,7 @@ function AnalyzeResult(props) {
 
     const download = async () => {
         try {
-            const response = await axios.get(`http://192.168.0.102:8000/parser/download/${version}`, {
+            const response = await axios.get(`http://${API_URL}:8000/parser/download/${version}`, {
                 responseType: 'blob',
             });
 

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
+const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
 const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
@@ -16,7 +17,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     useEffect(() => {
         const fetchBrands = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/brand/');
+                const response = await axios.get(`http://${API_URL}:8000/brand/`);
                 setBrands(response.data);
             } catch(error) {
                 console.error('Error fetching brands: ', error);
@@ -25,7 +26,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/location/');
+                const response = await axios.get(`http://${API_URL}:8000/location/`);
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);
@@ -45,6 +46,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 ...selectItem,
                 start_date: selectItem.start_date ? dayjs(selectItem.start_date) : null,
                 end_date: selectItem.end_date ? dayjs(selectItem.end_date) : null,
+                marks: selectItem.marks || null,
             });
             console.log(form.getFieldsValue());
             if (selectItem.state === "N") {

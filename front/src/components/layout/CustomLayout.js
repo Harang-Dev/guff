@@ -35,6 +35,7 @@ const CustomLayout = ({ children }) => {
 
                         <SubMenu key="sub1" icon={<PythonOutlined />} title="분석기">
                             <Menu.Item key="/analyze">한글 분석기</Menu.Item>
+                            <Menu.Item key="/wave-analyze">파형 분석기</Menu.Item>
                         </SubMenu>
                     
                         <SubMenu key="sub2" icon={<AppstoreOutlined />} title="자산 관리">

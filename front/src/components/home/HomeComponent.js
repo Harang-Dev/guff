@@ -3,8 +3,9 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 
 import { bColumn, aColumn } from './homeColumns';
-import { Card, Row, Col, Statistic, message, Table, Empty, Calendar, Divider } from 'antd';
+import { Card, Row, Col, message, Table, Empty, Calendar, Divider } from 'antd';
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 const HomeComponent = () => {
     const [batteryItem, setBatteryItem] = useState([]);
@@ -13,7 +14,8 @@ const HomeComponent = () => {
     useEffect(() => {
         const fetchBattery = async () =>  {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/battery/');
+                console.log(API_URL)
+                const response = await axios.get(`http://${API_URL}:8000/battery/`);
                 const filteredData = filterAndSortData(response.data);
                 setBatteryItem(filteredData);
             } catch(error) {
@@ -23,7 +25,7 @@ const HomeComponent = () => {
 
         const fetchAsset = async() => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/asset/');
+                const response = await axios.get(`http://${API_URL}:8000/asset/`);
                 console.log(response.data);
 
                 const filteredAssetItem = filterAndSortData(response.data);

@@ -1,10 +1,9 @@
 import React from 'react';
 import AnalyzeSuccess from '../../components/analyze/AnalyzeSuccess';
 import CustomLayout from '../../components/layout/CustomLayout';
-import { Layout, Typography, Divider } from 'antd';
+import { Typography, Divider } from 'antd';
 
 const { Title } = Typography;
-const { Content } = Layout;
 
 function Analyze(props) {
     return (

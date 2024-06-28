@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from "axios";
 
-import { SearchOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { Table, Button, Form, Badge, Popconfirm, notification, Layout, Space } from 'antd';
 import BatteryUpdateModal from './BatteryUpdateModal';
 import BatteryCreateModal from './BatteryCreateModal';
 import BatteryReadModal from './BatteryReadModal';
 
 /* eslint-disable no-restricted-globals */
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const EllipsisText = styled.div`
     white-space: nowrap;
@@ -37,9 +39,9 @@ function BatteryTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/battery/');
-                const productResponse = await axios.get('http://192.168.0.102:8000/product/');
-                const locationResponse = await axios.get('http://192.168.0.102:8000/location/');
+                const response = await axios.get(`http://${API_URL}:8000/battery/`);
+                const productResponse = await axios.get(`http://${API_URL}:8000/product/`);
+                const locationResponse = await axios.get(`http://${API_URL}:8000/location/`);
 
                 setProductFilters(productResponse.data.map(product => ({ 
                     text: `${product.product_name} (${product.brand_name})`,
@@ -76,8 +78,8 @@ function BatteryTable() {
             const updateItem = await form.validateFields();
 
             console.log(item);
-            await axios.put(`http://192.168.0.102:8000/battery/put/`, item);
-            const response = await axios.get('http://192.168.0.102:8000/battery/');
+            await axios.put(`http://${API_URL}:8000/battery/put/`, item);
+            const response = await axios.get(`http://${API_URL}:8000/battery/`);
             setData(response.data);
             setIsUpdateModalVisible(false);
 
@@ -91,8 +93,8 @@ function BatteryTable() {
         try {
             const createItem = await form.validateFields();
 
-            await axios.post('http://192.168.0.102:8000/battery/add', item);
-            const response = await axios.get('http://192.168.0.102:8000/battery/');
+            await axios.post(`http://${API_URL}:8000/battery/add`, item);
+            const response = await axios.get(`http://${API_URL}:8000/battery/`);
             setData(response.data);
             setIsCreateModalVisible(false);
             handleNotification('배터리 현황 데이터를 추가했습니다.');
@@ -103,8 +105,8 @@ function BatteryTable() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://192.168.0.102:8000/battery/delete/${id}`);
-            const response = await axios.get('http://192.168.0.102:8000/battery/');
+            await axios.delete(`http://${API_URL}:8000/battery/delete/${id}`);
+            const response = await axios.get(`http://${API_URL}:8000/battery/`);
 
             const updatedData = response.data;
             const totalPages = Math.ceil(updatedData.length / pageSize);
@@ -274,7 +276,7 @@ function BatteryTable() {
         <div>
             {contextHolder}
                 <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}} danger>데이터 등록</Button>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
                 </Space>
                 <Table 
                     columns={columns}

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
+const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
 const AssetCreateModal = ({open, onOk, onCancel }) => {
@@ -16,7 +17,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     useEffect(() => {
         const fetchBrands = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/brand/');
+                const response = await axios.get(`http://${API_URL}:8000/brand/`);
                 setBrands(response.data);
             } catch(error) {
                 console.error('Error fetching brands: ', error);
@@ -25,7 +26,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/location/');
+                const response = await axios.get(`http://${API_URL}:8000/location/`);
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);

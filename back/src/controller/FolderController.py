@@ -40,12 +40,12 @@ def insert(dto: InsertFolderDTO, db: Session = Depends(get_db)):
 
 @battery.put("/put", tags=['battery'])
 def update(dto: FolderDTOinDB, db: Session = Depends(get_db)):
-    current_data = mapper.read_id(dto.folder_id, db).due_date
+    # current_data = mapper.read_id(dto.folder_id, db).due_date
     
-    print(current_data, dto.due_date)
-    if current_data != dto.due_date:  
-        logData = ReplacementDTO(replaced_date=dto.due_date, folder_id=dto.folder_id)
-        Rmapper.insert(logData, db)
+    # print(current_data, dto.due_date)
+    # if current_data != dto.due_date:  
+    #     logData = ReplacementDTO(replaced_date=dto.due_date, folㅇder_id=dto.folder_id)
+    #     Rmapper.insert(logData, db)
 
     mapper.update(dto, db)
 

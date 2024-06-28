@@ -25,6 +25,7 @@ class FolderMapper:
         record.location_name = vo.location_name
         record.due_date = vo.due_date
         record.marks = vo.marks
+        record.state = vo.state
         db.commit()
 
     def delete(self, folder_id: int, db: Session):

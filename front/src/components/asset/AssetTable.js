@@ -10,6 +10,7 @@ import AssetCreateModal from './AssetCreateModal';
 
 /* eslint-disable no-restricted-globals */
 
+const API_URL = process.env.REACT_APP_API_URL;
 const { Header, Content, Footer, Sider } = Layout;
 
 const EllipsisText = styled.div`
@@ -21,7 +22,6 @@ const EllipsisText = styled.div`
 
 function AssetTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
-    const [visibleItems, setVisibleItems] = useState(10); // 초기 보여지는 아이템 수
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
 
     // Assetpage에 필요한 상태 관리
@@ -34,7 +34,6 @@ function AssetTable() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
-    const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -43,9 +42,9 @@ function AssetTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://192.168.0.102:8000/asset/');
-                const brandResponse = await axios.get('http://192.168.0.102:8000/brand/'); // 브랜드 API
-                const locationResponse = await axios.get('http://192.168.0.102:8000/location/'); // 위치 API
+                const response = await axios.get(`http://${API_URL}:8000/asset/`);
+                const brandResponse = await axios.get(`http://${API_URL}:8000/brand/`); // 브랜드 API
+                const locationResponse = await axios.get(`http://${API_URL}:8000/location/`); // 위치 API
 
                 setBrandFilters(brandResponse.data.map(brand => ({ text: brand.brand_name, value: brand.brand_name })));
                 setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
@@ -110,8 +109,8 @@ function AssetTable() {
     const handleOk = async (values) => {
         try {
             const updatedItem = await form.validateFields();
-            await axios.put(`http://192.168.0.102:8000/asset/put/`, values);
-            const response = await axios.get('http://192.168.0.102:8000/asset/');
+            await axios.put(`http://${API_URL}:8000/asset/put/`, values);
+            const response = await axios.get(`http://${API_URL}:8000/asset/`);
             setData(response.data);
             setIsModalVisible(false);
 
@@ -124,8 +123,8 @@ function AssetTable() {
     // 데이터 삭제를 위한 API 요청 함수
     const handleDelete = async (id) => {
         try{
-            await axios.delete(`http://192.168.0.102:8000/asset/delete/${id}`);
-            const response = await axios.get('http://192.168.0.102:8000/asset/');
+            await axios.delete(`http://${API_URL}:8000/asset/delete/${id}`);
+            const response = await axios.get(`http://${API_URL}:8000/asset/`);
             const updatedData = response.data;
             const totalPages = Math.ceil(updatedData.length / pageSize);
     
@@ -157,9 +156,9 @@ function AssetTable() {
 
             console.log(tesmp);
             console.log(item);
-            await axios.post('http://192.168.0.102:8000/asset/add/', item);
+            await axios.post(`http://${API_URL}:8000/asset/add/`, item);
             
-            const response = await axios.get('http://192.168.0.102:8000/asset/');
+            const response = await axios.get(`http://${API_URL}:8000/asset/`);
             setData(response.data);
             setCreateModalVisible(false);
 
@@ -329,7 +328,7 @@ function AssetTable() {
         <div>
             {contextHolder}
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}} danger>데이터 등록</Button>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
             </Space>
             <Table
                 columns={columns}

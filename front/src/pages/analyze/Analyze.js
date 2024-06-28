@@ -4,7 +4,6 @@ import CustomLayout from '../../components/layout/CustomLayout';
 import { Layout, Typography, Divider } from 'antd';
 
 const { Title } = Typography;
-const { Content } = Layout;
 
 function Analyze(props) {
     return (
