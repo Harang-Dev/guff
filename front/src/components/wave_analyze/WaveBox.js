@@ -26,10 +26,9 @@ function WaveBox(props) {
 
         try {
             const response = await axios.post(`http://${API_URL}:8000/wave/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
-            console.log('upload successful: ',  response.data);
             message.success('Upload Successful');
 
-            navigate('/wave-analyze/success', { state: { version, filename, data: response.data }});
+            navigate('/wave-analyze/success', { state : { filename: response.data }});
         } catch (error) {
             console.error('uploda error: ', error);
             message.error('Upload Failed');
@@ -42,14 +41,13 @@ function WaveBox(props) {
         beforeUpload: handleUpload,
     };
 
-    // CenteredContainer를 지우면 반응형으로 잘 동작함! 사이즈 줄이면 잘 반응함
-    // 근데 있으면 왜 반응하지 못하지? 병123신인가봐 ㅠㅠ
     return (
         <div>
             <Form>
                 <Form.Item label="버전" >
                     <Select placeholder="Select Version" onChange={setVersion}>
                         <Option value="HB">HB</Option>
+                        <Option value="BM">BM</Option>
                     </Select>
                 </Form.Item>
 

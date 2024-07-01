@@ -12,6 +12,7 @@ mapper = LocationMapper()
 
 @location.get("/", tags=['location'], response_model=list[LocationDTO])
 def read_all(db: Session = Depends(get_db)):
+    print(mapper.read_all(db))
     return mapper.read_all(db)
 
 @location.get("/read/{location_name}", tags=['location'], response_model=LocationDTO)
