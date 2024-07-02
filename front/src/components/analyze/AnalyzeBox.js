@@ -36,7 +36,6 @@ function AnalyzeBox(props) {
 
         try {
             const response = await axios.post(`http://${API_URL}:8000/parser/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
-            console.log('upload successful: ',  response.data);
             message.success('Upload Successful');
 
             navigate('/analyze/success', { state: { version, findText, data: response.data }});

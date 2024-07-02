@@ -21,7 +21,6 @@ const WaveTable = () => {
     };
     
     const showModal = () => {
-        console.log(filename);
         setIsModal(true);
     }
 

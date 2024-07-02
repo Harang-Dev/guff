@@ -58,20 +58,18 @@ class WaveMapper:
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
 
-    def get_time_data(self, filename: str, time: float, db: Session):
-        try:
-            wave_data = self.get_file(filename, db)
-            time_list = [i.time for i in wave_data]
-            time_data = min(time_list, key=lambda x: abs(x-time))
+    # def get_time_data(self, filename: str, time: float, db: Session):
+    #     try:
+    #         wave_data = self.get_file(filename, db)
+    #         time_list = [i.time for i in wave_data]
+    #         time_data = min(time_list, key=lambda x: abs(x-time))
 
-            print(time_data)
-
-            for index, data in enumerate(wave_data):
-                if data.time == time_data:
-                    return wave_data[:index + 1]
+    #         for index, data in enumerate(wave_data):
+    #             if data.time == time_data:
+    #                 return wave_data[:index + 1]
             
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
+    #     except Exception as e:
+    #         raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
 
 
             

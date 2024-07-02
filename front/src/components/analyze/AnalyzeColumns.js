@@ -20,7 +20,7 @@ export const SimpleColumns = (locData) => [
     {
         title: '진동속도(cm/s)',
         align: 'center',
-        children: [
+        items: [
             {
                 title: '최저치',
                 dataIndex: '진동속도(cm/s) 최저치',
@@ -38,7 +38,7 @@ export const SimpleColumns = (locData) => [
     {
         title: '진동레벨[dB(V)]',
         align: 'center',
-        children: [
+        items: [
             {
                 title: '최저치',
                 dataIndex: '진동레벨[dB(V)] 최저치',
@@ -56,7 +56,7 @@ export const SimpleColumns = (locData) => [
     {
         title: '소음[dB(A)]',
         align: 'center',
-        children: [
+        items: [
             {
                 title: '최저치',
                 dataIndex: '소음[dB(A)] 최저치',

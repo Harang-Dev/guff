@@ -61,7 +61,6 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
                 //     Object.entries(formattedValues).map(([key, value]) => [key, value || null])
                 // );
 
-                console.log(formattedValues);
                 form.resetFields();
                 onOk(formattedValues);
             })

@@ -50,7 +50,6 @@ function BatteryTable() {
                 setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
                 setData(response.data);
 
-                console.log(productFilters);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -76,8 +75,6 @@ function BatteryTable() {
     const handleUpdate = async (item) => {
         try {
             const updateItem = await form.validateFields();
-
-            console.log(item);
             await axios.put(`http://${API_URL}:8000/battery/put/`, item);
             const response = await axios.get(`http://${API_URL}:8000/battery/`);
             setData(response.data);

@@ -142,20 +142,6 @@ function AssetTable() {
     // 데이터 추가를 위한 API 요청 함수
     const handleCreate = async (item) => {
         try {
-            console.log(item);
-            const tesmp = {
-                "brand_name": "NeoBlast",
-                "asset_name": "test",
-                "state": true,
-                "location_name": "사무실",
-                "start_date": "2024-06-25",
-                "end_date": "2024-06-25",
-                "rent_state": true,
-                "marks": null
-            };
-
-            console.log(tesmp);
-            console.log(item);
             await axios.post(`http://${API_URL}:8000/asset/add/`, item);
             
             const response = await axios.get(`http://${API_URL}:8000/asset/`);

@@ -14,7 +14,6 @@ const HomeComponent = () => {
     useEffect(() => {
         const fetchBattery = async () =>  {
             try {
-                console.log(API_URL)
                 const response = await axios.get(`http://${API_URL}:8000/battery/`);
                 const filteredData = filterAndSortData(response.data);
                 setBatteryItem(filteredData);
@@ -26,7 +25,6 @@ const HomeComponent = () => {
         const fetchAsset = async() => {
             try {
                 const response = await axios.get(`http://${API_URL}:8000/asset/`);
-                console.log(response.data);
 
                 const filteredAssetItem = filterAndSortData(response.data);
                 setAssetItem(filteredAssetItem);
@@ -36,7 +34,6 @@ const HomeComponent = () => {
         }
 
         fetchBattery();
-        console.log(batteryItem);
         fetchAsset();
     }, []);
 

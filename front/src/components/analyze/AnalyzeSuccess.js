@@ -81,8 +81,6 @@ function AnalyzeResult(props) {
             case "간단이":
                 return SimpleColumns(locData);
             case "어중이떠중이":
-                const a = [ '소음레벨', '진동'];
-                console.log(a.includes('소음'));
                 return ProperColumns({data, locData});
             case "복잡이":
                 return ProperColumns({data, locData});;

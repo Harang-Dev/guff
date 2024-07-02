@@ -48,6 +48,7 @@ function WaveBox(props) {
                     <Select placeholder="Select Version" onChange={setVersion}>
                         <Option value="HB">HB</Option>
                         <Option value="BM">BM</Option>
+                        <Option value="SV">SV</Option>
                     </Select>
                 </Form.Item>
 

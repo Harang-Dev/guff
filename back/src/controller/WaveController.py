@@ -12,8 +12,9 @@ from src.mapper.WaveMapper import WaveMapper
 from src.service.WavePaser import WaveParser
 from src.service.HBParser import HBParser
 from src.service.BMParser import BMParser
+from src.service.SVParser import SVParser
 
-PARSER_VERSION = { 'HB': HBParser(), 'BM': BMParser() }
+PARSER_VERSION = { 'HB': HBParser(), 'BM': BMParser(), 'SV': SVParser() }
 
 wave_parser = APIRouter(prefix="/wave")
 mapper = WaveMapper()
@@ -44,6 +45,27 @@ async def parsing(file: UploadFile = File(...), version: str = Form(...), db: Se
 def get_file(filename: str, db: Session = Depends(get_db)):
     return mapper.get_file(filename, db)
 
-@wave_parser.get('/{filename}/{time}', tags=['wave'], response_model=list[WaveDataDTO])
-def get_time_data(filename: str, time: float, db: Session = Depends(get_db)):
-    return mapper.get_time_data(filename, time, db)
+@wave_parser.get('/{filename}/{time}', tags=['wave'])
+def get_time_data(filename: str, time: float, lastIndex: int = 0, db: Session = Depends(get_db)):
+    wave_data = mapper.get_file(filename, db)
+
+    time_list = [i.time for i in wave_data]
+    min_time = min(time_list, key=lambda x: abs(x-time))
+
+    for index, data in enumerate(wave_data):
+        if data.time == min_time:
+                current_index = index
+                time_data = wave_data[lastIndex:index + 1]
+
+    result_data = {
+        "wave_id" : 1,
+        "tran" : max([i.tm for i in time_data]),
+        "vert" : max([i.vm for i in time_data]),
+        "long" :max([i.lm for i in time_data]),
+        "ppv" : max([i.ppv for i in time_data]),
+        "latestIndex" : current_index,
+    }
+    
+    print([i.time for i in time_data])
+
+    return result_data

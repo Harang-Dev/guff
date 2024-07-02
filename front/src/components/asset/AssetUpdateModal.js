@@ -48,7 +48,6 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 end_date: selectItem.end_date ? dayjs(selectItem.end_date) : null,
                 marks: selectItem.marks || null,
             });
-            console.log(form.getFieldsValue());
             if (selectItem.state === "N") {
                 setIsLocationDisabled(true);
                 form.setFieldValue({location_name: "사무실"});
