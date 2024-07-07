@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Badge, Calendar, Modal, DatePicker, TimePicker, Input } from 'antd';
+import React, { useState } from 'react';
+import { Badge, Calendar, Modal, DatePicker, TimePicker, Input, Button } from 'antd';
 import 'antd/dist/antd.css';
 import DummyData from './dummy.json';
 
@@ -8,6 +8,7 @@ const { RangePicker } = DatePicker;
 
 const App = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
@@ -16,19 +17,29 @@ const App = () => {
   const [taskDetails, setTaskDetails] = useState('');
   const [notes, setNotes] = useState('');
   const [categoryColor, setCategoryColor] = useState('#1677ff');
-  const [schedule, setSchedule] = useState([]);
+  const [schedule, setSchedule] = useState(DummyData);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = () => {
-    setSchedule(DummyData);
+  const handleDateSelect = (value) => {
+    setSelectedStartDate(value);
+    setSelectedEndDate(value);
+    showFloatButton(true);
   };
 
-  const onSelect = (value) => {
-    setSelectedStartDate(value);
+  const showFloatButton = (show) => {
+    const floatButton = document.getElementById('floatButton');
+    if (floatButton) {
+      floatButton.style.display = show ? 'block' : 'none';
+    }
+  };
+
+  const openAddModal = () => {
     setIsModalVisible(true);
+    showFloatButton(false);
+  };
+
+  const openDetailModal = () => {
+    setIsDetailModalVisible(true);
+    showFloatButton(false);
   };
 
   const handleOk = () => {
@@ -49,6 +60,8 @@ const App = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsDetailModalVisible(false);
+    showFloatButton(true);
   };
 
   const getListData = (value) => {
@@ -80,9 +93,31 @@ const App = () => {
     return info.originNode;
   };
 
+  const showDetailModal = (value) => {
+    setSelectedStartDate(value);
+    setSelectedEndDate(value);
+    setIsDetailModalVisible(true);
+    showFloatButton(false);
+  };
+
+  const filterEventsForSelectedDate = () => {
+    if (!selectedStartDate || !selectedEndDate) return [];
+
+    const startDateStr = selectedStartDate.format('YYYY-MM-DD');
+    const endDateStr = selectedEndDate.format('YYYY-MM-DD');
+
+    return schedule.filter(event => {
+      return startDateStr >= event.startDate && endDateStr <= event.endDate;
+    });
+  };
+
   return (
     <>
-      <Calendar onSelect={onSelect} cellRender={cellRender} />
+      <Calendar onSelect={handleDateSelect} cellRender={cellRender} />
+      <div id="floatButton" style={{ display: 'none', position: 'fixed', bottom: '20px', right: '20px', zIndex: 999 }}>
+        <Button type="primary" size="large" style={{ marginBottom: '10px', display: 'block' }} onClick={openAddModal}>일정 추가</Button>
+        <Button type="default" size="large" style={{ display: 'block' }} onClick={openDetailModal}>상세 일정 보기</Button>
+      </div>
       <Modal
         title="일정 추가"
         visible={isModalVisible}
@@ -135,6 +170,27 @@ const App = () => {
             onChange={e => setCategoryColor(e.target.value)}
           />
         </div>
+      </Modal>
+      <Modal
+        title="상세 일정"
+        visible={isDetailModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            닫기
+          </Button>
+        ]}
+      >
+        {filterEventsForSelectedDate().map((event, index) => (
+          <div key={index} style={{ marginBottom: '16px', borderBottom: '1px solid #e8e8e8', paddingBottom: '12px' }}>
+            <p><strong>일정:</strong> {event.taskDetails}</p>
+            <p><strong>기간:</strong> {event.startDate} ~ {event.endDate}</p>
+            <p><strong>시간:</strong> {event.startTime} - {event.endTime}</p>
+            <p><strong>담당자:</strong> {event.assignee}</p>
+            <p><strong>비고:</strong> {event.notes}</p>
+            <p><strong>카테고리:</strong> <span style={{ backgroundColor: event.categoryColor, padding: '4px', color: 'white', borderRadius: '4px' }}>{event.categoryColor}</span></p>
+          </div>
+        ))}
       </Modal>
     </>
   );
