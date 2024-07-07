@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import Calendar from '../schedule/Calnedar';
 
 import { bColumn, aColumn } from './homeColumns';
-import { Card, Row, Col, message, Table, Empty, Calendar, Divider } from 'antd';
+import { Card, Row, Col, message, Table, Empty, Divider } from 'antd';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
