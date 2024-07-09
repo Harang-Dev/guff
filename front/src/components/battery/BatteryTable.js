@@ -39,9 +39,11 @@ function BatteryTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/battery/`);
-                const productResponse = await axios.get(`http://${API_URL}:8000/product/`);
-                const locationResponse = await axios.get(`http://${API_URL}:8000/location/`);
+                const response = await axios.get(`${API_URL}/battery/`);
+                const productResponse = await axios.get(`${API_URL}/product/`);
+                const locationResponse = await axios.get(`${API_URL}/location/`);
+
+                console.log(response.data);
 
                 setProductFilters(productResponse.data.map(product => ({ 
                     text: `${product.product_name} (${product.brand_name})`,
@@ -75,8 +77,8 @@ function BatteryTable() {
     const handleUpdate = async (item) => {
         try {
             const updateItem = await form.validateFields();
-            await axios.put(`http://${API_URL}:8000/battery/put/`, item);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.put(`${API_URL}/battery/put/`, item);
+            const response = await axios.get(`${API_URL}/battery/`);
             setData(response.data);
             setIsUpdateModalVisible(false);
 
@@ -90,8 +92,8 @@ function BatteryTable() {
         try {
             const createItem = await form.validateFields();
 
-            await axios.post(`http://${API_URL}:8000/battery/add`, item);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.post(`${API_URL}/battery/add`, item);
+            const response = await axios.get(`${API_URL}/battery/`);
             setData(response.data);
             setIsCreateModalVisible(false);
             handleNotification('배터리 현황 데이터를 추가했습니다.');
@@ -102,8 +104,8 @@ function BatteryTable() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://${API_URL}:8000/battery/delete/${id}`);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.delete(`${API_URL}/battery/delete/${id}`);
+            const response = await axios.get(`${API_URL}/battery/`);
 
             const updatedData = response.data;
             const totalPages = Math.ceil(updatedData.length / pageSize);

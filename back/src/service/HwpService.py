@@ -18,52 +18,32 @@ class HwpService:
 
         return mXml
 
-    def set_target_tag(self, xml, search_text: str):
+    def findTag(self, xml, findWord: str):
         tree = ET.parse(xml)
         root = tree.getroot()
         elements = list(root.iter())
 
-        target_tag = []
-        for item in elements:
-            if item.text and search_text in item.text and item.text.startswith(search_text):
-                target_tag.append(item)
-        
-        return target_tag
-    
-    def set_column_tag(self, target_tag):
-        column_tag = None
-        
-        for item in target_tag.iterancestors():
-            if item.tag == "ColumnSet":
-                column_tag = item
+        textTag = next((item for item in elements if item.text and item.text.startswith(findWord)), None)
+        columnTag = next((item for item in textTag.iterancestors() if item.tag == "ColumnSet"), None)
 
-        return column_tag
+        return columnTag, textTag
     
-    def set_table_cell(self, column_tag, target_tag):
-        table_tag = []
-        current_table_tag = []
-        start_collecting = False
+    def setTableData(self, columnTag, textTag):
+        findIndex = [i for i in columnTag.iter()].index(textTag)
+        tableControl = [ j for j in [ i for i in columnTag.iter()][findIndex:] if j.tag == "TableControl" ]
+        tableRow = [i.findall('.//TableRow') for i in tableControl ]
 
-        for item in column_tag.iter():
-            if item == target_tag:
-                start_collecting = True
-            elif start_collecting and item.tag == "TableCell":
+        xml_list = []
+        for rows, id in zip(tableRow, [id.get('table-id') for id in tableControl]):
+            for row in [ tag for row in rows for tag in row.findall('.//TableCell') ]:
                 data = {
-                    'row': item.get('row'),
-                    'col': item.get('col'),
-                    'colspan': item.get('colspan'),
-                    'rowspan': item.get('rowspan'),
-                    'text': "".join(elem.text for elem in item.findall(".//Text") if elem.text).replace(" ", "")
+                    'table-id': int(id),
+                    'row': int(row.get('row')),
+                    'rowspan': int(row.get('rowspan')),
+                    'col': int(row.get('col')),
+                    'colspan': int(row.get('colspan')),
+                    'text': "".join(t.text for t in row.findall('.//Text') if t.text)
                 }
+                xml_list.append(data)
 
-                if len(current_table_tag) != 0 and data['row'] == '0' and data['col'] == '0':
-                    table_tag.append(current_table_tag)
-                    current_table_tag = [data]
-                else:
-                    current_table_tag.append(data)
-
-        if current_table_tag:
-            table_tag.append(current_table_tag)
-
-        return table_tag
-
+        return xml_list

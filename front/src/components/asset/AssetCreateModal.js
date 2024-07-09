@@ -17,7 +17,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     useEffect(() => {
         const fetchBrands = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/brand/`);
+                const response = await axios.get(`${API_URL}/brand/`);
                 setBrands(response.data);
             } catch(error) {
                 console.error('Error fetching brands: ', error);
@@ -26,7 +26,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/location/`);
+                const response = await axios.get(`${API_URL}/location/`);
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);

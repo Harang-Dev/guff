@@ -20,7 +20,7 @@ function AnalyzeResult(props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/parser/${version}`);
+                const response = await axios.get(`${API_URL}/parser/${version}`);
                 setLocData(response.data);
             } catch (error) {
                 message.error('위치 데이터 불러오기 실패');
@@ -34,7 +34,7 @@ function AnalyzeResult(props) {
     const showStatisticsModal = () => {
         const statistics = async () => {
             try {
-                const response = await axios.post(`http://${API_URL}:8000/parser/statistics/`, {
+                const response = await axios.post(`${API_URL}/parser/statistics/`, {
                     version: version,
                     location: locData,
                 });
@@ -55,7 +55,7 @@ function AnalyzeResult(props) {
 
     const download = async () => {
         try {
-            const response = await axios.get(`http://${API_URL}:8000/parser/download/${version}`, {
+            const response = await axios.get(`${API_URL}/parser/download/${version}`, {
                 responseType: 'blob',
             });
 

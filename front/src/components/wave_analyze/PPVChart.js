@@ -15,7 +15,7 @@ const PPVChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://${API_URL}:8000/wave/${filename}`);
+        const response = await axios.get(`${API_URL}/wave/${filename}`);
         setData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);

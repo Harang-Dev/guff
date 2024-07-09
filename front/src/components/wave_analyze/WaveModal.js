@@ -24,7 +24,7 @@ const WaveModal = ({open, onCancel, item}) => {
         });
         
         try {
-            const response = await axios.get(`http://${API_URL}:8000/wave/${item}/${timeValue}?lastIndex=${latestIndex}`);
+            const response = await axios.get(`${API_URL}/wave/${item}/${timeValue}?lastIndex=${latestIndex}`);
             setLatestIndex(response.data.latestIndex);
             setCards(prevCards => [...prevCards, newCard(response.data)]);
         } catch (error) {

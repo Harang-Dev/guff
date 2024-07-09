@@ -1,26 +1,30 @@
-from abc import ABC, abstractmethod
+import copy
+from collections import defaultdict, Counter
+from itertools import cycle, chain
 
-class ParseService(ABC):
-    @abstractmethod
-    def delete_non_target_data(self, table_data):
-        pass
+class ParseService():
+    TARGET_TEXT = [ '일자', '발파시간', '계측위치', '진동속도', '진동레벨', '소음', '관리기준', '계측위치' ]
 
-    @abstractmethod
-    def extract_columns(self, table_list):
-        pass
 
-    @abstractmethod
-    def extract_non_column_data(self, table_list, columns):
-        pass
+    def getFilteredDataList(self, xmlData: list, columnRows: list[int]):
+        tableId = sorted(set([data['table-id'] for data in xmlData]))
+        attachedTableIdData = [[data for data in xmlData if data['table-id'] == id]for id in tableId]
 
-    @abstractmethod
-    def group_by_date(self, dict_list):
-        pass
+        filteredData = [
+            sublist for sublist in attachedTableIdData
+            if any( entry['row'] in columnRows and any(keyword in entry['text'] for keyword in self.TARGET_TEXT) for entry in sublist )
+        ]
 
-    @abstractmethod
-    def update_merge_data(self, group_list):
-        pass
+        return filteredData
+    
+    def expandData(self, data: dict):
+        expandData = []
 
-    @abstractmethod
-    def serialize_to_dict(self, group_list, columns):
-        pass
+        for i in range(data['colspan']):
+            tempData = copy.deepcopy(data)
+            tempData['colspan'] = 1
+            tempData['col'] += i
+
+            expandData.append(tempData)
+
+        return expandData

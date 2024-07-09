@@ -35,7 +35,7 @@ function AnalyzeBox(props) {
         formData.append('search_text', findText);
 
         try {
-            const response = await axios.post(`http://${API_URL}:8000/parser/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
+            const response = await axios.post(`${API_URL}/parser/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
             message.success('Upload Successful');
 
             navigate('/analyze/success', { state: { version, findText, data: response.data }});

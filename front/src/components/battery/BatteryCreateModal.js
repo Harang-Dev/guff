@@ -15,7 +15,7 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/product/`);
+                const response = await axios.get(`${API_URL}/product/`);
                 setProducts(response.data);
             } catch(error) {
                 console.error('Error fetching products: ', error);
@@ -24,7 +24,7 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
     
         const fetchLocations = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/location/`);
+                const response = await axios.get(`${API_URL}/location/`);
                 setLocations(response.data);
             } catch(error) {
                 console.error('Error fetching locations: ', error);

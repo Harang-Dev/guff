@@ -25,7 +25,7 @@ function WaveBox(props) {
         setFileName(file.name);
 
         try {
-            const response = await axios.post(`http://${API_URL}:8000/wave/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
+            const response = await axios.post(`${API_URL}/wave/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
             message.success('Upload Successful');
 
             navigate('/wave-analyze/success', { state : { filename: response.data }});
