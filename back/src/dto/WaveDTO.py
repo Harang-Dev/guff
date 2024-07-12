@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
 
 class WaveDataDTO(BaseModel):
@@ -13,3 +13,9 @@ class WaveDataDTO(BaseModel):
     lm: Optional[float]
     ppv: Optional[float] 
 
+class WaveFileDTO(BaseModel):
+    wave_name: str
+    data: list[WaveDataDTO]
+
+class WaveFileinDB(WaveFileDTO):
+    wave_id: int    

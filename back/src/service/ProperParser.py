@@ -33,7 +33,7 @@ class ProperParser(ParseService):
             customDict = CustomDefaultDict()
             rowsGroupList = [data for data in sortedDataList if data['row'] == row]
             for datum, column in zip(rowsGroupList, columns):
-                customDict.append(column['text'], datum['text'])
+                customDict.append(column['text'].replace(" ", ""), datum['text'])
             result.append(dict(customDict))
-        print(result)
+
         return result

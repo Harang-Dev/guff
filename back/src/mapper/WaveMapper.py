@@ -2,10 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from src.vo.WaveFileVO import WaveFileVO
-from src.dto.WaveFileDTO import *
+from src.dto.WaveDTO import *
 
 from src.vo.WaveDataVO import WaveDataVO
-from src.dto.WaveDataDTO import *
 
 class WaveMapper:
     def insert(self, filename: str, dto: list[WaveFileDTO], db: Session):
@@ -42,34 +41,26 @@ class WaveMapper:
             db.rollback()
             raise HTTPException(status_code=400, detail=f"Error inserting wave file and data: {str(e)}")
         
-    def get_file(self, filename: str, db: Session):
+    def getFileId(self, filename: str, db: Session):
         try:
             # Step 1: filename을 통해 wave_id 조회
             wave_file = db.query(WaveFileVO).filter(WaveFileVO.wave_name == filename).first()
             if not wave_file:
                 raise HTTPException(status_code=404, detail="File not found")
 
+            return wave_file.wave_id
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
+
+    def getWaveDataList(self, waveId: int, db: Session):
+        try:
             # Step 2: wave_id를 통해 WaveData 조회
-            wave_data = db.query(WaveDataVO).filter(WaveDataVO.wave_id == wave_file.wave_id).all()
+            wave_data = db.query(WaveDataVO).filter(WaveDataVO.wave_id == waveId).all()
             if not wave_data:
                 raise HTTPException(status_code=404, detail="Data not found")
 
             return wave_data
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
-
-    # def get_time_data(self, filename: str, time: float, db: Session):
-    #     try:
-    #         wave_data = self.get_file(filename, db)
-    #         time_list = [i.time for i in wave_data]
-    #         time_data = min(time_list, key=lambda x: abs(x-time))
-
-    #         for index, data in enumerate(wave_data):
-    #             if data.time == time_data:
-    #                 return wave_data[:index + 1]
-            
-    #     except Exception as e:
-    #         raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
-
 
             

@@ -1,29 +1,52 @@
-from fastapi import APIRouter, UploadFile, File, Form, Request
+from fastapi import APIRouter, UploadFile, File, Form, Request, Depends
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 from pathlib import Path
 
 import os, tempfile
 import pandas as pd
 
-from src.service.ParseService import ParseService
+from src.db.connection import get_db
+from src.dto.HwpDTO import *
 from src.service.HwpService import HwpService
 from src.service.SimpleParser import SimpleParser
 from src.service.ComplicatedParser import ComplicatedParser
 from src.service.ProperParser import ProperParser
+from src.mapper.HwpMapper import HwpMapper
 
 PARSER_VERSION = {'간단이': SimpleParser() , '복잡이': ComplicatedParser(), '어중이떠중이': ProperParser()}
-FIND_WORD = {
-    '간단이' : ['일시', '진동속도(cm/s)', '진동레벨[dB(V)]', '소음[dB(A)]', '구분'], 
-    '복잡이' : ['일시', '시간', '발파진동(cm/s)', '진동레벨dB(V)', '소음레벨dB(A)', '측정위치'], 
-    '어중이떠중이' : ['일자', '발파시간', '진동속도(cm/s)', '진동레벨(dB(V))', '소음레벨(dB(A))','계측위치']
+STANDARD_COLUMNS = {
+    '간단이' : { 
+        '일시' : 'measurement_date', 
+        '진동속도(cm/s)' : 'wave_speed', 
+        '진동레벨[dB(V)]' : 'wave_level', 
+        '소음[dB(A)]' : 'noise', 
+        '구분' : 'measurement_location',
+        '비고' : 'marks'}, 
+    '복잡이' : {
+        '일시' : 'measurement_date', 
+        '시간' : 'measurement_time', 
+        '발파진동(cm/s)' : 'wave_speed', 
+        '진동레벨dB(V)' : 'wave_level', 
+        '소음레벨dB(A)' : 'noise', 
+        '측정위치' : 'measurement_location'}, 
+    '어중이떠중이' : {
+        '일자' : 'measurement_date', 
+        '발파시간' : 'measurement_time', 
+        '진동속도(cm/s)' : 'wave_speed', 
+        '진동레벨(dB(V))' : 'wave_level', 
+        '소음레벨(dB(A))' : 'noise',
+        '계측위치' : 'measurement_location'}
     }
 
 parser = APIRouter(prefix='/parser')
 service = HwpService()
-serialize_data = []
+mapper = HwpMapper()
 
 @parser.post('/', tags=['parser'])
-async def parsing(file: UploadFile = File(...), version: str = Form(...), search_text: str = Form(...)):    
+async def parsing(file: UploadFile = File(...), version: str = Form(...), search_text: str = Form(...), db=Depends(get_db)):    
+    serialize_data = []
+
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         contents = await file.read()
         tmp_file.write(contents)
@@ -45,9 +68,27 @@ async def parsing(file: UploadFile = File(...), version: str = Form(...), search
     filteredXmlData = parser.getFilteredDataList(xmlData, [0, 1])
     for xmlDataList in filteredXmlData:
         serialize_data.extend(parser.getSerializeList([xmldata for xmldata in xmlDataList if xmldata['text']]))
-        
-    return serialize_data
 
+    print(serialize_data)
+
+    result = []
+    for data in serialize_data:
+        versionColumn = STANDARD_COLUMNS.get(version, {})
+        transformedData = {newKey: data[oldKey] for oldKey, newKey in versionColumn.items() if oldKey in data}
+        result.append(transformedData)
+    
+    mapper.insert(file.filename, result, db)
+
+    return file.filename
+
+@parser.get('/{filename}', tags=['parser'], response_model=list[HwpDataDTO])
+async def getHwpDataList(filename: str, db: Session = Depends(get_db)):
+    return mapper.getFileDataList(mapper.getFileID(filename, db), db)
+
+@parser.get('/{filename}/locations', tags=['parser'], response_model=list[str])
+async def getLocations(filename: str, db: Session = Depends(get_db)):
+    return mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
+    
 # @parser.get('/{version}', tags=['parser'])
 # def get_locations(version: str):
 #     if not version:

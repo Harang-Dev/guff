@@ -40,7 +40,7 @@ class SimpleParser(ParseService):
                     rowsGroupList = [data for data in dataList if data['row'] in [row]]
                     for data, column in zip(rowsGroupList, columns):
                         customDict.append(column['text'], data['text'])
-                    result.append(customDict)
+                    result.append(dict(customDict))
 
         return result
     

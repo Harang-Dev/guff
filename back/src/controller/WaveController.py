@@ -5,7 +5,7 @@ from datetime import datetime
 
 import os, tempfile
 
-from src.dto.WaveFileDTO import *
+from src.dto.WaveDTO import *
 
 from src.db.connection import get_db
 from src.mapper.WaveMapper import WaveMapper
@@ -43,11 +43,11 @@ async def parsing(file: UploadFile = File(...), version: str = Form(...), db: Se
 
 @wave_parser.get('/{filename}', tags=['wave'], response_model=list[WaveDataDTO])
 def get_file(filename: str, db: Session = Depends(get_db)):
-    return mapper.get_file(filename, db)
+    return mapper.getWaveDataList(mapper.getFileId(filename, db), db)
 
 @wave_parser.get('/{filename}/{time}', tags=['wave'])
 def get_time_data(filename: str, time: float, lastIndex: int = 0, db: Session = Depends(get_db)):
-    wave_data = mapper.get_file(filename, db)
+    wave_data = mapper.getWaveDataList(mapper.getFileId(filename, db), db)
 
     time_list = [i.time for i in wave_data]
     min_time = min(time_list, key=lambda x: abs(x-time))

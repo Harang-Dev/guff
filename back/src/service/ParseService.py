@@ -3,7 +3,7 @@ from collections import defaultdict, Counter
 from itertools import cycle, chain
 
 class ParseService():
-    TARGET_TEXT = [ '일자', '발파시간', '계측위치', '진동속도', '진동레벨', '소음', '관리기준', '계측위치' ]
+    TARGET_TEXT = [ 'cm/s', 'dB(V)', 'dB(A)' ]
 
 
     def getFilteredDataList(self, xmlData: list, columnRows: list[int]):
