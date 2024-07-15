@@ -9,12 +9,9 @@ import pandas as pd
 from src.db.connection import get_db
 from src.dto.HwpDTO import *
 from src.service.HwpService import HwpService
-from src.service.SimpleParser import SimpleParser
-from src.service.ComplicatedParser import ComplicatedParser
-from src.service.ProperParser import ProperParser
 from src.mapper.HwpMapper import HwpMapper
+from src.container.ParserContainer import ParserContainer
 
-PARSER_VERSION = {'간단이': SimpleParser() , '복잡이': ComplicatedParser(), '어중이떠중이': ProperParser()}
 STANDARD_COLUMNS = {
     '간단이' : { 
         '일시' : 'measurement_date', 
@@ -43,8 +40,18 @@ parser = APIRouter(prefix='/parser')
 service = HwpService()
 mapper = HwpMapper()
 
+def get_parser(version: str):
+    parserContainer = ParserContainer()
+    return parserContainer.parserVersion().get(version)
+
 @parser.post('/', tags=['parser'])
-async def parsing(file: UploadFile = File(...), version: str = Form(...), search_text: str = Form(...), db=Depends(get_db)):    
+async def parsing(
+    file: UploadFile = File(...), 
+    search_text: str = Form(...), 
+    version: str = Form(...), 
+    db=Depends(get_db), 
+):    
+    parser = get_parser(version)
     serialize_data = []
 
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
@@ -63,13 +70,10 @@ async def parsing(file: UploadFile = File(...), version: str = Form(...), search
     xmlData = service.setTableData(columnTag, textTag)
 
     os.remove(xml_path)
-    parser = PARSER_VERSION[version]
     
-    filteredXmlData = parser.getFilteredDataList(xmlData, [0, 1])
+    filteredXmlData = parser.getFilteredDataList(xmlData)
     for xmlDataList in filteredXmlData:
         serialize_data.extend(parser.getSerializeList([xmldata for xmldata in xmlDataList if xmldata['text']]))
-
-    print(serialize_data)
 
     result = []
     for data in serialize_data:
@@ -88,7 +92,7 @@ async def getHwpDataList(filename: str, db: Session = Depends(get_db)):
 @parser.get('/{filename}/locations', tags=['parser'], response_model=list[str])
 async def getLocations(filename: str, db: Session = Depends(get_db)):
     return mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
-    
+
 # @parser.get('/{version}', tags=['parser'])
 # def get_locations(version: str):
 #     if not version:

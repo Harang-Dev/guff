@@ -23,7 +23,7 @@ mapper = WaveMapper()
 async def parsing(file: UploadFile = File(...), version: str = Form(...), db: Session = Depends(get_db)):
     service = PARSER_VERSION[version]
 
-    filename = f'{datetime.now().strftime('%y%m%d-%H:%M:%S')}-{version}-{file.filename}'
+    filename = f"{datetime.now().strftime('%y%m%d-%H:%M:%S')}-{version}-{file.filename}"
 
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         contents = await file.read()

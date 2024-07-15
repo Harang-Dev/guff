@@ -5,6 +5,31 @@ from src.dto.CustomDefaultDict import CustomDefaultDict
 from src.service.ParseService import ParseService
 
 class ProperParser(ParseService):
+    TARGET_TEXT = [ 'cm/s', 'dB(V)', 'dB(A)' ]
+
+    def getFilteredDataList(self, xmlData: list):
+        columnRows = [0, 1]
+        tableId = sorted(set([data['table-id'] for data in xmlData]))
+        attachedTableIdData = [[data for data in xmlData if data['table-id'] == id]for id in tableId]
+
+        filteredData = [
+            sublist for sublist in attachedTableIdData
+            if any( entry['row'] in columnRows and any(keyword in entry['text'] for keyword in self.TARGET_TEXT) for entry in sublist )
+        ]
+
+        return filteredData
+
+    def expandData(self, data: dict):
+        expandData = []
+
+        for i in range(data['colspan']):
+            tempData = copy.deepcopy(data)
+            tempData['colspan'] = 1
+            tempData['col'] += i
+
+            expandData.append(tempData)
+
+        return expandData
 
     def createRange(self, dataList: list):
         mergeDataList = [mergeData for mergeData in dataList if mergeData['rowspan'] > 1]

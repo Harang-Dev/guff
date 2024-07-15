@@ -1,3 +1,5 @@
+import copy
+
 from collections import defaultdict, Counter
 from itertools import chain
 
@@ -5,10 +7,34 @@ from src.service.ParseService import ParseService
 from src.dto.CustomDefaultDict import CustomDefaultDict
 
 class SimpleParser(ParseService):
-    TARGET_TEXT = [ '구분', '진동속도', '진동레벨', '소음', '허용기준', '비고' ]
+    TARGET_TEXT = [ 'cm/s', 'dB(V)', 'dB(A)' ]
     
-    def createRange(self, dateDataList: list[dict]):
-        rowCounts = Counter(data['row'] for data in dateDataList)
+    def getFilteredDataList(self, xmlData: list):
+        columnRows = [1, 2]
+        tableId = sorted(set([data['table-id'] for data in xmlData]))
+        attachedTableIdData = [[data for data in xmlData if data['table-id'] == id]for id in tableId]
+
+        filteredData = [
+            sublist for sublist in attachedTableIdData
+            if any( entry['row'] in columnRows and any(keyword in entry['text'] for keyword in self.TARGET_TEXT) for entry in sublist )
+        ]
+
+        return filteredData
+
+    def expandData(self, data: dict):
+        expandData = []
+
+        for i in range(data['colspan']):
+            tempData = copy.deepcopy(data)
+            tempData['colspan'] = 1
+            tempData['col'] += i
+
+            expandData.append(tempData)
+
+        return expandData
+
+    def createRange(self, dataList: list[dict]):
+        rowCounts = Counter(data['row'] for data in dataList)
         dateRow = sorted(list({row: count for row, count in rowCounts.items() if count == 1}.keys()))
         
         ranges = defaultdict(range)
