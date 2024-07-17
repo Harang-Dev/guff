@@ -3,11 +3,12 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 
-import os, tempfile
+import os, tempfile, ast
 import pandas as pd
 
 from src.db.connection import get_db
 from src.dto.HwpDTO import *
+from src.dto.CustomDefaultDict import CustomDefaultDict
 from src.service.HwpService import HwpService
 from src.mapper.HwpMapper import HwpMapper
 from src.container.ParserContainer import ParserContainer
@@ -49,7 +50,7 @@ async def parsing(
     file: UploadFile = File(...), 
     search_text: str = Form(...), 
     version: str = Form(...), 
-    db=Depends(get_db), 
+    db=Depends(get_db),
 ):    
     parser = get_parser(version)
     serialize_data = []
@@ -85,52 +86,41 @@ async def parsing(
 
     return file.filename
 
-@parser.get('/{filename}', tags=['parser'], response_model=list[HwpDataDTO])
+@parser.get('/{filename}', tags=['parser'])
 async def getHwpDataList(filename: str, db: Session = Depends(get_db)):
-    return mapper.getFileDataList(mapper.getFileID(filename, db), db)
+    dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
 
+    for idx in range(len(dbData)):
+        try:
+            dbData[idx].wave_level = ast.literal_eval(dbData[idx].wave_level)
+            dbData[idx].wave_speed = ast.literal_eval(dbData[idx].wave_speed)
+            dbData[idx].noise = ast.literal_eval(dbData[idx].noise)
+        except:
+            continue
+
+    return dbData
+    
 @parser.get('/{filename}/locations', tags=['parser'], response_model=list[str])
-async def getLocations(filename: str, db: Session = Depends(get_db)):
+async def getLocatons(filename: str, db: Session = Depends(get_db)):
     return mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
 
-# @parser.get('/{version}', tags=['parser'])
-# def get_locations(version: str):
-#     if not version:
-#         return {'Error' : 'Not input version data'}
+@parser.get('/{filename}/statistics', tags=['parser'])
+async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
+    compareColumns = ['measurement_location', 'wave_speed', 'wave_level', 'noise']
 
-#     global serialize_data
-#     locations = [item[FIND_WORD[version]] for item in serialize_data]
-#     unique_locations = [{'location_name': item} for item in list(set(locations))]
+    dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
+    locations = mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
 
-#     return unique_locations
-
-# @parser.post('/statistics/', tags=['parser'])
-# async def filter_location(request: Request):    
-#     data = await request.json()
-#     version = data.get("version")
-#     location = data.get("location")
-    
-#     result = {}
-#     global serialize_data
-#     for loc_name in location:
-#         classification_data = [item for item in serialize_data if item[FIND_WORD[version]] == loc_name['location_name']]
-#         statistics_data = [{item: parse_float(items[item]) for item in items} for items in classification_data ]
-
-#         result[loc_name['location_name']] = {}
-#         min_data = {}
-#         max_data = {}
+    d = [{column: vars(item)[column] for column in compareColumns} for item in dbData]
+    # b = [[z for z in d if z['measurement_location'] == location]for location in locations]
+    b = CustomDefaultDict()
+    for location in locations:
+        for z in d:
+            for c in range(1, len(compareColumns)):
+                b.append(location, z[compareColumns[c]])
+                print(b)
+    return d
         
-#         for i in pd.DataFrame(statistics_data).columns:
-#             if i not in ['허용기준', '비고'] and i not in min_data.keys():
-#                 values = [parse_float(item[i]) for item in statistics_data if parse_float(item[i]) is not None]
-#                 min_data[i] = min(values) if values else '-'
-#                 max_data[i] = max(values) if values else '-'
-
-#         result[loc_name['location_name']]['Min'] = min_data
-#         result[loc_name['location_name']]['Max'] = max_data
-
-#     return result
-
 # @parser.get('/download/{version}', tags=['parser'])
 # def download_excel(version: str):
 #     df = pd.DataFrame(serialize_data)

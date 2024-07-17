@@ -69,7 +69,6 @@ class HwpMapper:
         try:
             # Step 2: file_id를 통해 WaveData 조회
             hwpLocationList = db.query(HwpDataVO.measurement_location).distinct().filter(HwpDataVO.file_id == fileId).all()
-            print(hwpLocationList)
             if not hwpLocationList:
                 raise HTTPException(status_code=404, detail="Data not found")
 

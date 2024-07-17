@@ -5,22 +5,31 @@ import { useLocation } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
 import { Space, Table, message, Button } from 'antd';
 
-import { SimpleColumns, ProperColumns } from './AnalyzeColumns';
+import { simpleColumns, properColumns, complicatedColumns } from './AnalyzeColumns';
 import AnalyzeStatisticsModal from './AnalyzeStatisticsModal';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 function AnalyzeResult(props) {
     const location = useLocation();
-    const { version , data } = location.state || {};
-    const [ sData, setData ] = useState([]);
+    const { version , filename } = location.state || {};
+    const [ data, setData ] = useState([]);
     const [ locData, setLocData ] = useState([]);
     const [ statisticsModalVisible, setStatisticsModalVisible ] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${API_URL}/parser/${version}`);
+                const response = await axios.get(`${API_URL}/parser/${filename}`);
+                setData(response.data);
+            } catch (error) {
+                message.error('한글 데이터 불러오기 실패');
+            }
+        };
+
+        const fetchLocData = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/parser/${filename}/locations`);
                 setLocData(response.data);
             } catch (error) {
                 message.error('위치 데이터 불러오기 실패');
@@ -28,6 +37,7 @@ function AnalyzeResult(props) {
         };
 
         fetchData();
+        fetchLocData();
     }, [version]); // version이 변경될 때만 실행
 
 
@@ -79,34 +89,37 @@ function AnalyzeResult(props) {
     const selectColumn = () => {
         switch (version) {
             case "간단이":
-                return SimpleColumns(locData);
+                return simpleColumns(locData);
             case "어중이떠중이":
-                return ProperColumns({data, locData});
+                return properColumns(locData);
             case "복잡이":
-                return ProperColumns({data, locData});;
+                return complicatedColumns(locData);;
         }
     };
-
 
     return (
         <div>
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                <Button type="primary" icon={<PlusOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button>
+                {/* <Button type="primary" icon={<PlusOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button> */}
                 <Button type="primary" icon={<PlusOutlined />} onClick={download} style={{marginBottom: 10}} >다운로드</Button>
             </Space>
 
             <Table
+                bordered
                 columns={selectColumn()}
                 dataSource={data}
-                pagination={{ pageSize: 50 }}
-                scroll={{ y: 800 }}
-            />
+                pagination={false}
+                scroll={{
+                    y: 700,
+                  }}
+            />    
             <AnalyzeStatisticsModal
                 open={statisticsModalVisible}
                 onCancel={handleStatisticsModalCancel}
-                item={sData}
+                item={data}
                 version={version}
             />
+
         </div>
     );
 };
