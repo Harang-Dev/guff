@@ -14,6 +14,7 @@ function AnalyzeResult(props) {
     const location = useLocation();
     const { version , filename } = location.state || {};
     const [ data, setData ] = useState([]);
+    const [ statisticsData, setStatisticsData ] = useState([]);
     const [ locData, setLocData ] = useState([]);
     const [ statisticsModalVisible, setStatisticsModalVisible ] = useState(false);
 
@@ -44,11 +45,8 @@ function AnalyzeResult(props) {
     const showStatisticsModal = () => {
         const statistics = async () => {
             try {
-                const response = await axios.post(`${API_URL}/parser/statistics/`, {
-                    version: version,
-                    location: locData,
-                });
-                setData(response.data);
+                const response = await axios.get(`${API_URL}/parser/${filename}/statistics`);
+                setStatisticsData(response.data);
                 console.log(response.data);
             } catch(error) {
                 message.error('통계 조회 실패');
@@ -100,7 +98,7 @@ function AnalyzeResult(props) {
     return (
         <div>
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                {/* <Button type="primary" icon={<PlusOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button> */}
+                <Button type="primary" icon={<PlusOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button>
                 <Button type="primary" icon={<PlusOutlined />} onClick={download} style={{marginBottom: 10}} >다운로드</Button>
             </Space>
 
@@ -116,7 +114,7 @@ function AnalyzeResult(props) {
             <AnalyzeStatisticsModal
                 open={statisticsModalVisible}
                 onCancel={handleStatisticsModalCancel}
-                item={data}
+                item={statisticsData}
                 version={version}
             />
 

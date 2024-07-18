@@ -3,8 +3,12 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 
-import os, tempfile, ast
+import os, tempfile, ast, json
 import pandas as pd
+import numpy as np
+
+# debug module
+from tabulate import tabulate
 
 from src.db.connection import get_db
 from src.dto.HwpDTO import *
@@ -106,20 +110,29 @@ async def getLocatons(filename: str, db: Session = Depends(get_db)):
 
 @parser.get('/{filename}/statistics', tags=['parser'])
 async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
-    compareColumns = ['measurement_location', 'wave_speed', 'wave_level', 'noise']
+    compareColumns = ['wave_speed', 'wave_level', 'noise']
 
     dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
     locations = mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
 
-    d = [{column: vars(item)[column] for column in compareColumns} for item in dbData]
-    # b = [[z for z in d if z['measurement_location'] == location]for location in locations]
-    b = CustomDefaultDict()
+    result = []
     for location in locations:
-        for z in d:
-            for c in range(1, len(compareColumns)):
-                b.append(location, z[compareColumns[c]])
-                print(b)
-    return d
+        statisticsResult = CustomDefaultDict()
+        statisticsResult.append('measurement_location', location)
+        for column in compareColumns:
+            tmpList = [parseFloat(transLiteral(vars(item)[column])) for item in dbData if item.measurement_location == location]
+            tmpDF = pd.DataFrame(tmpList)
+
+            if isNestedList(tmpList):
+                statisticsResult.append(column, [tmpDF[0].min(skipna=True), tmpDF[0].max(skipna=True)])
+                statisticsResult.append(column, [tmpDF[1].min(skipna=True), tmpDF[1].max(skipna=True)])
+            else:
+                statisticsResult.append(column, tmpDF[0].min(skipna=True))
+                statisticsResult.append(column, tmpDF[0].max(skipna=True))
+
+        result.append(statisticsResult)
+
+    return statisticsResult
         
 # @parser.get('/download/{version}', tags=['parser'])
 # def download_excel(version: str):
@@ -140,11 +153,31 @@ async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
 
 ##################################################################################################
 
-def parse_float(value):
+def transLiteral(value):
     try:
-        return f'{float(value)}'
+        return ast.literal_eval(value)
     except:
-        return None
+        return value
+
+def parseFloat(value):
+    if isinstance(value, list):
+        for idx in range(len(value)):
+            try:
+                value[idx] = float(value[idx])
+            except:
+                value[idx] = None
+        return value
+    else:
+        try:
+            return float(value)
+        except:
+            return None
+
+def isNestedList(value):
+    if isinstance(value, list):
+        return all(isinstance(item, list) for item in value)
+    else:
+        return False
 
 # def classification_evening_data(data_frame: pd.DataFrame, parser_name: str,):
 #     new_columns = []

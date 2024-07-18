@@ -22,8 +22,6 @@ class HwpMapper:
             db.commit()
             db.refresh(hwpFile)
 
-            print(dto)
-
             data_list = [
                 HwpDataVO(
                     file_id=hwpFile.file_id,
