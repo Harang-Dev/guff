@@ -7,9 +7,6 @@ import os, tempfile, ast, json
 import pandas as pd
 import numpy as np
 
-# debug module
-from tabulate import tabulate
-
 from src.db.connection import get_db
 from src.dto.HwpDTO import *
 from src.dto.CustomDefaultDict import CustomDefaultDict
