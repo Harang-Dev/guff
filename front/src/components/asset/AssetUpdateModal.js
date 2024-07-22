@@ -15,29 +15,6 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
-        const fetchBrands = async () => {
-            try {
-                const response = await axios.get(`http://${API_URL}:8000/brand/`);
-                setBrands(response.data);
-            } catch(error) {
-                console.error('Error fetching brands: ', error);
-            }
-        };
-    
-        const fetchLocations = async () => {
-            try {
-                const response = await axios.get(`http://${API_URL}:8000/location/`);
-                setLocations(response.data);
-            } catch(error) {
-                console.error('Error fetching locations: ', error);
-            }
-        };
-    
-        fetchBrands();
-        fetchLocations();
-    }, []);
-
-    useEffect(() => {
         if (selectItem) {
             // selectItem에 넘어오는 date 값들은 String으로 이루어져있음
             // 근데 DatePicker는 moment 객체로 받아들여야해서 date.isValid에서 에러가 발생한다고함
@@ -48,7 +25,6 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 end_date: selectItem.end_date ? dayjs(selectItem.end_date) : null,
                 marks: selectItem.marks || null,
             });
-            console.log(form.getFieldsValue());
             if (selectItem.state === "N") {
                 setIsLocationDisabled(true);
                 form.setFieldValue({location_name: "사무실"});
@@ -57,6 +33,24 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
             }
         }
     }, [selectItem, form]);
+
+    const fetchBrands = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/brand/`);
+            setBrands(response.data);
+        } catch(error) {
+            console.error('Error fetching brands: ', error);
+        }
+    };
+
+    const fetchLocations = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/location/`);
+            setLocations(response.data);
+        } catch(error) {
+            console.error('Error fetching locations: ', error);
+        }
+    };
 
     const handleStateChange = (value) => {
         if (value === "N") {
@@ -104,7 +98,13 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 </Form.Item>
 
                 <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
-                    <Select placeholder="Select a brand">
+                    <Select placeholder="Select a brand" 
+                        onDropdownVisibleChange={(open) => {
+                            if (open) {
+                                fetchBrands();
+                            }
+                        }}
+                    >
                         {brands.map(brand => (
                             <Option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</Option>
                         ))}
@@ -123,7 +123,15 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 </Form.Item>
 
                 <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
-                    <Select placeholder="Select a location" disabled={isLocationDisabled}>
+                    <Select 
+                        placeholder="Select a location" 
+                        disabled={isLocationDisabled} 
+                        onDropdownVisibleChange={(open) => {
+                            if(open) {
+                                fetchLocations();
+                            }
+                        }}
+                    >
                         {locations.map(location => (
                             <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
                         ))}

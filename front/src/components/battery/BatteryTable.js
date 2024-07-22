@@ -22,6 +22,7 @@ const EllipsisText = styled.div`
 function BatteryTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
+    const [sselectedItem, setSSelectedItem] = useState(null); // 선택된 아이템 데이터
 
     const [productFilters, setProductFilters] = useState(null);
     const [locationFilters, setLocationFilters] = useState(null);
@@ -39,9 +40,9 @@ function BatteryTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/battery/`);
-                const productResponse = await axios.get(`http://${API_URL}:8000/product/`);
-                const locationResponse = await axios.get(`http://${API_URL}:8000/location/`);
+                const response = await axios.get(`${API_URL}/battery/`);
+                const productResponse = await axios.get(`${API_URL}/product/`);
+                const locationResponse = await axios.get(`${API_URL}/location/`);
 
                 setProductFilters(productResponse.data.map(product => ({ 
                     text: `${product.product_name} (${product.brand_name})`,
@@ -50,7 +51,6 @@ function BatteryTable() {
                 setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
                 setData(response.data);
 
-                console.log(productFilters);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -60,12 +60,14 @@ function BatteryTable() {
     }, []);
 
     const showUpdateModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsUpdateModalVisible(true);
     };
 
     const showReadModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsReadModalVisible(true);
     };
 
@@ -76,10 +78,8 @@ function BatteryTable() {
     const handleUpdate = async (item) => {
         try {
             const updateItem = await form.validateFields();
-
-            console.log(item);
-            await axios.put(`http://${API_URL}:8000/battery/put/`, item);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.put(`${API_URL}/battery/put/`, item);
+            const response = await axios.get(`${API_URL}/battery/`);
             setData(response.data);
             setIsUpdateModalVisible(false);
 
@@ -93,8 +93,8 @@ function BatteryTable() {
         try {
             const createItem = await form.validateFields();
 
-            await axios.post(`http://${API_URL}:8000/battery/add`, item);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.post(`${API_URL}/battery/add`, item);
+            const response = await axios.get(`${API_URL}/battery/`);
             setData(response.data);
             setIsCreateModalVisible(false);
             handleNotification('배터리 현황 데이터를 추가했습니다.');
@@ -105,8 +105,8 @@ function BatteryTable() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://${API_URL}:8000/battery/delete/${id}`);
-            const response = await axios.get(`http://${API_URL}:8000/battery/`);
+            await axios.delete(`${API_URL}/battery/delete/${id}`);
+            const response = await axios.get(`${API_URL}/battery/`);
 
             const updatedData = response.data;
             const totalPages = Math.ceil(updatedData.length / pageSize);

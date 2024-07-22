@@ -1,11 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, message, Form, Descriptions, Divider } from 'antd';
-
+import { Modal, Button, message, Form, Divider, Table } from 'antd';
+import { complicatedStatisticsColumns, properStatisticsColumns, simpleStatisticsColumns } from './AnalyzeColumns';
 
 const AnalyzeStatisticsModal = ({open, onCancel, item, version }) => {
     const [form] = Form.useForm();
-    const blastColumn = [ 'cm/s', 'dB' ];
+
+    const selectColumn = () => {
+        switch (version) {
+            case "간단이":
+                return simpleStatisticsColumns();
+            case "어중이떠중이":
+                return properStatisticsColumns();
+            case "복잡이":
+                return complicatedStatisticsColumns();;
+        }
+    };
 
     return (
         <Modal
@@ -23,21 +33,18 @@ const AnalyzeStatisticsModal = ({open, onCancel, item, version }) => {
                 OK
                 </Button>
             ]}
+            width="100%"
             >
             <Divider />
-            {Object.keys(item).map((locName, index) => (
-                <Descriptions title={locName} key={index} column={version === '간단이' ? 2 : 12}>
-                    <Descriptions.Item span={version === '간단이' ? 2 : 12}>Min</Descriptions.Item>
-                    {Object.keys(item[locName].Min).map((key) => (
-                        blastColumn.some(keyword => key.includes(keyword)) ? <Descriptions.Item key={`MIN-${key}`} label={key} span={version === '간단이' ? 1 : 4}>{item[locName].Min[key]}</Descriptions.Item> : null
-                    ))}
-                    <Descriptions.Item span={version === '간단이' ? 2 : 12}>Max</Descriptions.Item>
-                    {Object.keys(item[locName].Max).map((key) => (
-                        blastColumn.some(keyword => key.includes(keyword)) ? <Descriptions.Item key={`Max-${key}`} label={key} span={version === '간단이' ? 1 : 4}>{item[locName].Max[key]}</Descriptions.Item> : null
-                    ))}
-                </Descriptions>
-
-            ))}            
+            <Table
+                bordered
+                columns={selectColumn()}
+                dataSource={item}
+                pagination={false}
+                scroll={{
+                    y: 700
+                }}
+            />
         </Modal>
     );
 };

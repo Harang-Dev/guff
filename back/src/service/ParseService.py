@@ -1,26 +1,18 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
-class ParseService(ABC):
+class ParseService(metaclass=ABCMeta):
     @abstractmethod
-    def delete_non_target_data(self, table_data):
+    def getFilteredDataList(self, xmlData):
         pass
 
     @abstractmethod
-    def extract_columns(self, table_list):
+    def expandData(self, data):
         pass
 
     @abstractmethod
-    def extract_non_column_data(self, table_list, columns):
+    def createRange(self, dataList):
         pass
 
     @abstractmethod
-    def group_by_date(self, dict_list):
-        pass
-
-    @abstractmethod
-    def update_merge_data(self, group_list):
-        pass
-
-    @abstractmethod
-    def serialize_to_dict(self, group_list, columns):
+    def getSerializeList(self, xmlDataList):
         pass

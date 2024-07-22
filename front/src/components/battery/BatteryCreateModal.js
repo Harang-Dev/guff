@@ -12,28 +12,23 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
     const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get(`http://${API_URL}:8000/product/`);
-                setProducts(response.data);
-            } catch(error) {
-                console.error('Error fetching products: ', error);
-            }
-        };
-    
-        const fetchLocations = async () => {
-            try {
-                const response = await axios.get(`http://${API_URL}:8000/location/`);
-                setLocations(response.data);
-            } catch(error) {
-                console.error('Error fetching locations: ', error);
-            }
-        };
-    
-        fetchProducts();
-        fetchLocations();
-    }, []);
+    const fetchLocations = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/location/`);
+            setLocations(response.data);
+        } catch(error) {
+            console.error('Error fetching locations: ', error);
+        }
+    };
+
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/product/`);
+            setProducts(response.data);
+        } catch(error) {
+            console.error('Error fetching products: ', error);
+        }
+    };
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -61,7 +56,6 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
                 //     Object.entries(formattedValues).map(([key, value]) => [key, value || null])
                 // );
 
-                console.log(formattedValues);
                 form.resetFields();
                 onOk(formattedValues);
             })
@@ -82,7 +76,13 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
 
             <Form form={form} layout="vertical">
                 <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Select placeholder="Select a product">
+                    <Select 
+                        placeholder="Select a product"
+                        onDropdownVisibleChange={(open) => {
+                            if (open) { fetchProducts(); }
+                        }}
+                        >
+
                         {products.map(product => (
                             <Option key={product.product_name} value={product.product_name}>{product.product_name} ({product.brand_name})</Option>
                         ))}
@@ -97,7 +97,13 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
                 </Form.Item>
 
                 <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
-                    <Select placeholder="Select a location" disabled={isLocationDisabled}>
+                    <Select 
+                        placeholder="Select a location" 
+                        disabled={isLocationDisabled}
+                        onDropdownVisibleChange={(open) => {
+                            if (open) { fetchLocations(); }
+                        }}    
+                    >
                         {locations.map(location => (
                             <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
                         ))}

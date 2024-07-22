@@ -42,9 +42,9 @@ function AssetTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://${API_URL}:8000/asset/`);
-                const brandResponse = await axios.get(`http://${API_URL}:8000/brand/`); // 브랜드 API
-                const locationResponse = await axios.get(`http://${API_URL}:8000/location/`); // 위치 API
+                const response = await axios.get(`${API_URL}/asset/`);
+                const brandResponse = await axios.get(`${API_URL}/brand/`); // 브랜드 API
+                const locationResponse = await axios.get(`${API_URL}/location/`); // 위치 API
 
                 setBrandFilters(brandResponse.data.map(brand => ({ text: brand.brand_name, value: brand.brand_name })));
                 setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
@@ -60,13 +60,15 @@ function AssetTable() {
 
     // 수정 모달 창 실행 함수
     const showModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsModalVisible(true);
     };
 
     // 조회 모달 창 실행 함수
     const showReadModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setReadModalVisible(true);
     }
 
@@ -109,8 +111,8 @@ function AssetTable() {
     const handleOk = async (values) => {
         try {
             const updatedItem = await form.validateFields();
-            await axios.put(`http://${API_URL}:8000/asset/put/`, values);
-            const response = await axios.get(`http://${API_URL}:8000/asset/`);
+            await axios.put(`${API_URL}/asset/put/`, values);
+            const response = await axios.get(`${API_URL}/asset/`);
             setData(response.data);
             setIsModalVisible(false);
 
@@ -123,8 +125,8 @@ function AssetTable() {
     // 데이터 삭제를 위한 API 요청 함수
     const handleDelete = async (id) => {
         try{
-            await axios.delete(`http://${API_URL}:8000/asset/delete/${id}`);
-            const response = await axios.get(`http://${API_URL}:8000/asset/`);
+            await axios.delete(`${API_URL}/asset/delete/${id}`);
+            const response = await axios.get(`${API_URL}/asset/`);
             const updatedData = response.data;
             const totalPages = Math.ceil(updatedData.length / pageSize);
     
@@ -142,23 +144,9 @@ function AssetTable() {
     // 데이터 추가를 위한 API 요청 함수
     const handleCreate = async (item) => {
         try {
-            console.log(item);
-            const tesmp = {
-                "brand_name": "NeoBlast",
-                "asset_name": "test",
-                "state": true,
-                "location_name": "사무실",
-                "start_date": "2024-06-25",
-                "end_date": "2024-06-25",
-                "rent_state": true,
-                "marks": null
-            };
-
-            console.log(tesmp);
-            console.log(item);
-            await axios.post(`http://${API_URL}:8000/asset/add/`, item);
+            await axios.post(`${API_URL}/asset/add/`, item);
             
-            const response = await axios.get(`http://${API_URL}:8000/asset/`);
+            const response = await axios.get(`${API_URL}/asset/`);
             setData(response.data);
             setCreateModalVisible(false);
 
@@ -198,12 +186,6 @@ function AssetTable() {
 
     // 표 속성 정해주는 변수
     const columns = [
-        // {
-        //     title: '순번',
-        //     dataIndex: 'asset_id',
-        //     key: 'asset_id',
-        //     align: 'center',
-        // },
         {
             title: '사용 여부',
             dataIndex: 'state',
