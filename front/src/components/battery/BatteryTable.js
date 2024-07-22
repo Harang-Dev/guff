@@ -22,6 +22,7 @@ const EllipsisText = styled.div`
 function BatteryTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
+    const [sselectedItem, setSSelectedItem] = useState(null); // 선택된 아이템 데이터
 
     const [productFilters, setProductFilters] = useState(null);
     const [locationFilters, setLocationFilters] = useState(null);
@@ -43,8 +44,6 @@ function BatteryTable() {
                 const productResponse = await axios.get(`${API_URL}/product/`);
                 const locationResponse = await axios.get(`${API_URL}/location/`);
 
-                console.log(response.data);
-
                 setProductFilters(productResponse.data.map(product => ({ 
                     text: `${product.product_name} (${product.brand_name})`,
                     value: `${product.product_name} (${product.brand_name})`,
@@ -61,12 +60,14 @@ function BatteryTable() {
     }, []);
 
     const showUpdateModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsUpdateModalVisible(true);
     };
 
     const showReadModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsReadModalVisible(true);
     };
 

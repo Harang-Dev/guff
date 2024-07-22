@@ -14,28 +14,23 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
-    useEffect(() => {
-        const fetchBrands = async () => {
-            try {
-                const response = await axios.get(`${API_URL}/brand/`);
-                setBrands(response.data);
-            } catch(error) {
-                console.error('Error fetching brands: ', error);
-            }
-        };
-    
-        const fetchLocations = async () => {
-            try {
-                const response = await axios.get(`${API_URL}/location/`);
-                setLocations(response.data);
-            } catch(error) {
-                console.error('Error fetching locations: ', error);
-            }
-        };
-    
-        fetchBrands();
-        fetchLocations();
-    }, []);
+    const fetchBrands = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/brand/`);
+            setBrands(response.data);
+        } catch(error) {
+            console.error('Error fetching brands: ', error);
+        }
+    };
+
+    const fetchLocations = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/location/`);
+            setLocations(response.data);
+        } catch(error) {
+            console.error('Error fetching locations: ', error);
+        }
+    };
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -81,7 +76,13 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
 
             <Form form={form} layout="vertical">
                 <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
-                    <Select placeholder="Select a brand">
+                <Select placeholder="Select a brand" 
+                        onDropdownVisibleChange={(open) => {
+                            if (open) {
+                                fetchBrands();
+                            }
+                        }}
+                    >
                         {brands.map(brand => (
                             <Option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</Option>
                         ))}
@@ -100,7 +101,15 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                 </Form.Item>
 
                 <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
-                    <Select placeholder="Select a location" disabled={isLocationDisabled}>
+                    <Select 
+                        placeholder="Select a location" 
+                        disabled={isLocationDisabled} 
+                        onDropdownVisibleChange={(open) => {
+                            if(open) {
+                                fetchLocations();
+                            }
+                        }}
+                    >
                         {locations.map(location => (
                             <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
                         ))}

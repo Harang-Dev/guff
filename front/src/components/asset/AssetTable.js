@@ -60,13 +60,15 @@ function AssetTable() {
 
     // 수정 모달 창 실행 함수
     const showModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setIsModalVisible(true);
     };
 
     // 조회 모달 창 실행 함수
     const showReadModal = (record) => {
-        setSelectedItem(record);
+        const shallowRecord = { ...record }
+        setSelectedItem(shallowRecord);
         setReadModalVisible(true);
     }
 
@@ -184,12 +186,6 @@ function AssetTable() {
 
     // 표 속성 정해주는 변수
     const columns = [
-        // {
-        //     title: '순번',
-        //     dataIndex: 'asset_id',
-        //     key: 'asset_id',
-        //     align: 'center',
-        // },
         {
             title: '사용 여부',
             dataIndex: 'state',

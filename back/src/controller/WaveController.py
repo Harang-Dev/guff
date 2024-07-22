@@ -66,6 +66,4 @@ def get_time_data(filename: str, time: float, lastIndex: int = 0, db: Session = 
         "latestIndex" : current_index,
     }
     
-    print([i.time for i in time_data])
-
     return result_data

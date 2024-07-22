@@ -28,7 +28,6 @@ def insert(dto: ProductDTO, db: Session = Depends(get_db)):
 
 @product.put("/update", tags=['product'])
 def update(dto: ProductDTO, change_product: ProductDTO, db: Session = Depends(get_db)):
-    print(dto)
     mapper.update(dto, change_product, db)
 
 @product.delete("/delete", tags=['product'])

@@ -11,7 +11,7 @@ class HwpMapper:
     def insert(self, filename: str, dto: list[HwpFileDTO], db: Session):
         try:
             total_rows = db.query(HwpFileVO).count()
-            if total_rows > 6:
+            if total_rows > 1:
                 oldest_ids = db.query(HwpFileVO).order_by(HwpFileVO.file_id).limit(5).all()
                 for row in oldest_ids:
                     db.delete(row)

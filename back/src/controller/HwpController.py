@@ -108,6 +108,7 @@ async def getHwpDataList(filename: str, db: Session = Depends(get_db)):
 async def getLocatons(filename: str, db: Session = Depends(get_db)):
     return mapper.getFileLocationDataList(mapper.getFileID(filename, db), db)
 
+# 여기 지금 None 값 섞인 채로 리턴되면 에러가 발생함;
 @parser.get('/{filename}/statistics', tags=['parser'])
 async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
     compareColumns = ['wave_speed', 'wave_level', 'noise']
@@ -124,15 +125,15 @@ async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
             tmpDF = pd.DataFrame(tmpList)
 
             if isNestedList(tmpList):
-                statisticsResult.append(column, [tmpDF[0].min(skipna=True), tmpDF[0].max(skipna=True)])
-                statisticsResult.append(column, [tmpDF[1].min(skipna=True), tmpDF[1].max(skipna=True)])
+                statisticsResult.append(column, [str(float(tmpDF[0].min(skipna=True))), str(float(tmpDF[0].max(skipna=True)))])
+                statisticsResult.append(column, [str(float(tmpDF[1].min(skipna=True))), str(float(tmpDF[1].max(skipna=True)))])
             else:
-                statisticsResult.append(column, tmpDF[0].min(skipna=True))
-                statisticsResult.append(column, tmpDF[0].max(skipna=True))
+                statisticsResult.append(column, str(float(tmpDF[0].min(skipna=True))))
+                statisticsResult.append(column, str(float(tmpDF[0].max(skipna=True))))
 
-        result.append(statisticsResult)
-
-    return statisticsResult
+        result.append(dict(statisticsResult))
+        
+    return result
         
 # @parser.get('/download/{version}', tags=['parser'])
 # def download_excel(version: str):

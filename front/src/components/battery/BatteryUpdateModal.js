@@ -14,39 +14,11 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get(`${API_URL}/product/`);
-                setProducts(response.data);
-            } catch(error) {
-                console.error('Error fetching products: ', error);
-            }
-        };
-    
-        const fetchLocations = async () => {
-            try {
-                const response = await axios.get(`${API_URL}/location/`);
-                setLocations(response.data);
-            } catch(error) {
-                console.error('Error fetching locations: ', error);
-            }
-        };
-    
-        fetchProducts();
-        fetchLocations();
-    }, []);
-
-    useEffect(() => {
         if (selectItem) {
-            // selectItem에 넘어오는 date 값들은 String으로 이루어져있음
-            // 근데 DatePicker는 moment 객체로 받아들여야해서 date.isValid에서 에러가 발생한다고함
-            // 이를 해결하기 위해서 moment객체로 타입 변환을 해주면 된다함
             form.setFieldsValue({
                 ...selectItem,
                 due_date: selectItem.due_date ? dayjs(selectItem.due_date) : null,
             });
-
-            console.log(form.getFieldsValue());
 
             if (selectItem.state == false) {
                 setIsLocationDisabled(true);
@@ -54,8 +26,27 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
             } else {
                 setIsLocationDisabled(false);
             }
+            console.log(open);
         }
     }, [selectItem, form]);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/product/`);
+            setProducts(response.data);
+        } catch(error) {
+            console.error('Error fetching products: ', error);
+        }
+    };
+
+    const fetchLocations = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/location/`);
+            setLocations(response.data);
+        } catch(error) {
+            console.error('Error fetching locations: ', error);
+        }
+    };
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -78,7 +69,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     folder_name: values.folder_name || null,
                     marks: values.marks || null,
                 };
-                console.log(values);
+
                 form.resetFields();
                 onOk(formattedValues);
             })
@@ -103,7 +94,13 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 </Form.Item>
 
                 <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Select placeholder="Select a product">
+                    <Select 
+                        placeholder="Select a product"
+                        onDropdownVisibleChange={(open) => {
+                            if (open) { fetchProducts(); }
+                        }}
+                        >
+
                         {products.map(product => (
                             <Option key={product.product_name} value={product.product_name}>{product.product_name} ({product.brand_name})</Option>
                         ))}
@@ -118,7 +115,13 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                 </Form.Item>
 
                 <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
-                    <Select placeholder="Select a location" disabled={isLocationDisabled}>
+                    <Select 
+                        placeholder="Select a location" 
+                        disabled={isLocationDisabled}
+                        onDropdownVisibleChange={(open) => {
+                            if (open) { fetchLocations(); }
+                        }}    
+                    >
                         {locations.map(location => (
                             <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
                         ))}

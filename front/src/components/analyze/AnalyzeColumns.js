@@ -1,3 +1,5 @@
+import { Tag } from 'antd';
+
 const transLocData = (item) => {
     return item.map(location => ({ text: location, value: location })); 
 }
@@ -216,3 +218,309 @@ export const complicatedColumns = (locData) => [
         key: 'noise',
     },
 ];
+
+export const simpleStatisticsColumns = () => [
+    {
+        title: '위치',
+        dataIndex: 'measurement_location',
+        align: 'center',
+    },
+    {
+        title: '진동속도(cm/s)',
+        align: 'center',
+        children: [
+            {
+                title: '최저치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'wave_speed',
+                        key: 'wave_speed_min', 
+                        align: 'center',
+                        render: (text, record) => record.wave_speed[0] ? record.wave_speed[0][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'wave_speed',
+                        key: 'wave_speed_max',
+                        align: 'center',
+                        render: (text, record) => record.wave_speed[0] ? record.wave_speed[0][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+            {
+                title: '최고치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'wave_speed',
+                        key: 'wave_speed_min', 
+                        align: 'center',
+                        render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'wave_speed',
+                        key: 'wave_speed_max',
+                        align: 'center',
+                        render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        title: '진동레벨[dB(V)]',
+        align: 'center',
+        children: [
+            {
+                title: '최저치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'wave_level',
+                        key: 'wave_level', 
+                        align: 'center',
+                        render: (text, record) => record.wave_level[0] ? record.wave_level[0][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'wave_level',
+                        key: 'wave_level',
+                        align: 'center',
+                        render: (text, record) => record.wave_level[0] ? record.wave_level[0][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+            {
+                title: '최고치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'wave_level',
+                        key: 'wave_level', 
+                        align: 'center',
+                        render: (text, record) => record.wave_level[1] ? record.wave_level[1][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'wave_level',
+                        key: 'wave_level',
+                        align: 'center',
+                        render: (text, record) => record.wave_level[1] ? record.wave_level[1][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        title: '소음[dB(A)]',
+        align: 'center',
+        children: [
+            {
+                title: '최저치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'noise',
+                        key: 'noise', 
+                        align: 'center',
+                        render: (text, record) => record.noise[0] ? record.noise[0][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'noise',
+                        key: 'noise',
+                        align: 'center',
+                        render: (text, record) => record.noise[0] ? record.noise[0][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+            {
+                title: '최고치',
+                align: 'center',
+                children: [
+                    {
+                        title: 'MIN',
+                        dataIndex: 'noise',
+                        key: 'noise', 
+                        align: 'center',
+                        render: (text, record) => record.noise[1] ? record.noise[1][0] : '', 
+                        ellipsis: true,
+                    },
+                    {
+                        title: 'MAX',
+                        dataIndex: 'noise',
+                        key: 'noise',
+                        align: 'center',
+                        render: (text, record) => record.noise[1] ? record.noise[1][1] : '',
+                        ellipsis: true,
+                    },
+                ],
+            },
+        ],
+    },
+]
+
+export const properStatisticsColumns = () => [
+    {
+        title: '위치',
+        dataIndex: 'measurement_location',
+        align: 'center',
+    },
+    {
+        title: '진동속도(cm/s)',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'wave_speed',
+                key: 'wave_speed_min', 
+                align: 'center',
+                render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'wave_speed',
+                key: 'wave_speed_max',
+                align: 'center',
+                render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][1] : '',
+                ellipsis: true,
+            },
+        ],
+    },
+    {
+        title: '진동레벨[dB(V)]',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'wave_level',
+                key: 'wave_level', 
+                align: 'center',
+                render: (text, record) => record.wave_level[1] ? record.wave_level[1][0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'wave_level',
+                key: 'wave_level',
+                align: 'center',
+                render: (text, record) => record.wave_level[1] ? record.wave_level[1][1] : '',
+                ellipsis: true,
+            },
+        ],
+    },
+    {
+        title: '소음[dB(A)]',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'noise',
+                key: 'noise', 
+                align: 'center',
+                render: (text, record) => record.noise[1] ? record.noise[1][0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'noise',
+                key: 'noise',
+                align: 'center',
+                render: (text, record) => record.noise[1] ? record.noise[1][1] : '',
+                ellipsis: true,
+            },
+        ],
+    },
+]
+
+export const complicatedStatisticsColumns = () => [
+    {
+        title: '위치',
+        dataIndex: 'measurement_location',
+        align: 'center',
+    },
+    {
+        title: '진동속도(cm/s)',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'wave_speed',
+                key: 'wave_speed_min', 
+                align: 'center',
+                render: (text, record) => record.wave_speed ? record.wave_speed[0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'wave_speed',
+                key: 'wave_speed_max',
+                align: 'center',
+                render: (text, record) => record.wave_speed ? record.wave_speed[1] : '',
+                ellipsis: true,
+            },
+        ],
+    },
+    {
+        title: '진동레벨[dB(V)]',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'wave_level',
+                key: 'wave_level', 
+                align: 'center',
+                render: (text, record) => record.wave_level ? record.wave_level[0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'wave_level',
+                key: 'wave_level',
+                align: 'center',
+                render: (text, record) => record.wave_level ? record.wave_level[1]: '',
+                ellipsis: true,
+            },
+        ],
+    },
+    {
+        title: '소음[dB(A)]',
+        align: 'center',
+        children: [
+            {
+                title: 'MIN',
+                dataIndex: 'noise',
+                key: 'noise', 
+                align: 'center',
+                render: (text, record) => record.noise ? record.noise[0] : '', 
+                ellipsis: true,
+            },
+            {
+                title: 'MAX',
+                dataIndex: 'noise',
+                key: 'noise',
+                align: 'center',
+                render: (text, record) => record.noise ? record.noise[1] : '',
+                ellipsis: true,
+            },
+        ],
+    },
+]
