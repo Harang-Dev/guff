@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import Calendar from '../schedule/Calnedar';
+import CustomCalendar from '../schedule/CustomCalendar';
 
 import { bColumn, aColumn } from './homeColumns';
 import { Card, Row, Col, message, Table, Empty, Divider } from 'antd';
@@ -91,15 +91,9 @@ const HomeComponent = () => {
                 </Card>
             </Col>
 
-            {/* <Col span={8}>
-                <Card title="한글 분석기" bordered={true}>
-                    사용하러가기 ㅋ
-                </Card>
-            </Col> */}
-
             <Divider />
 
-            <Calendar></Calendar>
+            <CustomCalendar />
         </Row>
 
     );

@@ -1,0 +1,50 @@
+/* 선택된 날짜의 배경색을 기본 색상으로 변경합니다. */
+.ant-picker-cell-selected .ant-picker-cell-inner, 
+.ant-picker-cell-range-start .ant-picker-cell-inner, 
+.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: none !important;
+}
+
+/* Range 선택 시 색상을 제거합니다. */
+.ant-picker-cell-range-hover-start::before,
+.ant-picker-cell-range-hover-end::before,
+.ant-picker-cell-range-hover::before {
+  background: none !important;
+}
+
+.events, .events-container {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.events .ant-badge-status {
+  width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis !important;
+}
+
+.ant-btn > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis !important;
+}
+
+/* .ant-input {
+  background: transparent;
+} */
+
+
+/* CustomCalendarCss.css */
+
+/* CustomCalendarCss.css */
+
+.events-container {
+  position: relative;
+  min-height: 40px; /* Adjust as needed */
+}
+
+.ant-picker-calendar-date-value {
+  margin-bottom: 10px !important;
+}

@@ -9,6 +9,7 @@ from src.controller.BrandController import brand
 from src.controller.HwpController import parser
 from src.controller.ProductController import product
 from src.controller.WaveController import wave_parser
+from src.controller.ScheduleController import schedule
 
 app = FastAPI()
 app.include_router(battery)
@@ -18,6 +19,7 @@ app.include_router(brand)
 app.include_router(parser)
 app.include_router(product)
 app.include_router(wave_parser)
+app.include_router(schedule)
 
 app.add_middleware(
     CORSMiddleware,
