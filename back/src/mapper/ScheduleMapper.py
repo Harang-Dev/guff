@@ -24,20 +24,21 @@ class ScheduleMapper:
                 func.date(ScheduleVO.schedule_startDate) == startDate.date()
             ).all()
     
-    # def update(self, dto: AssetDTOinDB, db: Session):
-    #     vo = AssetVO(**dto.model_dump())
-    #     record = db.query(AssetVO).filter(AssetVO.asset_id == vo.asset_id).first()
-    #     record.brand_name = vo.brand_name
-    #     record.asset_name = vo.asset_name
-    #     record.state = vo.state
-    #     record.location_name = vo.location_name
-    #     record.start_date = vo.start_date
-    #     record.end_date = vo.end_date
-    #     record.rent_state = vo.rent_state
-    #     record.marks = vo.marks
-    #     db.commit()
+    def update(self, dto: ScheduleDTOinDB, db: Session):
+        vo = ScheduleVO(**dto.model_dump())
+        record = db.query(ScheduleVO).filter(ScheduleVO.schedule_id == vo.schedule_id).first()
+        record.schedule_startDate = vo.schedule_startDate
+        record.schedule_endDate = vo.schedule_endDate
+        record.schedule_manager = vo.schedule_manager
+        record.schedule_category = vo.schedule_category
+        record.schedule_marks = vo.schedule_marks
+        record.schedule_title = vo.schedule_title
+        record.schedule_color = vo.schedule_color
+        record.schedule_location = vo.schedule_location
+        record.schedule_allDay = vo.schedule_allDay
+        db.commit()
 
-    # def delete(self, asset_id: int, db: Session):
-    #     record = db.query(AssetVO).filter(AssetVO.asset_id == asset_id).first()
-    #     db.delete(record)
-    #     db.commit()
+    def delete(self, schedule_id: int, db: Session):
+        record = db.query(ScheduleVO).filter(ScheduleVO.schedule_id == schedule_id).first()
+        db.delete(record)
+        db.commit()

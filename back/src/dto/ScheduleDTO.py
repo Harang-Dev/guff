@@ -11,7 +11,8 @@ class ScheduleDTO(BaseModel):
     schedule_marks: str
     schedule_title: str
     schedule_color: str
-
+    schedule_location: str
+    schedule_allDay: bool
 
 class ScheduleDTOinDB(ScheduleDTO):
     schedule_id: int

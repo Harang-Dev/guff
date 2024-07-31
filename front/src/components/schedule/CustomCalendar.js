@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Badge, Calendar, message, Modal, DatePicker, TimePicker, Input, Button, Dropdown, theme, Menu, Drawer, Card } from 'antd';
+import { Badge, Calendar, message, Modal, DatePicker, TimePicker, Input, Button, Dropdown, theme, Menu, Drawer, Card, Popover } from 'antd';
 import CustomDrawer from './CustomDrawer';
 import dayjs from 'dayjs';
 import axios from 'axios';
@@ -8,17 +8,22 @@ import './CustomCalendarCss.css';
 
 
 const EventItem = styled.div`
-  top: ${props => props.index * 35}px;
-  position: absolute;
-  width: ${props => props.width + 23 + 7}px;
-  width: ${props => (props.width + 23) * props.cellCount - 22 }px;
   border-radius: 7px;
-  background-color: cyan;
-  z-index: 2;
+  background: ${props => props.background ? props.background : '#d9d9d9'};
+  margin-bottom: 3px;
+
+  &:hover,
+  &.group-hover {
+    background-color: lightblue;
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.1),
+                0px 2px 4px 0px rgba(0,0,0,0.08),
+                0px 4px 12px 0px rgba(0,0,0,0.06);
+  }
 `;
 
-
-
+const CustomCalendarWrapper = styled.div`
+  position: relative;
+`
 
 const CustomCalendar = () => {
   const [open, setOpen] = useState(false);
@@ -94,56 +99,45 @@ const CustomCalendar = () => {
       if (startDate <= date.format('YYYY-MM-DD') && endDate >= date.format('YYYY-MM-DD')) return currentYearData[key];
     }).filter(item => item != null)
 
-    targetData.map(item => {
-      console.log(item);
-      // console.log(dayjs(item.schedule_endDate).diff(dayjs(item.schedule_startDate), 'days'));  
-    })
-
-    // console.log(targetData);
-    const weekData = targetData.map(item => {
-      return calcDateBar(item);
-    })
-
     return (
       <Dropdown menu={{}} trigger={['contextMenu']}>
-        <div ref={cellRef} className="event-container" style={{ width: '100%', height: '100%' }}>
-          {weekData.map((item, index) => (
-            Object.keys(item).map(key => {
-                const startDate = item[key].start.format('YYYY-MM-DD')
-                const findDate = date.format('YYYY-MM-DD');
-
-                if (startDate == findDate) {
-                  const durationCount = item[key].end.diff(item[key].start, 'days') + 1
-                  const title = targetData[index].schedule_title
-                  return (
-                    <EventItem width={cellDimensions.width} cellCount={durationCount} index={index + 1}>
-                      <div style={{marginLeft: 10}}>{title}</div>
-                    </EventItem>
-                  )
+        <div>
+          {targetData.map(item => (
+            <EventItem>
+              <Popover 
+                content={
+                    <div>
+                      <p>시작: {dayjs(item.schedule_startDate).format("YYYY-MM-DD")}</p>
+                      <p>종료: {dayjs(item.schedule_endDate).format("YYYY-MM-DD")}</p>
+                    </div>
                 }
-                return null;
-              })
+                title={item.schedule_title}
+              >
+                <div style={{marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: 1}} onClick={() => showDrawer(item)}>
+                  {item.schedule_title}
+                </div>
+              </Popover>
+              </EventItem>
           ))}
         </div>
       </Dropdown>
     );
+
   };
 
   return (
     <>
-      <EventItem width={cellDimensions.width} cellCount={1} index={1}>{cellDimensions.width} {cellDimensions.height}</EventItem>
       <Calendar
         cellRender={cellDataRender}
         onPanelChange={onPanelChange}
       />
-      <div>dfadsf</div>
       <CustomDrawer
         onClose={closeDrawer}
         open={open}
         item={selectedItem}
         updateItemTitle={updateItemTitle}
       />
-    </>
+    </>  
   );
 };
 

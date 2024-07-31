@@ -23,3 +23,7 @@ def getSelectedDateScheduleData(startDate: datetime, db: Session = Depends(get_d
 @schedule.get('/year/{year}', tags=['schedule'])
 def getTargetYearScheduleData(year: int, db: Session = Depends(get_db)):
     return mapper.read_year(year, db)
+
+@schedule.put('/update', tags=['schedule'])
+def updateScheduleData(updateScheduleData: ScheduleDTOinDB, db: Session = Depends(get_db)):
+    mapper.update(updateScheduleData)

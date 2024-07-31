@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 
 BASE = declarative_base()
 
@@ -14,6 +14,9 @@ class ScheduleVO(BASE):
     schedule_marks = Column(String)
     schedule_title = Column(String)
     schedule_color = Column(String)
+    schedule_location = Column(String)
+    schedule_allDay = Column(Boolean)
+
 
 
 
