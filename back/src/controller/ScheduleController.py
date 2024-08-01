@@ -26,4 +26,4 @@ def getTargetYearScheduleData(year: int, db: Session = Depends(get_db)):
 
 @schedule.put('/update', tags=['schedule'])
 def updateScheduleData(updateScheduleData: ScheduleDTOinDB, db: Session = Depends(get_db)):
-    mapper.update(updateScheduleData)
+    mapper.update(updateScheduleData, db)

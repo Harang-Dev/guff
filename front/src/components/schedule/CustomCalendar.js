@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Badge, Calendar, message, Modal, DatePicker, TimePicker, Input, Button, Dropdown, theme, Menu, Drawer, Card, Popover } from 'antd';
+import { Calendar, message, Dropdown, Popover } from 'antd';
 import CustomDrawer from './CustomDrawer';
 import dayjs from 'dayjs';
 import axios from 'axios';
@@ -21,38 +21,24 @@ const EventItem = styled.div`
   }
 `;
 
-const CustomCalendarWrapper = styled.div`
-  position: relative;
-`
-
 const CustomCalendar = () => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [currentYear, setCurrentYear] = useState(dayjs().year());
   const [currentYearData, setCurrentYearData] = useState([]);
   
-  const cellRef = useRef(null);
-  const [cellDimensions, setCellDimensions] = useState({ width: 0, height: 0 });
-
   useEffect(() => {
-      const fetchYearData = async() => {
-        try {
-          const response = await axios.get('http://localhost:8000/schedule/year/' + currentYear);
-          setCurrentYearData(response.data);
-        } catch (error) {
-          message.error('캘린더 데이터 조회 실패')
-        }
+    const fetchYearData = async() => {
+      try {
+        const response = await axios.get('http://localhost:8000/schedule/year/' + currentYear);
+        setCurrentYearData(response.data);
+      } catch (error) {
+        message.error('캘린더 데이터 조회 실패')
       }
-
-      fetchYearData();
-  }, [currentYear]);
-
-  useEffect(() => {
-    if (cellRef.current) {
-        const { offsetWidth, offsetHeight } = cellRef.current;
-        setCellDimensions({ width: offsetWidth, height: offsetHeight });
     }
-  }, []);
+
+    fetchYearData();
+  }, [currentYear, open]);
 
   const onPanelChange = (value, mode) => {
     setCurrentYear(value.year());
@@ -76,22 +62,6 @@ const CustomCalendar = () => {
     );
   };
 
-  const calcDateBar = (dateDict) => {
-    const start = dayjs(dateDict.schedule_startDate)
-    const end = dayjs(dateDict.schedule_endDate)
-    const eventWeeks = []
-
-    let currentStart = start
-
-    while (currentStart.isBefore(end)) {
-      const currentEnd = currentStart.endOf('week').isBefore(end) ? currentStart.endOf('week') : end;
-      eventWeeks.push({ start: currentStart, end: currentEnd });
-      currentStart = currentStart.add(1, 'week').startOf('week');
-    }
-
-    return eventWeeks;
-  }
-
   const cellDataRender = (date) => {
     const targetData = Object.keys(currentYearData).map(key => {
       const startDate = dayjs(currentYearData[key].schedule_startDate).format('YYYY-MM-DD');
@@ -103,7 +73,7 @@ const CustomCalendar = () => {
       <Dropdown menu={{}} trigger={['contextMenu']}>
         <div>
           {targetData.map(item => (
-            <EventItem>
+            <EventItem background={item.schedule_color}>
               <Popover 
                 content={
                     <div>
@@ -117,7 +87,7 @@ const CustomCalendar = () => {
                   {item.schedule_title}
                 </div>
               </Popover>
-              </EventItem>
+            </EventItem>
           ))}
         </div>
       </Dropdown>

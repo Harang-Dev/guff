@@ -2,26 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { Switch, Drawer, Form, Input, Divider, TimePicker, Row, Col, DatePicker, ConfigProvider, ColorPicker, theme, message } from 'antd';
 import { generate, green, presetPalettes, red } from '@ant-design/colors';
 import { SwapRightOutlined, UserOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { useForm } from 'antd/es/form/Form';
 import axios from 'axios';
 import ko_KR from 'antd/es/locale/ko_KR';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko'
 
+const { TextArea } = Input;
 dayjs.locale('ko');
 
-
-
 const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
-    const [title, setTitle] = useState('');
     const [inputMouse, setInputMouse] = useState(false);
     const [startTimeMouse, setStartTimeMouse] = useState(false);
     const [endTimeMouse, setEndTimeMouse] = useState(false);
     const [onedayTimeMouse, setOneDayTimeMouse] = useState(false);
-    const [allDay, setAllDay] = useState(false);
     const [manager, setManager] = useState(false);
     const [location, setLocation] = useState(false);
+    const [allDay, setAllDay] = useState(false);
+    const [date, setDate] = useState(null);
     const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (item) {
+            form.setFieldsValue({
+                ...item,
+                schedule_startDate: dayjs(item.schedule_startDate),
+                schedule_endDate: dayjs(item.schedule_endDate),
+            });
+            setAllDay(form.getFieldValue('schedule_allDay'));
+            setDate(form.getFieldValue('schedule_startDate'));
+        }
+    }, [item, form]);
+
 
     const genPresets = (presets = presetPalettes) =>
         Object.entries(presets).map(([label, colors]) => ({
@@ -38,7 +49,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
 
     const handleChange = (e) => {
         const newTitle = e.target.value;
-        setTitle(newTitle);
+        form.setFieldValue('schedule_title', newTitle);
         if (item) {
           updateItemTitle(item.schedule_id, newTitle);
         }
@@ -46,24 +57,44 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
 
     const handleClose = async () => {
         try {
-          const values = await form.validateFields();
-          
-          const payload = {
-            ...values,
-            schedule_startDate: values.schedule_startDate.toISOString(),
-            schedule_endDate: values.schedule_endDate.toISOString(),
-          };
-    
-          console.log(payload)
+            const values = await form.validateFields();
 
-          await axios.put(`http://localhost:8000/schedule/update`, payload);
-          updateItemTitle(item.schedule_id, values.schedule_title); // Update the item title in the parent component
-          message.success('Data updated successfully');
+            if(allDay) {
+                const payload = {
+                    ...values,
+                    schedule_id: item.schedule_id,
+                    schedule_startDate: values.schedule_startDate.format('YYYY-MM-DD'),
+                    schedule_endDate: values.schedule_endDate.format('YYYY-MM-DD'),
+                    schedule_allDay: values.schedule_allDay,
+                    schedule_color: values.schedule_color['metaColor'].originalInput
+                }
+                await axios.put(`http://localhost:8000/schedule/update`, payload);
+                updateItemTitle(item.schedule_id, values.schedule_title); // Update the item title in the parent component
+            }
+            else {
+                const datePart = dayjs(date)
+                const startTimePart = dayjs(values.schedule_startDate, 'HH:mm')
+                const endTimePart = dayjs(values.schedule_endDate, 'HH:mm')
+                const payload = {
+                    ...values,
+                    schedule_id: item.schedule_id,
+                    schedule_startDate: datePart.hour(startTimePart.hour()).minute(startTimePart.minute()).format('YYYY-MM-DDTHH:mm:ss'),
+                    schedule_endDate: datePart.hour(endTimePart.hour()).minute(endTimePart.minute()).format('YYYY-MM-DDTHH:mm:ss'),
+                    schedule_allDay: values.schedule_allDay,
+                    schedule_color: values.schedule_color['metaColor'].originalInput
+                }
+
+                await axios.put(`http://localhost:8000/schedule/update`, payload);
+                updateItemTitle(item.schedule_id, values.schedule_title); // Update the item title in the parent component
+            }
+            
+            message.success('Data updated successfully');
         } catch (error) {
           console.error('Failed to update data:', error);
           message.error('Failed to update data');
         }
-        form.resetFields();
+        
+        form.resetFields()
         onClose(); // Close the drawer
       };
 
@@ -81,7 +112,6 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                         ]}
                     >
                         <Input
-                            defaultValue={item ? item.schedule_title : ''}
                             onChange={handleChange}
                             onMouseEnter={() => setInputMouse(true)} 
                             onMouseLeave={() => setInputMouse(false)}
@@ -99,8 +129,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                             >   
                                 {allDay ? 
                                     <DatePicker
-                                        defaultValue={item ? dayjs(item.schedule_startDate) : ''} 
-                                        format={'MM월 MM일 (ddd)'} 
+                                        format={'MM월 DD일 (ddd)'} 
                                         placeholder='시작 요일' 
                                         onMouseEnter={() => setStartTimeMouse(true)} 
                                         onMouseLeave={() => setStartTimeMouse(false)}
@@ -110,8 +139,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                                     />
                                 :
                                     <TimePicker 
-                                        defaultValue={item ? dayjs(item.schedule_startDate) : ''} 
-                                        format={'HH:mm (ddd)'} 
+                                        format={'HH:mm'} 
                                         placeholder='시작 시간' 
                                         onMouseEnter={() => setStartTimeMouse(true)} 
                                         onMouseLeave={() => setStartTimeMouse(false)}
@@ -123,7 +151,6 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
 
                             </Form.Item>
                         </Col>
-
                         <Col>
                             <Form.Item
                                 name="schedule_endDate"
@@ -136,8 +163,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                             >
                                 {allDay ? 
                                     <DatePicker
-                                        defaultValue={item ? dayjs(item.schedule_endDate) : ''} 
-                                        format={'MM월 MM일 (ddd)'} 
+                                        format={'MM월 DD일 (ddd)'} 
                                         placeholder='종료 요일' 
                                         onMouseEnter={() => setEndTimeMouse(true)} 
                                         onMouseLeave={() => setEndTimeMouse(false)}
@@ -146,9 +172,8 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                                     />
                                 :
                                     <TimePicker 
-                                        defaultValue={item ? dayjs(item.schedule_endDate) : ''} 
-                                        format={'HH:mm (ddd)'} 
-                                        placeholder='시작 시간' 
+                                        format={'HH:mm'} 
+                                        placeholder='시작 시간'
                                         onMouseEnter={() => setEndTimeMouse(true)} 
                                         onMouseLeave={() => setEndTimeMouse(false)}
                                         variant={endTimeMouse ? 'filled' : 'borderless'}
@@ -163,30 +188,27 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                     {allDay ?
                         null
                         :
-                        <Form.Item
-                            name="schedule_startDate"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '이벤트 날짜를 등록해주세요'
-                                },
-                            ]}
-                        >
-                            <DatePicker
-                                defaultValue={item ? dayjs(item.schedule_startDate) : ''}
-                                format="MM-DD (ddd)"
-                                onMouseEnter={() => setOneDayTimeMouse(true)} 
-                                onMouseLeave={() => setOneDayTimeMouse(false)}
-                                variant={onedayTimeMouse ? 'filled' : 'borderless'}
-                                size='small'
-                            />                    
-                        </Form.Item>
+                        <DatePicker
+                            defaultValue={date}
+                            value={date}
+                            format="MM월 DD일 (ddd)"
+                            onMouseEnter={() => setOneDayTimeMouse(true)} 
+                            onMouseLeave={() => setOneDayTimeMouse(false)}
+                            variant={onedayTimeMouse ? 'filled' : 'borderless'}
+                            size='small'
+                        />                
                     }
 
                     <Form.Item 
                         name='schedule_allDay'
                     >
-                        <Switch style={{marginLeft: 5}} onChange={setAllDay} defaultValue={item ? () => setAllDay(item.schedule_allDay) : () => setAllDay(false)} size='small'/>&nbsp;&nbsp;종일
+                        <Switch 
+                            style={{marginLeft: 5}} 
+                            onChange={setAllDay} 
+                            size='small'
+                            checked={allDay}
+                        />
+                            &nbsp;&nbsp;종일
                     </Form.Item>
 
                     <Divider />
@@ -216,11 +238,34 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                     </Form.Item>
 
                     <Form.Item
+                        name="schedule_category"
+                    >
+                        <Input 
+                            prefix={<EnvironmentOutlined style={{ color: 'rgba(0,0,0,.25)', marginRight: 5}}/>}
+                            placeholder="카테고리"
+                            onMouseEnter={() => setLocation(true)} 
+                            onMouseLeave={() => setLocation(false)}
+                            variant={location ? 'filled' : 'borderless'}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="schedule_marks"
+                    >
+                        <TextArea 
+                            prefix={<EnvironmentOutlined style={{ color: 'rgba(0,0,0,.25)', marginRight: 5}}/>}
+                            placeholder="설명"
+                            onMouseEnter={() => setLocation(true)} 
+                            onMouseLeave={() => setLocation(false)}
+                            variant={location ? 'filled' : 'borderless'}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
                         name="schedule_color"
                     >
                         <ColorPicker
                             style={{marginLeft: 5}}
-                            defaultValue="#d9d9d9"
                             presets={presets}
                             size='small'
                         />

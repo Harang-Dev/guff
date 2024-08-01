@@ -24,7 +24,7 @@ class ScheduleMapper:
                 func.date(ScheduleVO.schedule_startDate) == startDate.date()
             ).all()
     
-    def update(self, dto: ScheduleDTOinDB, db: Session):
+    def update(self, dto, db: Session):
         vo = ScheduleVO(**dto.model_dump())
         record = db.query(ScheduleVO).filter(ScheduleVO.schedule_id == vo.schedule_id).first()
         record.schedule_startDate = vo.schedule_startDate
