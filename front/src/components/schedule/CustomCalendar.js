@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, message, Dropdown, Popover } from 'antd';
+import { Calendar, message, Dropdown, Popover, Badge, Card, Menu } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
+import tinycolor from 'tinycolor2';
 import CustomDrawer from './CustomDrawer';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import styled from 'styled-components';
 import './CustomCalendarCss.css';
 
-
 const EventItem = styled.div`
   border-radius: 7px;
-  background: ${props => props.background ? props.background : '#d9d9d9'};
   margin-bottom: 3px;
+  width: 90%;
+  cursor: default;
 
-  &:hover,
-  &.group-hover {
-    background-color: lightblue;
+  &:hover {
+    color: white;
+    background-color: ${props => tinycolor(props.background).setAlpha(0.3).toString()};
     box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.1),
                 0px 2px 4px 0px rgba(0,0,0,0.08),
                 0px 4px 12px 0px rgba(0,0,0,0.06);
@@ -62,6 +64,18 @@ const CustomCalendar = () => {
     );
   };
 
+  const items = (date) => [
+    {
+      key: '1',
+      label: (
+        <div onClick={() => showDrawer(date)}>
+          이벤트 생성 {date.format('YYYY-MM-DD')}
+        </div>
+      ),
+      icon: <SmileOutlined />,
+    }
+  ];
+
   const cellDataRender = (date) => {
     const targetData = Object.keys(currentYearData).map(key => {
       const startDate = dayjs(currentYearData[key].schedule_startDate).format('YYYY-MM-DD');
@@ -70,7 +84,7 @@ const CustomCalendar = () => {
     }).filter(item => item != null)
 
     return (
-      <Dropdown menu={{}} trigger={['contextMenu']}>
+      <Dropdown overlay={<Menu items={items(date)} />} trigger={['contextMenu']} style={{minHeight: "100%"}}>
         <div>
           {targetData.map(item => (
             <EventItem background={item.schedule_color}>
@@ -79,12 +93,14 @@ const CustomCalendar = () => {
                     <div>
                       <p>시작: {dayjs(item.schedule_startDate).format("YYYY-MM-DD")}</p>
                       <p>종료: {dayjs(item.schedule_endDate).format("YYYY-MM-DD")}</p>
+                      <p>담당자: {item.schedule_manager}</p>
+                      <p>카테고리: {item.schedule_category}</p>
                     </div>
                 }
                 title={item.schedule_title}
               >
                 <div style={{marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: 1}} onClick={() => showDrawer(item)}>
-                  {item.schedule_title}
+                  <Badge status="processing" color={item.schedule_color}/>&nbsp;&nbsp;{item.schedule_category ? `[ ${item.schedule_category} ]` : null} {item.schedule_title}
                 </div>
               </Popover>
             </EventItem>
@@ -92,11 +108,13 @@ const CustomCalendar = () => {
         </div>
       </Dropdown>
     );
-
   };
 
   return (
     <>
+      <Card>
+        df
+      </Card>
       <Calendar
         cellRender={cellDataRender}
         onPanelChange={onPanelChange}

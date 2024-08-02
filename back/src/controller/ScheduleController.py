@@ -27,3 +27,11 @@ def getTargetYearScheduleData(year: int, db: Session = Depends(get_db)):
 @schedule.put('/update', tags=['schedule'])
 def updateScheduleData(updateScheduleData: ScheduleDTOinDB, db: Session = Depends(get_db)):
     mapper.update(updateScheduleData, db)
+
+@schedule.delete('/delete/{id}', tags=['schedule'])
+def deleteScheduleData(id: int, db: Session = Depends(get_db)):
+    mapper.delete(id, db)
+
+@schedule.post('/create', tags=['schedule'])
+def createSchduleData(scheduleData: ScheduleDTO, db: Session = Depends(get_db)):
+    mapper.insert(scheduleData, db)

@@ -6,12 +6,12 @@ from enum import Enum
 class ScheduleDTO(BaseModel):
     schedule_startDate: datetime
     schedule_endDate: datetime
-    schedule_manager: str
-    schedule_category: str
-    schedule_marks: str
-    schedule_title: str
-    schedule_color: str
-    schedule_location: str
+    schedule_manager: Optional[str]
+    schedule_category: Optional[str]
+    schedule_marks: Optional[str]
+    schedule_title: Optional[str]
+    schedule_color: Optional[str]
+    schedule_location: Optional[str]
     schedule_allDay: bool
 
 class ScheduleDTOinDB(ScheduleDTO):
