@@ -15,14 +15,7 @@ class AssetVO(BASE):
     end_date = Column(Date)
     rent_state = Column(Boolean)
     marks = Column(String)
-
-    # def __init__(self, folder_name, location_id, due_date, marks, folder_id=None):
-    #     self.folder_id = folder_id
-    #     self.folder_name = folder_name
-    #     self.location_id = location_id
-    #     self.due_date = due_date
-    #     self.marks = marks
-
+    
     def __repr__(self):
         return f"<Asset(asset_id={self.asset_id}, brand_name={self.brand_name}, asset_name={self.asset_name}, state={self.state})> location_name={self.location_name}, start_date={self.start_date}, end_date={self.end_date}, marks={self.marks}"
 

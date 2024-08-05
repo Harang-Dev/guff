@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .calendar-container {
+      position: relative;
+      width: 700px;
+      height: 300px;
+      border: 1px solid #ddd;
+      display: flex;
+    }
+    .date-cell {
+      flex: 1;
+      border: 1px solid #ddd;
+      height: 50px;
+      text-align: center;
+      line-height: 50px;
+      position: relative;
+    }
+    .event-bar {
+      position: absolute;
+      height: 20px;
+      background-color: red;
+      z-index: 7;
+      top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar-container">
+    <div class="date-cell">24</div>
+    <div class="date-cell">25</div>
+    <div class="date-cell">26</div>
+    <div class="date-cell">27</div>
+
+    <!-- 이벤트 바 -->
+    <div class="event-bar" style="left: 0px; width: 200px;">연속 이벤트 1</div>
+    <div class="event-bar" style="left: 200px; width: 100px; top: 40px;">이벤트 2</div>
+  </div>
+</body>
+</html>

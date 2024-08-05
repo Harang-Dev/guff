@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "startDate": "2024-07-08",
+    "endDate": "2024-07-09",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "assignee": "강태화",
+    "taskDetails": "카던",
+    "notes": "카던 2수",
+    "categoryColor": "#1677ff"
+  },
+  {
+    "id": 2,
+    "startDate": "2024-07-09",
+    "endDate": "2024-07-14",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "assignee": "강태화",
+    "taskDetails": "가디언 토벌",
+    "notes": "데스칼루다",
+    "categoryColor": "#ff4d4f"
+  },
+  {
+    "id": 3,
+    "startDate": "2024-07-10",
+    "endDate": "2024-07-15",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "assignee": "강태화",
+    "taskDetails": "아브렐슈드",
+    "notes": "4관문 까지 하기",
+    "categoryColor": "#52c41a"
+  },
+  {
+    "id": 4,
+    "startDate": "2024-07-11",
+    "endDate": "2024-07-17",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "assignee": "강태화",
+    "taskDetails": "쿠크세이튼",
+    "notes": "딜찍으로만 하기",
+    "categoryColor": "#1890ff"
+  },
+  {
+    "id": 5,
+    "startDate": "2024-07-12",
+    "endDate": "2024-07-12",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "assignee": "강태화",
+    "taskDetails": "생활",
+    "notes": "고고학 하기",
+    "categoryColor": "#faad14"
+  }
+]
