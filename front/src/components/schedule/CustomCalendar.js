@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, message, Dropdown, Popover, Badge, Card, Menu } from 'antd';
+import { Calendar, message, Dropdown, Popover, Badge, Card, Menu, Form } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import tinycolor from 'tinycolor2';
 import CustomDrawer from './CustomDrawer';
@@ -28,7 +28,8 @@ const CustomCalendar = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [currentYear, setCurrentYear] = useState(dayjs().year());
   const [currentYearData, setCurrentYearData] = useState([]);
-  
+  const [isEdit, setIsEdit] = useState(false);
+
   useEffect(() => {
     const fetchYearData = async() => {
       try {
@@ -46,13 +47,15 @@ const CustomCalendar = () => {
     setCurrentYear(value.year());
   }
 
-  const showDrawer = (item) => {
+  const showDrawer = (item, edit) => {
     const shallowItem = {...item}
     setSelectedItem(shallowItem);
+    setIsEdit(edit)
     setOpen(true);
   }
 
   const closeDrawer = () => {
+    setIsEdit(false);
     setOpen(false);
   }
 
@@ -68,7 +71,7 @@ const CustomCalendar = () => {
     {
       key: '1',
       label: (
-        <div onClick={() => showDrawer(date)}>
+        <div onClick={() => showDrawer(date, false)}>
           이벤트 생성 {date.format('YYYY-MM-DD')}
         </div>
       ),
@@ -84,7 +87,7 @@ const CustomCalendar = () => {
     }).filter(item => item != null)
 
     return (
-      <Dropdown overlay={<Menu items={items(date)} />} trigger={['contextMenu']} style={{minHeight: "100%"}}>
+      <Dropdown overlay={<Menu items={items(date)}/>} trigger={['contextMenu']} style={{minHeight: "100%"}}>
         <div>
           {targetData.map(item => (
             <EventItem background={item.schedule_color}>
@@ -99,7 +102,7 @@ const CustomCalendar = () => {
                 }
                 title={item.schedule_title}
               >
-                <div style={{marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: 1}} onClick={() => showDrawer(item)}>
+                <div style={{marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: 1}} onClick={() => showDrawer(item, true)}>
                   <Badge status="processing" color={item.schedule_color}/>&nbsp;&nbsp;{item.schedule_category ? `[ ${item.schedule_category} ]` : null} {item.schedule_title}
                 </div>
               </Popover>
@@ -124,6 +127,7 @@ const CustomCalendar = () => {
         open={open}
         item={selectedItem}
         updateItemTitle={updateItemTitle}
+        status={isEdit}
       />
     </>  
   );

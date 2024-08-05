@@ -10,26 +10,38 @@ import 'dayjs/locale/ko'
 const { TextArea } = Input;
 dayjs.locale('ko');
 
-const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
+const CustomDrawer = ({ onClose, open, item, updateItemTitle, status}) => {
     const [hoveredField, setHoveredField] = useState('');
-    const [editStat, setEditStat] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
     const [allDay, setAllDay] = useState(false);
     const [date, setDate] = useState(null);
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
-        if (item && item.schedule_id) {
+        if(item) {
+            const isEditObject =  !status;
             form.setFieldsValue({
-                ...item,
-                schedule_startDate: dayjs(item.schedule_startDate),
-                schedule_endDate: dayjs(item.schedule_endDate),
+                schedule_id: isEditObject ? null : item.schedule_id,
+                schedule_title: isEditObject ? '' : item.schedule_title,
+                schedule_startDate: isEditObject ? dayjs() : dayjs(item.schedule_startDate),
+                schedule_endDate: isEditObject ? dayjs() : dayjs(item.schedule_endDate),
+                schedule_manager: isEditObject ? '' : item.schedule_manager,
+                schedule_category: isEditObject ? '' : item.schedule_category,
+                schedule_marks: isEditObject ? '' : item.schedule_marks,
+                schedule_color: isEditObject ? '#d9d9d9' : item.schedule_color,
+                schedule_location: isEditObject ? '' : item.schedule_location,
+                schedule_allDay: isEditObject ? false : item.schedule_allDay
             });
-            setEditStat(true);
-            setAllDay(form.getFieldValue('schedule_allDay'));
-            setDate(form.getFieldValue('schedule_startDate'));
-        } else {
-            setEditStat(false);
+
+            if (status) {
+                setIsEdit(status);
+                setAllDay(form.getFieldValue('schedule_allDay'));
+                setDate(form.getFieldValue('schedule_startDate'));
+            } else {
+                setDate(dayjs())
+                setIsEdit(status)
+            }
         }
     }, [item, form]);
 
@@ -63,16 +75,15 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
         }
     };
 
-    const createPayload = (values, item) => {
-        const dataColor = values.schedule_color != item.schedule_color ? values.schedule_color.toHexString() : item.schedule_color;
-        
-        if (values.schedule_allDay) {
+    const createPayload = (values) => {
+        const dataColor = typeof(values.schedule_color) != "string" ? values.schedule_color.toHexString() : form.getFieldValue('schedule_color');
+
+        if (allDay) {
             return {
                 ...values,
-                schedule_id: item.schedule_id,
                 schedule_startDate: values.schedule_startDate.format('YYYY-MM-DD'),
                 schedule_endDate: values.schedule_endDate.format('YYYY-MM-DD'),
-                schedule_allDay: values.schedule_allDay,
+                schedule_allDay: allDay,
                 schedule_color: dataColor
             }
         } else {
@@ -82,10 +93,9 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
 
             return {
                 ...values,
-                schedule_id: item.schedule_id,
                 schedule_startDate: datePart.hour(startTimePart.hour()).minute(startTimePart.minute()).format('YYYY-MM-DDTHH:mm:ss'),
                 schedule_endDate: datePart.hour(endTimePart.hour()).minute(endTimePart.minute()).format('YYYY-MM-DDTHH:mm:ss'),
-                schedule_allDay: values.schedule_allDay,
+                schedule_allDay: allDay,
                 schedule_color: dataColor
             }
         }
@@ -105,11 +115,9 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
     const handleClose = async () => {
         try {
             const values = await form.validateFields();
-            const payload = createPayload(values, item)
+            const payload = Object.fromEntries(Object.entries(createPayload(values)).filter(([_, v]) => v !== undefined));        
 
-            console.log(payload, editStat)
-
-            if (editStat) {
+            if (isEdit) {
                 await axios.put(`http://localhost:8000/schedule/update`, payload);
                 handleNotification('이벤트를 수정 하였습니다.')
             } else {
@@ -135,7 +143,10 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
         <ConfigProvider locale={ko_KR}>
             {contextHolder}
             <Drawer title="이벤트" keyboard={true} mask={false} onClose={handleClose} open={open}>
-                <Form form={form}>  
+                <Form form={form}>
+                    <Form.Item name="schedule_id" initialValue={form.getFieldValue('schedule_id') ? form.getFieldValue('schedule_id') : null} hidden>
+                        <Input type="hidden" />
+                    </Form.Item>  
                     <Form.Item
                         name="schedule_title"
                         rules={[
@@ -223,7 +234,6 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                         null
                         :
                         <DatePicker
-                            defaultValue={date}
                             value={date}
                             format="MM월 DD일 (ddd)"
                             onMouseEnter={() => handleMouseEnter('nonAllDayDate')} 
@@ -309,7 +319,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle }) => {
                     </Form.Item>
                 </Form>
 
-                {editStat ?
+                {isEdit ?
                 <Popconfirm
                     title="이벤트 삭제"
                     description="이벤트를 삭제하겠습니까?"
