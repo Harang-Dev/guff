@@ -132,20 +132,26 @@ async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
         
     return result
         
-# @parser.get('/download/{version}', tags=['parser'])
-# def download_excel(version: str):
-#     df = pd.DataFrame(serialize_data)
+# @parser.get('/{filename}/download', tags=['parser'])
+# def download_excel(filename: str, db: Session = Depends(get_db)):
+#     dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
 
-#     # 특정 열이 존재하는지 확인하고 제거
-#     for col in ['허용기준', '비고']:
-#         if col in df.columns:
-#             df = df.drop(columns=[col])
+#     tmp = [{key:value for key,value in i.__dict__.items()} for i in dbData]
+#     df = pd.DataFrame(tmp)
+#     df = df.drop(columns=['_sa_instance_state', 'data_id', 'file_id'])
 
-#     with pd.ExcelWriter('output.xlsx') as writer:
-#         for location, group in df.groupby(FIND_WORD[version]):
+#     df['wave_speed'] = df['wave_speed'].apply(lambda x: ast.literal_eval(x)[1])
+#     df['wave_level'] = df['wave_level'].apply(lambda x: ast.literal_eval(x)[1])
+#     df['noise'] = df['noise'].apply(lambda x: ast.literal_eval(x)[1])
+
+#     mapping = {v: k for group in STANDARD_COLUMNS.values() for k, v in group.items()}
+#     df.rename(columns=mapping, inplace=True)
+
+#     with pd.ExcelWriter(f'{filename}.xlsx') as writer:
+#         for location, group in df.groupby('계측위치'):
 #             group.to_excel(writer, sheet_name=location, index=False)
 
-#     response = FileResponse('./output.xlsx', filename="output.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     response = FileResponse(f'./{filename}.xlsx', filename=f"{filename}.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 #     return response
 

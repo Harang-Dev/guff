@@ -7,6 +7,8 @@ import { Space, Table, message, Button } from 'antd';
 
 import { simpleColumns, properColumns, complicatedColumns } from './AnalyzeColumns';
 import AnalyzeStatisticsModal from './AnalyzeStatisticsModal';
+import * as XLSX from 'xlsx';
+
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -63,7 +65,7 @@ function AnalyzeResult(props) {
 
     const download = async () => {
         try {
-            const response = await axios.get(`${API_URL}/parser/download/${version}`, {
+            const response = await axios.get(`${API_URL}/parser/${filename}/download`, {
                 responseType: 'blob',
             });
 
@@ -71,14 +73,13 @@ function AnalyzeResult(props) {
             const link = document.createElement('a');
 
             link.href = url;
-            link.setAttribute('download', 'test.xlsx');
+            link.setAttribute('download', `${filename}.xlsx`);
 
             document.body.appendChild(link);
             link.click();
 
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
-
         } catch(error) {
             message.error('엑셀 다운로드 실패');
         }

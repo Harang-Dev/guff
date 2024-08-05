@@ -8,6 +8,8 @@ import axios from 'axios';
 import styled from 'styled-components';
 import './CustomCalendarCss.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const EventItem = styled.div`
   border-radius: 7px;
   margin-bottom: 3px;
@@ -33,7 +35,7 @@ const CustomCalendar = () => {
   useEffect(() => {
     const fetchYearData = async() => {
       try {
-        const response = await axios.get('http://localhost:8000/schedule/year/' + currentYear);
+        const response = await axios.get(`${API_URL}/schedule/year/` + currentYear);
         setCurrentYearData(response.data);
       } catch (error) {
         message.error('캘린더 데이터 조회 실패')

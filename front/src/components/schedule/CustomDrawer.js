@@ -7,6 +7,8 @@ import ko_KR from 'antd/es/locale/ko_KR';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko'
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const { TextArea } = Input;
 dayjs.locale('ko');
 
@@ -103,7 +105,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle, status}) => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8000/schedule/delete/${item.schedule_id}`)
+            await axios.delete(`${API_URL}/schedule/delete/${item.schedule_id}`)
             handleNotification('이벤트를 삭제 하였습니다.')
         } catch (error) {
             message.error('이벤트 삭제 실패')
@@ -118,10 +120,10 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle, status}) => {
             const payload = Object.fromEntries(Object.entries(createPayload(values)).filter(([_, v]) => v !== undefined));        
 
             if (isEdit) {
-                await axios.put(`http://localhost:8000/schedule/update`, payload);
+                await axios.put(`${API_URL}/schedule/update`, payload);
                 handleNotification('이벤트를 수정 하였습니다.')
             } else {
-                await axios.post(`http://localhost:8000/schedule/create`, payload);
+                await axios.post(`${API_URL}/schedule/create`, payload);
                 handleNotification('이벤트를 생성 하였습니다.')
             }
 
