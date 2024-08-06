@@ -45,7 +45,7 @@ const CustomDrawer = ({ onClose, open, item, updateItemTitle, status}) => {
                 setIsEdit(status)
             }
         }
-    }, [item, form]);
+    }, [item, form, status]);
 
     const handleMouseEnter = (field) => {
         setHoveredField(field);

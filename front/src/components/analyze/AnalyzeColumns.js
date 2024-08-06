@@ -1,4 +1,12 @@
 import { Tag } from 'antd';
+import styled from 'styled-components'
+
+const Highlight = styled.span`
+    color: red;
+    font-weight: bolder;
+`
+
+
 
 const transLocData = (item) => {
     return item.map(location => ({ text: location, value: location })); 
@@ -238,7 +246,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_speed',
                         key: 'wave_speed_min', 
                         align: 'center',
-                        render: (text, record) => record.wave_speed[0] ? record.wave_speed[0][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.wave_speed[0] ? record.wave_speed[0][0] : null
+                            const maxMin = record.wave_speed[1] ? record.wave_speed[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? <Highlight>{minMin}</Highlight> : minMin
+                            )
+                        },
                         ellipsis: true,
                     },
                     {
@@ -260,7 +275,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_speed',
                         key: 'wave_speed_min', 
                         align: 'center',
-                        render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.wave_speed[0] ? record.wave_speed[0][0] : null
+                            const maxMin = record.wave_speed[1] ? record.wave_speed[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? maxMin : <Highlight>{maxMin}</Highlight>
+                            )
+                        },                        
                         ellipsis: true,
                     },
                     {
@@ -268,7 +290,7 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_speed',
                         key: 'wave_speed_max',
                         align: 'center',
-                        render: (text, record) => record.wave_speed[1] ? record.wave_speed[1][1] : '',
+                        render: (text, record) => record.wave_speed[1] ? <Highlight>{record.wave_speed[1][1]}</Highlight> : '',
                         ellipsis: true,
                     },
                 ],
@@ -288,7 +310,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_level',
                         key: 'wave_level', 
                         align: 'center',
-                        render: (text, record) => record.wave_level[0] ? record.wave_level[0][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.wave_level[0] ? record.wave_level[0][0] : null
+                            const maxMin = record.wave_level[1] ? record.wave_level[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? <Highlight>{minMin}</Highlight> : minMin
+                            )
+                        },
                         ellipsis: true,
                     },
                     {
@@ -310,7 +339,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_level',
                         key: 'wave_level', 
                         align: 'center',
-                        render: (text, record) => record.wave_level[1] ? record.wave_level[1][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.wave_level[0] ? record.wave_level[0][0] : null
+                            const maxMin = record.wave_level[1] ? record.wave_level[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? maxMin : <Highlight>{maxMin}</Highlight>
+                            )
+                        },
                         ellipsis: true,
                     },
                     {
@@ -318,7 +354,7 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'wave_level',
                         key: 'wave_level',
                         align: 'center',
-                        render: (text, record) => record.wave_level[1] ? record.wave_level[1][1] : '',
+                        render: (text, record) => record.wave_level[1] ? <Highlight>{record.wave_level[1][1]}</Highlight> : '',
                         ellipsis: true,
                     },
                 ],
@@ -338,7 +374,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'noise',
                         key: 'noise', 
                         align: 'center',
-                        render: (text, record) => record.noise[0] ? record.noise[0][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.noise[0] ? record.noise[0][0] : null
+                            const maxMin = record.noise[1] ? record.noise[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? <Highlight>{minMin}</Highlight> : minMin
+                            )
+                        },
                         ellipsis: true,
                     },
                     {
@@ -360,7 +403,14 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'noise',
                         key: 'noise', 
                         align: 'center',
-                        render: (text, record) => record.noise[1] ? record.noise[1][0] : '', 
+                        render: (text, record) => {
+                            const minMin = record.noise[0] ? record.noise[0][0] : null
+                            const maxMin = record.noise[1] ? record.noise[1][0] : null 
+                            
+                            return (
+                                minMin < maxMin ? maxMin : <Highlight>{maxMin}</Highlight>
+                            )
+                        },
                         ellipsis: true,
                     },
                     {
@@ -368,7 +418,7 @@ export const simpleStatisticsColumns = () => [
                         dataIndex: 'noise',
                         key: 'noise',
                         align: 'center',
-                        render: (text, record) => record.noise[1] ? record.noise[1][1] : '',
+                        render: (text, record) => record.noise[1] ? <Highlight>{record.noise[1][1]}</Highlight> : '',
                         ellipsis: true,
                     },
                 ],

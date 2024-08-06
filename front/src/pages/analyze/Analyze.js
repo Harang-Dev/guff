@@ -1,7 +1,7 @@
 import React from 'react';
 import AnalyzeBox from '../../components/analyze/AnalyzeBox';
 import CustomLayout from '../../components/layout/CustomLayout';
-import { Layout, Typography, Divider } from 'antd';
+import { Typography, Divider } from 'antd';
 
 const { Title } = Typography;
 

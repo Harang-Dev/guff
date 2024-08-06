@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, message, Card, Select, Space, Input, Row, Col, Statistic, Descriptions } from 'antd';
+import { Modal, Button, message, Card, Select, Space, Input, Descriptions } from 'antd';
 import axios from 'axios';
 
 const { Option } = Select;

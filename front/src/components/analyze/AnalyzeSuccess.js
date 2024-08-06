@@ -8,6 +8,7 @@ import { Space, Table, message, Button } from 'antd';
 import { simpleColumns, properColumns, complicatedColumns } from './AnalyzeColumns';
 import AnalyzeStatisticsModal from './AnalyzeStatisticsModal';
 import * as XLSX from 'xlsx';
+import ReactDOMServer from 'react-dom/server'
 
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -65,7 +66,7 @@ function AnalyzeResult(props) {
 
     const download = async () => {
         try {
-            const response = await axios.get(`${API_URL}/parser/${filename}/download`, {
+            const response = await axios.get(`${API_URL}/parser/${filename}/download/${version}`, {
                 responseType: 'blob',
             });
 

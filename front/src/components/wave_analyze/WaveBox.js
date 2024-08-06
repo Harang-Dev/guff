@@ -11,7 +11,6 @@ const { Dragger } = Upload;
 
 function WaveBox(props) {
     const [version, setVersion] = useState(null);
-    const [filename, setFileName] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     
@@ -24,7 +23,6 @@ function WaveBox(props) {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('version', version);
-        setFileName(file.name);
 
         try {
             const response = await axios.post(`${API_URL}/wave/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, Form, Request, Depends
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, UploadFile, File, Form, Request, Depends, HTTPException
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 
 import os, tempfile, ast, json
 import pandas as pd
 import numpy as np
+import openpyxl
 
 from src.db.connection import get_db
 from src.dto.HwpDTO import *
@@ -17,25 +18,28 @@ from src.container.ParserContainer import ParserContainer
 STANDARD_COLUMNS = {
     '간단이' : { 
         '일시' : 'measurement_date', 
+        '구분' : 'measurement_location',
         '진동속도(cm/s)' : 'wave_speed', 
         '진동레벨[dB(V)]' : 'wave_level', 
         '소음[dB(A)]' : 'noise', 
-        '구분' : 'measurement_location',
-        '비고' : 'marks'}, 
+        '비고' : 'marks'
+        }, 
     '복잡이' : {
         '일시' : 'measurement_date', 
         '시간' : 'measurement_time', 
         '발파진동(cm/s)' : 'wave_speed', 
         '진동레벨dB(V)' : 'wave_level', 
         '소음레벨dB(A)' : 'noise', 
-        '측정위치' : 'measurement_location'}, 
+        '측정위치' : 'measurement_location'
+        }, 
     '어중이떠중이' : {
-        '일자' : 'measurement_date', 
+        '일자' : 'measurement_date',
+        '계측위치' : 'measurement_location',
         '발파시간' : 'measurement_time', 
         '진동속도(cm/s)' : 'wave_speed', 
         '진동레벨(dB(V))' : 'wave_level', 
-        '소음레벨(dB(A))' : 'noise',
-        '계측위치' : 'measurement_location'}
+        '소음레벨(dB(A))' : 'noise'
+        }
     }
 
 parser = APIRouter(prefix='/parser')
@@ -132,30 +136,73 @@ async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
         
     return result
         
-# @parser.get('/{filename}/download', tags=['parser'])
-# def download_excel(filename: str, db: Session = Depends(get_db)):
-#     dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
+@parser.get('/{filename}/download/{version}', tags=['parser'])
+async def download_excel(filename: str, version: str, db: Session = Depends(get_db)):
+    dbData = mapper.getFileDataList(mapper.getFileID(filename, db), db)
 
-#     tmp = [{key:value for key,value in i.__dict__.items()} for i in dbData]
-#     df = pd.DataFrame(tmp)
-#     df = df.drop(columns=['_sa_instance_state', 'data_id', 'file_id'])
+    tmp = [{key:value for key,value in i.__dict__.items()} for i in dbData]
+    df = pd.DataFrame(tmp).drop(columns=['_sa_instance_state', 'data_id', 'file_id'])
 
-#     df['wave_speed'] = df['wave_speed'].apply(lambda x: ast.literal_eval(x)[1])
-#     df['wave_level'] = df['wave_level'].apply(lambda x: ast.literal_eval(x)[1])
-#     df['noise'] = df['noise'].apply(lambda x: ast.literal_eval(x)[1])
+    waveSpeed = df['wave_speed']
+    waveLevel = df['wave_level']
+    noise = df['noise']
 
-#     mapping = {v: k for group in STANDARD_COLUMNS.values() for k, v in group.items()}
-#     df.rename(columns=mapping, inplace=True)
+    desired_columns = [column for column in STANDARD_COLUMNS[version].values()]
+    existing_columns = [col for col in desired_columns if col in df.columns]
+    df = df[existing_columns]
 
-#     with pd.ExcelWriter(f'{filename}.xlsx') as writer:
-#         for location, group in df.groupby('계측위치'):
-#             group.to_excel(writer, sheet_name=location, index=False)
+    mapping= {v: k for k, v in STANDARD_COLUMNS[version].items()}
+    df.rename(columns=mapping, inplace=True)
 
-#     response = FileResponse(f'./{filename}.xlsx', filename=f"{filename}.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    df = transExcel(waveSpeed, waveLevel, noise, df, version)
+    for i in df:
+        print(i)
+    with pd.ExcelWriter(f'{filename}.xlsx') as writer:
+        for location, group in df.groupby(mapping['measurement_location']):
+            group.to_excel(writer, sheet_name=location, index=False)
 
-#     return response
+            # Set all columns to the same width
+            column_width = 30  # Change this value to your desired width
+            for column in group.columns:
+                col_idx = group.columns.get_loc(column) + 1
+                writer.sheets[location].column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = column_width       
+
+    response = FileResponse(f'./{filename}.xlsx', filename=f"{filename}.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    return response
 
 ##################################################################################################
+
+# def existinColumns()
+
+def transExcel(waveSpeed, waveLevel, noise, df, version):
+    if version == '간단이':
+        newColumns = ['진동속도(cm/s) 최저치', '진동레벨(dB(V)) 최저치', '소음레벨(dB(A)) 최저치', '진동속도(cm/s) 최고치', '진동레벨(dB(V)) 최고치', '소음레벨(dB(A)) 최고치']
+        cols = list(df.columns)
+
+        index_at = cols.index('진동속도(cm/s)')
+        for idx in range(len(newColumns)):
+            cols.insert(index_at + idx, newColumns[idx])
+
+        df['진동속도(cm/s) 최저치'] = [ast.literal_eval(i)[0] for i in waveSpeed]
+        df['진동레벨(dB(V)) 최저치'] = [ast.literal_eval(i)[0] for i in waveLevel]
+        df['소음레벨(dB(A)) 최저치'] = [ast.literal_eval(i)[0] for i in noise]
+
+        df['진동속도(cm/s) 최고치'] = [ast.literal_eval(i)[1] for i in waveSpeed]
+        df['진동레벨(dB(V)) 최고치'] = [ast.literal_eval(i)[1] for i in waveLevel]
+        df['소음레벨(dB(A)) 최고치'] = [ast.literal_eval(i)[1] for i in noise]
+
+        return df[cols].drop(columns=['진동속도(cm/s)', '진동레벨[dB(V)]', '소음[dB(A)]'])
+    elif version == '어중이떠중이':
+        df['진동속도(cm/s)'] = [ast.literal_eval(i)[1] for i in waveSpeed]
+        df['진동레벨(dB(V))'] = [ast.literal_eval(i)[1] for i in waveLevel]
+        df['소음레벨(dB(A))'] = [ast.literal_eval(i)[1] for i in noise]
+    else:
+        df['발파진동(cm/s)'] = [i for i in waveSpeed]
+        df['진동레벨dB(V)'] = [i for i in waveLevel]
+        df['소음레벨dB(A)'] = [i for i in noise]
+
+    return df
 
 def transLiteral(value):
     try:
