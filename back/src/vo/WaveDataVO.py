@@ -5,18 +5,18 @@ BASE = declarative_base()
 
 class WaveDataVO(BASE):
     __tablename__ = 'WaveData'
-    data_id = Column(Integer, primary_key=True, autoincrement=True)
-    wave_id = Column(Integer, nullable=False)
-    time = Column(Float(10))
-    tran = Column(Float(10))
-    tm = Column(Float(10))
-    vert = Column(Float(10))
-    vm = Column(Float(50))
-    long = Column(Float(10))
-    lm = Column(Float(10))
-    ppv = Column(Float(10))
-    pps = Column(Float(10))
-    marks = Column(String(50), nullable=True)
+    data_id = Column(Integer, primary_key=True)
+    wave_id = Column(Integer)
+    time = Column(Float)
+    tran = Column(Float)
+    tm = Column(Float)
+    vert = Column(Float)
+    vm = Column(Float)
+    long = Column(Float)
+    lm = Column(Float)
+    ppv = Column(Float)
+    pps = Column(Float)
+    marks = Column(String)
 
     # def __init__(self, product_name):
     #     self.product_name = product_name

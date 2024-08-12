@@ -40,6 +40,7 @@ function AnalyzeResult(props) {
             }
         };
 
+        console.log(filename)
         fetchData();
         fetchLocData();
     }, [version]); // version이 변경될 때만 실행

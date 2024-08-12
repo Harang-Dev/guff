@@ -23,7 +23,7 @@ app.include_router(schedule)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://192.168.0.102:3000"],  # 허용할 도메인
+    allow_origins=["http://localhost:3000"],  # 허용할 도메인
     allow_credentials=True,
     allow_methods=["*"],  # 허용할 HTTP 메소드
     allow_headers=["*"],  # 허용할 HTTP 헤더

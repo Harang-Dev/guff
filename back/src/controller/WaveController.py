@@ -9,7 +9,6 @@ from src.dto.WaveDTO import *
 
 from src.db.connection import get_db
 from src.mapper.WaveMapper import WaveMapper
-from src.service.WavePaser import WaveParser
 from src.service.HBParser import HBParser
 from src.service.BMParser import BMParser
 from src.service.SVParser import SVParser

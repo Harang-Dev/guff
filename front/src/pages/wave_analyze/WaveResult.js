@@ -3,11 +3,14 @@ import WaveTable from '../../components/wave_analyze/WaveTable';
 import PPVChart from '../../components/wave_analyze/PPVChart';
 import XYZChart from '../../components/wave_analyze/XYZChart';
 import CustomLayout from '../../components/layout/CustomLayout';
-import { Divider, Typography } from 'antd';
+import G2PlotChart from '../../components/wave_analyze/TestChar';
+import G2Test from '../../components/wave_analyze/TestChart';
+import { Divider, Typography, Row, Col } from 'antd';
 
 const { Title } = Typography;
 
 const WaveResult = () => {
+
   return (
       <CustomLayout>
             <Typography>
@@ -16,8 +19,16 @@ const WaveResult = () => {
 
             <Divider/>
             <WaveTable />
-            <PPVChart />
-            <XYZChart />
+            <Row>
+              <Col span={12}>
+              <G2Test />
+                {/* <PPVChart /> */}
+              </Col>
+              <Col span={12}>
+                <G2PlotChart />
+                {/* <XYZChart /> */}
+              </Col>
+            </Row>
       </CustomLayout>
   );
 }
