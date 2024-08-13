@@ -4,7 +4,7 @@ from typing import Optional
 class WaveDataDTO(BaseModel):
     data_id: Optional[int]
     wave_id: int
-    time: Optional[float]
+    time: Optional[str]
     tran: Optional[float]
     tm: Optional[float]
     vert: Optional[float]

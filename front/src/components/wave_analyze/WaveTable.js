@@ -33,7 +33,7 @@ const WaveTable = () => {
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
                 <Button type="primary" icon={<PlusOutlined/>}onClick={() => (handleDownload('ppv-container', 'PPV Graph'))} >PPV Download</Button>
                 <Button type="primary" icon={<PlusOutlined/>}onClick={() => (handleDownload('xyz-container', 'XYZ Graph'))}>XYZ Download</Button>
-                <Button type="primary" onClick={showModal}>통계 요약</Button>
+                <Button type="primary" onClick={showModal}>도표 분석</Button>
             </Space>
             <WaveModal 
                 open={ismodal}

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { Line } from '@antv/g2plot';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Line, Column } from '@antv/g2plot';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-const G2PlotChart = () => {
+const G2Test = () => {
   const chartRef = useRef(null);
   const location = useLocation();
   const { filename } = location.state || {};
@@ -15,21 +15,9 @@ const G2PlotChart = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${API_URL}/wave/${filename}`);
-        const rawData = response.data
+        const rawData = response.data;
 
-        // 중복된 데이터 제거
-        const uniqueData = rawData.reduce((acc, current) => {
-          const x = parseFloat(current.time);
-          const y = parseFloat(current.ppv);
-
-          if (!acc.find(item => item.time === x && item.ppv === y)) {
-            acc.push({ time: x, ppv: y });
-          }
-
-          return acc;
-        }, []);
-
-        setData(uniqueData);
+        setData(rawData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -39,7 +27,7 @@ const G2PlotChart = () => {
   }, [filename]);
 
   useEffect(() => {
-    if (!chartRef.current || data.length === 0) return;
+    if (!chartRef.current) return;
 
     const linePlot = new Line(chartRef.current, {
       data,
@@ -54,7 +42,7 @@ const G2PlotChart = () => {
           },
         },
         tickCount: 5,
-        nice: true,
+        nice: true
       },
       yAxis: {
         label: {
@@ -64,8 +52,7 @@ const G2PlotChart = () => {
             fill: '#000',
           },
         },
-        tickCount: 5,
-        nice: true,
+        nice: true
       },
       animation: {
         appear: {
@@ -74,11 +61,9 @@ const G2PlotChart = () => {
         },
       },
       smooth: true,
-      regressionLine: false, // 추세선 비활성화
-      interactions: 'Zoom',
       slider: {
         start: 0.1,
-        end: 0.5,
+        end: 0.2,
       },
     });
 
@@ -90,4 +75,4 @@ const G2PlotChart = () => {
   return <div ref={chartRef} style={{ width: '100%' }} />;
 };
 
-export default G2PlotChart;
+export default G2Test;

@@ -26,9 +26,9 @@ const G2PlotChart = () => {
 
   const transformedData = (tempData) => {
     return tempData.flatMap(item => [
-      { time: parseFloat(item['time']), value: parseFloat(item['tran']), division: 'tran' },
-      { time: parseFloat(item['time']), value: parseFloat(item['vert']), division: 'vert' },
-      { time: parseFloat(item['time']), value: parseFloat(item['long']), division: 'long' },
+      { time: item['time'], value: parseFloat(item['tran']), division: 'tran' },
+      { time: item['time'], value: parseFloat(item['vert']), division: 'vert' },
+      { time: item['time'], value: parseFloat(item['long']), division: 'long' },
     ]);
   };
 
@@ -49,19 +49,25 @@ const G2PlotChart = () => {
           },
         },
       },
-    yAxis: {
-      label: {
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-          fill: '#000',
+      yAxis: {
+        label: {
+          style: {
+            fontSize: 14,
+            fontWeight: 'bold',
+            fill: '#000',
+          },
         },
       },
-    },
-    smooth: true,
-    slider: {
-        start: 0.1,
-        end: 0.5,
+      smooth: true,
+      slider: {
+          start: 0.1,
+          end: 0.5,
+        },
+      animation: {
+        appear: {
+          animation: 'path-in',
+          duration: 5000,
+        },
       },
     });
 

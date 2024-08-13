@@ -7,7 +7,7 @@ class WaveDataVO(BASE):
     __tablename__ = 'WaveData'
     data_id = Column(Integer, primary_key=True)
     wave_id = Column(Integer)
-    time = Column(Float)
+    time = Column(String)
     tran = Column(Float)
     tm = Column(Float)
     vert = Column(Float)

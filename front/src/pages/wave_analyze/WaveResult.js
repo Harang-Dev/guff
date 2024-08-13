@@ -20,11 +20,11 @@ const WaveResult = () => {
             <Divider/>
             <WaveTable />
             <Row>
-              <Col span={12}>
+              <Col span={24}>
               <G2Test />
                 {/* <PPVChart /> */}
               </Col>
-              <Col span={12}>
+              <Col span={24}>
                 <G2PlotChart />
                 {/* <XYZChart /> */}
               </Col>
