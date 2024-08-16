@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form, Request, Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import Dict, Any
 
 import os, tempfile
 
@@ -44,14 +45,18 @@ async def parsing(file: UploadFile = File(...), version: str = Form(...), db: Se
 def get_file(filename: str, db: Session = Depends(get_db)):
     return mapper.getWaveDataList(mapper.getFileId(filename, db), db)
 
-@wave_parser.get('/{filename}/calc', tags=['wave'])
-def get_time_data(filename: str, time: float = None, prevTime: float = None, db: Session = Depends(get_db)):
+@wave_parser.post('/{filename}/calc', tags=['wave'])
+def get_time_data(filename: str, waveData: list[WaveCalcDTO], db: Session = Depends(get_db)):
     wave_data = mapper.getWaveDataList(mapper.getFileId(filename, db), db)
 
-    if prevTime:
-        filteredWaveData = [i for i in wave_data if float(i.time) > prevTime]
-    
-    filteredWaveData = [i for i in wave_data]
-    min_time = min(filteredWaveData, key=lambda x: abs(float(x.time)-float(time)))    
+    result = []
+    timeData = [vars(i)['time'] for i in waveData]
+    for i in timeData:
+        min_time = min(wave_data, key=lambda x: abs(float(x.time) - float(i)))
+        
+        targetData = wave_data.index(min_time)
+        result.append(wave_data[:targetData + 1])
 
-    return [i for i in filteredWaveData if float(i.time) <= float(min_time.time)]
+        del wave_data[:targetData + 1]
+
+    return result

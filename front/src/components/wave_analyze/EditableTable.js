@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Form, Button, message } from 'antd';
+import { Table, Input, Form, Button, Popconfirm, Space, message } from 'antd';
 import { EditableCell, EditableRow } from './EditableComponents';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -10,11 +10,11 @@ const EditableTable = (resetKey) => {
     const location = useLocation();
     const { filename } = location.state || {};
     const [dataSource, setDataSource] = useState([]);
-    const [prevTime, setPrevTime] = useState(null);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
         setDataSource([]);
-        setPrevTime(null);
+        setCount(0);
     }, [resetKey])
 
     const columns = [
@@ -45,25 +45,16 @@ const EditableTable = (resetKey) => {
             dataIndex: 'ppv',
         },
         {
-            title: 'Operation',
-            dataIndex: 'operation',
+            title: 'Delete',
+            dataIndex: 'delete',
             render: (_, record) =>
             dataSource.length >= 1 ? (
-                <Button onClick={() => handleCalc(record.time)}>계산하기</Button>
+                <Popconfirm title={`선택한 행을 삭제하시겠습니까?`} onConfirm={() => handleDelete(record.key)}>
+                    <a>Delete</a>
+                </Popconfirm>
             ) : null,
         },
     ];
-
-    const handleCalc = async (time) => {
-        try{
-            const response = await axios.get(`${API_URL}/wave/${filename}/calc?time=${time}${prevTime ? `&prevTime=${prevTime}` : ''}`)
-            console.log(response.data, prevTime)
-            setPrevTime(time)
-        }
-        catch (error) {
-            message.error('파형 데이터 불러오기 실패')
-        }
-    } 
 
     const handleDelete = (key) => {
         const newData = dataSource.filter((item) => item.key !== key);
@@ -84,15 +75,34 @@ const EditableTable = (resetKey) => {
 
     const handleAdd = () => {
         const newData = {
-            key: '-',
+            key: count,
+            type: '-',
             time: '-',
-            tm: '-',
-            vm: '-',
-            lm: '-',
-            ppv: '-'
         };
         setDataSource([...dataSource, newData]);
+        setCount(count + 1);
     };
+
+    const handleCalc = async () => {
+        try {
+            if (dataSource.length > 0) {
+                const response = await axios.post(`${API_URL}/wave/${filename}/calc`, dataSource)
+                const mokData = Object.keys(response.data).map(key => response.data[key])
+
+                setDataSource(
+                    mokData.map((items, index) => ({
+                        ...dataSource[index],
+                        tm: Math.max(...items.map(item => item.tm)),
+                        vm: Math.max(...items.map(item => item.vm)),
+                        lm: Math.max(...items.map(item => item.lm)),
+                        ppv: Math.max(...items.map(item => item.ppv)),
+                    }))
+                );
+            }
+        } catch (error) {
+            message.error('도표 분석 실패!');
+        }
+    }
 
     const mergedColumns = columns.map((col) => {
         if (!col.editable) {
@@ -113,9 +123,10 @@ const EditableTable = (resetKey) => {
 
     return (
         <>
-            <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                Add a row
-            </Button>
+            <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
+                <Button onClick={handleAdd} style={{marginBottom: 10}}>행 추가</Button>
+                <Button onClick={handleCalc} style={{marginBottom: 10}}>계산하기</Button>
+            </Space>
             <Form component={false}>
                 <Table
                 components={{

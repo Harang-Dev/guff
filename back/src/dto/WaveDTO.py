@@ -18,4 +18,10 @@ class WaveFileDTO(BaseModel):
     data: list[WaveDataDTO]
 
 class WaveFileinDB(WaveFileDTO):
-    wave_id: int    
+    wave_id: int
+
+class WaveCalcDTO(BaseModel):
+    key: int
+    type: str
+    time: float 
+   
