@@ -1,58 +1,126 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Line } from '@ant-design/plots';
-import { Typography } from 'antd';
-import axios from 'axios';
+import { Line } from '@antv/g2plot';
+import React, { useEffect, useRef } from 'react';
+import { Button } from 'antd';
 
-const API_URL = process.env.REACT_APP_API_URL;
-const { Title } = Typography;
+const XYZChart = ({ data }) => {
+  const chartRef = useRef(null);
 
-const XYZChart = () => {
-  const location = useLocation();
-  const { filename } = location.state || {};
-  const [ data, setData ] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/wave/${filename}`);
-        setData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, [filename]);
-
-  const transformedData = useMemo(() => {
-    return data.flatMap(item => [
-      { time: parseFloat(item['time']), value: parseFloat(item['tran']), division: 'tran' },
-      { time: parseFloat(item['time']), value: parseFloat(item['vert']), division: 'vert' },
-      { time: parseFloat(item['time']), value: parseFloat(item['long']), division: 'long' },
+  const transformedData = (tempData) => {
+    return tempData.flatMap(item => [
+      { time: item['time'], value: parseFloat(item['tran']), division: 'tran' },
+      { time: item['time'], value: parseFloat(item['vert']), division: 'vert' },
+      { time: item['time'], value: parseFloat(item['long']), division: 'long' },
     ]);
-  }, [data]);
-
-  const config = {
-    data: transformedData,
-    xField: 'time',
-    yField: 'value',
-    seriesField: 'division',
-    colorField: 'division',
-    scale: { color: { range: ['#30BF78', '#F4664A', '#FAAD14'] } },
-    shapeField: 'smooth',
   };
 
-  return (
-    <div>
-      <Typography>
-        <Title level={4}>XYZ Graph</Title>
-      </Typography>
-      <div id="xyz-container">
-        <Line {...config} />
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    if (!chartRef.current || !data) return;
+
+    const linePlot = new Line(chartRef.current, {
+      data: transformedData(data),
+      xField: 'time',
+      yField: 'value',
+      seriesField: 'division',
+      xAxis: {
+        title: {
+          text: 'TIME(SEC)',  // X축 제목
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+        },
+        label: {
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+          formatter: (val) => Number(val).toFixed(2), // 소수점 2자리로 설정
+        },
+        tickCount: 5,
+      },
+      yAxis: {
+        title: {
+          text: 'PPV(mm/sec)',  // Y축 제목
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+        },
+        label: {
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+          formatter: (val) => Number(val).toFixed(2), // 소수점 2자리로 설정
+        },
+        tickCount: 5,
+      },
+      legend: {
+        position: 'top-left', // 범례 위치 설정
+      },
+      slider: {
+        start: 0,
+        end: 1,
+      },
+      point: {
+        shape: 'circle',
+        size: 2,
+        style: () => {
+          return {
+            fillOpacity: 0,
+            stroke: 'transparent',
+          };
+        },
+      },
+      appendPadding: [0, 0, 0, 0],
+      smooth: true,
+      lineStyle: {
+        lineWidth: 1.5,
+      },
+      theme: {
+        geometries: {
+          point: {
+            circle: {
+              active: {
+                style: {
+                  r: 4,
+                  fillOpacity: 1,
+                  stroke: '#000',
+                  lineWidth: 1,
+                },
+              },
+            },
+          },
+        },
+      },
+      interactions: [{ type: 'marker-active' }, { type: 'brush' }],
+    });
+
+    linePlot.render();
+
+    return () => linePlot.destroy(); // Cleanup chart on component unmount
+
+  }, [data]);
+
+  return  <div ref={chartRef} style={{ width: '100%' }} />;
+
+
+  // return (
+  // <div>
+  //         <Button onClick={console.log('2')} style={{ marginBottom: 10 }}>
+  //       전체 범위 보기
+  //     </Button>
+
+  // </div>
+  // )
 };
 
 export default XYZChart;

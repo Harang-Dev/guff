@@ -1,47 +1,131 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
-import { Line } from '@ant-design/plots'
-import { Typography } from "antd";
-import axios from 'axios';
+import { Line } from '@antv/g2plot';
+import React, { useEffect, useRef } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL;
-const { Title } = Typography;
-
-const PPVChart = () => {
-  const location = useLocation();
-  const { filename } = location.state || {};
-  const [ data, setData ] = useState([]);
+const PPVChart = ({ data }) => {
+  const chartRef = useRef(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/wave/${filename}`);
-        setData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    if (!chartRef.current || !data) return;
 
-    fetchData();
-  }, [filename]);
-    
-    const config = {
-        data,
-        xField: 'time',
-        yField: 'ppv',
-        shapeField: 'smooth',
-      };
+    const dataWithSeries = data.map(item => ({ ...item, series: 'PPV' }));
 
-    return (
-      <div>
-        <Typography>
-          <Title level={4}>PPV Graph</Title>
-        </Typography>
-        <div id="ppv-container">
-          <Line {...config} />
-        </div>
-      </div>
-    );
-}
+    const linePlot = new Line(chartRef.current, {
+      data: dataWithSeries,
+      xField: 'time',
+      yField: 'ppv',
+      seriesField: 'series',
+      xAxis: {
+        title: {
+          text: 'TIME(SEC)',
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+        },
+        label: {
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+          formatter: (val) => Number(val).toFixed(2),
+        },
+        tickCount: 5,
+      },
+      yAxis: {
+        title: {
+          text: 'PPV(mm/sec)',
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+        },
+        label: {
+          style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            fill: '#000',
+            fontFamily: 'Lucida Console',
+          },
+          formatter: (val) => Number(val).toFixed(2),
+        },
+        tickCount: 5,
+      },
+      legend: {
+        position: 'top-left',
+      },
+      smooth: true,
+      slider: {
+        start: 0,
+        end: 1,
+      },
+      annotations: [
+        {
+          type: 'region',
+          start: ['-0.250', 'min'],  // 범위의 시작점 (x = 1.00)
+          end: ['0.197', 'max'],  // 범위의 끝점 (x = 2.00)
+          style: {
+            fill: '#FF0000',
+            fillOpacity: 0.2,  // 투명도 설정
+          },
+        },
+        {
+          type: 'text',
+          position: [1.5, 'max'], // 텍스트가 표시될 위치
+          content: '범위 표시 (1.00초 ~ 2.00초)',
+          style: {
+            fill: '#FF0000',
+            fontSize: 14,
+            fontWeight: 'bold',
+            textAlign: 'center',
+          },
+          offsetY: -10,
+        },
+      ],
+      point: {
+        shape: 'circle',
+        size: 3,
+        style: () => {
+          return {
+            fillOpacity: 0,
+            stroke: 'transparent',
+          };
+        },
+      },
+      appendPadding: [0, 0, 0, 0],
+      lineStyle: {
+        lineWidth: 1.5,
+      },
+      theme: {
+        geometries: {
+          point: {
+            circle: {
+              active: {
+                style: {
+                  r: 4,
+                  fillOpacity: 1,
+                  stroke: '#000',
+                  lineWidth: 1,
+                },
+              },
+            },
+          },
+        },
+      },
+      interactions: [{ type: 'marker-active' }, { type: 'brush' }],
+    });
+
+    linePlot.render();
+
+    return () => linePlot.destroy(); // Cleanup chart on component unmount
+  }, [data]);
+
+  return <div ref={chartRef} style={{ width: '100%' }} />;
+};
 
 export default PPVChart;
