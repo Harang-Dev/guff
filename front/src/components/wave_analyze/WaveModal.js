@@ -45,19 +45,20 @@ const WaveModal = ({open, onCancel, onCalc}) => {
                 const response = await axios.post(`${API_URL}/wave/${filename}/calc`, dataSource)
                 const mokData = Object.keys(response.data).map(key => response.data[key])
 
-                onCalc(response.data, dataSource.map(item => item.type));
-                setDataSource(
-                    mokData.map((items, index) => ({
-                        ...dataSource[index],
-                        tm: Math.max(...items.map(item => item.tm)),
-                        vm: Math.max(...items.map(item => item.vm)),
-                        lm: Math.max(...items.map(item => item.lm)),
-                        ppv: Math.max(...items.map(item => item.ppv)),
-                    }))
-                );
+                const mapData = mokData.map((items, index) => ({
+                    ...dataSource[index],
+                    tm: Math.max(...items.map(item => item.tm)),
+                    vm: Math.max(...items.map(item => item.vm)),
+                    lm: Math.max(...items.map(item => item.lm)),
+                    ppv: Math.max(...items.map(item => item.ppv)),
+                }))
+
+                onCalc(response.data, dataSource.map(item => item.type), mapData);
+                setDataSource(mapData);
             }
         } catch (error) {
             message.error('도표 분석 실패!');
+            console.log(error);
         }
     }
 

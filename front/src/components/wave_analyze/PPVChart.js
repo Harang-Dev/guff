@@ -1,15 +1,18 @@
 import { Line } from '@antv/g2plot';
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef, useState, useImperativeHandle } from 'react';
 
-const PPVChart = ({ data }) => {
+const PPVChart = forwardRef(({ data }, ref) => {
   const chartRef = useRef(null);
+  const [linePlot, setLinePlot] = useState(null);
+
+  const colors = ['#F4664A', '#2F54EB', '#52C41A', '#FAAD14']; // 사용할 색상 배열
 
   useEffect(() => {
     if (!chartRef.current || !data) return;
 
     const dataWithSeries = data.map(item => ({ ...item, series: 'PPV' }));
-
-    const linePlot = new Line(chartRef.current, {
+    
+    const config = {
       data: dataWithSeries,
       xField: 'time',
       yField: 'ppv',
@@ -64,29 +67,6 @@ const PPVChart = ({ data }) => {
         start: 0,
         end: 1,
       },
-      annotations: [
-        {
-          type: 'region',
-          start: ['-0.250', 'min'],  // 범위의 시작점 (x = 1.00)
-          end: ['0.197', 'max'],  // 범위의 끝점 (x = 2.00)
-          style: {
-            fill: '#FF0000',
-            fillOpacity: 0.2,  // 투명도 설정
-          },
-        },
-        {
-          type: 'text',
-          position: [1.5, 'max'], // 텍스트가 표시될 위치
-          content: '범위 표시 (1.00초 ~ 2.00초)',
-          style: {
-            fill: '#FF0000',
-            fontSize: 14,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          },
-          offsetY: -10,
-        },
-      ],
       point: {
         shape: 'circle',
         size: 3,
@@ -118,14 +98,57 @@ const PPVChart = ({ data }) => {
         },
       },
       interactions: [{ type: 'marker-active' }, { type: 'brush' }],
-    });
+    };
 
-    linePlot.render();
+    const newPlot = new Line(chartRef.current, config);
+    newPlot.render()
+    setLinePlot(newPlot);
 
-    return () => linePlot.destroy(); // Cleanup chart on component unmount
+    return () => {
+      if (newPlot) newPlot.destroy();
+    };
   }, [data]);
 
+  useImperativeHandle(ref, () => ({
+    updateAnnotations: (annotations) => {
+      if (linePlot) {
+        const formattedAnnotations = annotations.map((annotation, index) => {
+          const color = colors[index % colors.length]; // 색상 순환 로직
+
+          if (annotation.type === 'region') {
+            return {
+              type: 'region',
+              start: annotation.start,
+              end: annotation.end,
+              style: { fill: color, fillOpacity: 0.2 },
+            };
+          } else if (annotation.type === 'text') {
+            return {
+              type: 'text',
+              position: annotation.position,
+              content: annotation.content,
+              style: annotation.style || {
+                fill: '#000',
+                fontSize: 14,
+                fontWeight: 'bold',
+                textAlign: 'center',
+                textBaseline: 'middle',
+                background: {
+                  fill: '#fff',
+                  padding: [2, 2, 2, 2],
+                  radius: 2,
+                },
+              },
+            };
+          }
+          return annotation;
+        });
+        linePlot.update({ annotations: formattedAnnotations });
+      }
+    },
+  }));
+
   return <div ref={chartRef} style={{ width: '100%' }} />;
-};
+});
 
 export default PPVChart;
