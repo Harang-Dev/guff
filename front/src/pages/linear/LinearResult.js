@@ -1,23 +1,23 @@
 import React from 'react';
-import WaveTable from '../../components/wave_analyze/WaveTable';
 import CustomLayout from '../../components/layout/CustomLayout';
+import LinearTabs from '../../components/linear/LinearTabs';
 
 import { Divider, Typography, Row, Col } from 'antd';
 
 const { Title } = Typography;
 
-const WaveResult = () => {
+const LinearResult = () => {
 
   return (
       <CustomLayout>
             <Typography>
-                <Title>파형 분석기</Title>  
+                <Title>회귀 분석기</Title>  
             </Typography>
 
             <Divider/>
-            <WaveTable />
+            <LinearTabs />
       </CustomLayout>
   );
 }
 
-export default WaveResult;
+export default LinearResult;

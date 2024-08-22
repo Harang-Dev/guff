@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { createGlobalStyle } from 'styled-components'; 
 import "./App.css";
 import Home from "./pages/Home";
 import BatteryAsset from "./pages/battery/BatteryAsset";
@@ -8,8 +9,9 @@ import Analyze from "./pages/analyze/Analyze";
 import AnalyzeResult from "./pages/analyze/AnalyzeResult";
 import Wave from './pages/wave_analyze/Wave'
 import NotFound from "./pages/NotFound";
-import { createGlobalStyle } from 'styled-components'; 
 import WaveResult from "./pages/wave_analyze/WaveResult";
+import Linear from './pages/linear/Linear'
+import LinearResult from './pages/linear/LinearResult';
 
 const GlobalStyle = createGlobalStyle`
     @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
@@ -35,6 +37,8 @@ function App() {
           <Route path="/analyze/success" element={<AnalyzeResult />} />
           <Route path="/wave-analyze" element={<Wave />} />
           <Route path="/wave-analyze/success" element={<WaveResult />} />
+          <Route path="/linear" element={<Linear />} />
+          <Route path="/linear/success" element={<LinearResult />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

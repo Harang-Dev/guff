@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@ant-design/charts": "^2.1.1",
+    "@antv/g2": "^5.2.3",
     "@antv/g2plot": "^2.4.32",
     "@craco/craco": "^7.1.0",
     "@testing-library/jest-dom": "^5.17.0",
