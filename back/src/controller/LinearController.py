@@ -38,8 +38,10 @@ async def downloadExcelForm():
 
 @linear.get('/linregress/{filename}', tags=['linear'])
 def getLinearData(filename: str, db: Session = Depends(get_db)):
-    linearData = mapper.getLinearDataList(mapper.getFileId(filename, db), db)
-    print(linearData)
-    r = service.linregress(linearData)
+    fileID = mapper.getFileId(filename, db)
+    linearData = mapper.getLinearDataList(fileID, db)
+    r, tempDTO = service.linregress(linearData, fileID)
+
+    mapper.updateTKvalue(fileID, tempDTO, db)
 
     return r

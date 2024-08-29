@@ -6,7 +6,7 @@ from scipy.stats import linregress, t
 from src.dto.LinearDTO import *
 
 class LinearService:
-    def linregress(self, linearData: list[LinearDataDTO]):
+    def linregress(self, linearData: list[LinearDataDTO], fileID: int):
         # row 생략 없이 출력
         pd.set_option('display.max_rows', None)
         # col 생략 없이 출력
@@ -25,8 +25,18 @@ class LinearService:
 
         C50 = round(10 ** intercept, 3)
         C84 = round(C50 * 10 ** (self.getFreedom(84, len(df)) * std_err), 2)
-        C95 = round(C50 * 10 ** (self.getFreedom(95, len(df)) * std_err), 2)
+        C95 = round(C50 * 10 ** (self.getFreedom(95, len(df)) * std_err), 2) # getFreedom이 t값, C(n)값이 k값
 
+        tmp = {
+            'linear_file_id': fileID,
+            'linear_5k_value': float(C50), 
+            'linear_8t_value': f'[{float(self.getFreedom(84,len(df)))}, {float(C84)}]', 
+            'linear_9t_value': f'[{self.getFreedom(95, len(df))}, {float(C95)}]'
+        }
+        tempDTO = LinearDataDTO(
+            **tmp
+        )
+                            
         srsdMin = float(df['srsd'].min() * 0.01)
         srsdMax = float(df['srsd'].max() * 100)
 
@@ -45,7 +55,7 @@ class LinearService:
             'c95': yValueForC95.tolist(),
         }
 
-        return result
+        return result, tempDTO
 
     def getChartParameter(self, x, y):
         slope, intercept, r_value, p_value, std_err = linregress(x, y)
@@ -57,7 +67,10 @@ class LinearService:
         return intercept, round(slope, 3), round(standard_error, 3)
 
     def setCol(self, colData: pd.DataFrame):
-        if colData.name == 'ppv' :
+        if colData.isnull().values.all():
+            return colData
+
+        if colData.name == 'ppv':
             return colData.dropna()
         
         return colData.apply(lambda x: round(x, 3)).dropna()
@@ -67,4 +80,5 @@ class LinearService:
         degressOfFreedom = 10000000 if dataLen > 30 else dataLen -2
 
         tinv_value = t.ppf(1 - p_value / 2, degressOfFreedom)
+
         return round(tinv_value, 3)

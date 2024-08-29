@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, Button, message, Input, Table, Space  } from 'antd';
+import { Modal, Button, message, Space, Popconfirm  } from 'antd';
 import axios from 'axios';
-import EditableTable from './EditableTable';
+import EditableTable from '../layout/EditableTable';
 import { useLocation } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -11,6 +11,45 @@ const WaveModal = ({open, onCancel, onCalc}) => {
     const { filename } = location.state || {};
     const [dataSource, setDataSource] = useState([]);
     const [count, setCount] = useState(0);
+
+    const columns = [
+        {
+            title: 'Type',
+            dataIndex: 'type',
+            editable: true,
+        },
+        {
+            title: 'Time',
+            dataIndex: 'time',
+            editable: true,
+        },
+        {
+            title: 'TM',
+            dataIndex: 'tm',
+        },
+        {
+            title: 'VM',
+            dataIndex: 'vm',
+        },
+        {
+            title: 'LM',
+            dataIndex: 'lm',
+        },
+        {
+            title: 'PPV',
+            dataIndex: 'ppv',
+        },
+        {
+            title: 'Delete',
+            dataIndex: 'delete',
+            render: (_, record) =>
+            dataSource.length >= 1 ? (
+                <Popconfirm title={`선택한 행을 삭제하시겠습니까?`} onConfirm={() => handleDelete(record.key)}>
+                    <Button type='link'>Delete</Button>
+                </Popconfirm>
+            ) : null,
+        },
+    ];
 
     const handleDelete = (key) => {
         const newData = dataSource.filter((item) => item.key !== key);
@@ -82,8 +121,8 @@ const WaveModal = ({open, onCancel, onCalc}) => {
             </Space>
 
             <EditableTable 
+                columns={columns}
                 dataSource={dataSource}
-                onDelete={handleDelete}
                 onSave={handleSave}
             />
         </Modal>

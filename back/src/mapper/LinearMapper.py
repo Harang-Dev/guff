@@ -56,4 +56,17 @@ class LinearMapper:
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
 
+    def updateTKvalue(self, fileID: int, dto: LinearDatainDB, db: Session):
+        try:
+            vo = LinearDataVO(**dto.model_dump(by_alias=True))
+            records = db.query(LinearDataVO).filter(LinearDataVO.linear_file_id == vo.linear_file_id).all()
             
+            for record in records:
+                record.linear_5k_value = dto.k5_value
+                record.linear_8t_value = dto.t8_value
+                record.linear_9t_value = dto.t9_value
+            
+            db.commit()
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")

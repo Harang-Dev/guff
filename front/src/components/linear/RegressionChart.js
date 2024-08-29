@@ -1,36 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Mix } from '@antv/g2plot';
-
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL;
 
 const RegressionChart = ({ chartData }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
         if (containerRef.current && chartData) {
-            // 데이터 필터링 (0보다 큰 값만 남기기)
             const dataPoint = chartData.x.map((item, index) => ({
                 x: chartData.x[index],
                 y: chartData.y[index],
+                type: 'point',
             })).filter(point => point.x > 0 && point.y > 0);
-    
-            // 회귀선 데이터 정렬 및 필터링
+
             const regressionData = ['c50', 'c84', 'c95'].map(type => 
                 chartData[type].map((item, index) => ({
                     x: chartData.xValue[index],
                     y: item,
-                    type: type,
+                    type: type === 'c50' ? '50% 추정선' : type === 'c84' ? '84% 추정선' : '95% 추정선',
                 })).filter(point => point.x > 0 && point.y > 0)
             );
-    
-            // 모든 회귀선 데이터를 합치기
+
             const allRegressionData = [].concat(...regressionData);
-    
-            // 그래프 그리기
+
             const plot = new Mix(containerRef.current, {
                 autoFit: true,
+                syncViewPadding: true,
+                legend: { position: 'top-left', },
                 plots: [
                     {
                         type: 'line',
@@ -40,14 +35,11 @@ const RegressionChart = ({ chartData }) => {
                             yField: 'y',
                             seriesField: 'type',
                             colorField: 'type',
-                            lineStyle: {
-                                lineWidth: 2,
-                            },
+                            lineStyle: (item) => item.type === '84% 추정선' ? { lineDash: [4, 4] } : {},
                             xAxis: {
                                 type: 'log',
                                 min: 1,
                                 max: 10000,
-
                             },
                             yAxis: {
                                 type: 'log',
@@ -62,6 +54,7 @@ const RegressionChart = ({ chartData }) => {
                             data: dataPoint,
                             xField: 'x',
                             yField: 'y',
+                            seriesField: 'type',
                             size: 3,
                             pointStyle: {
                                 stroke: '#777777',
@@ -72,7 +65,6 @@ const RegressionChart = ({ chartData }) => {
                                 type: 'log',
                                 min: 1,
                                 max: 10000,
-
                             },
                             yAxis: {
                                 type: 'log',
@@ -81,20 +73,18 @@ const RegressionChart = ({ chartData }) => {
                             },
                         },
                     },
-
                 ],
-                syncView: true,  // 여러 플롯이 동일한 축을 공유하도록 설정
             });
-    
+
             plot.render();
-    
+
             return () => {
-                plot.destroy(); // 컴포넌트가 언마운트될 때 차트를 파괴합니다.
+                plot.destroy(); 
             };
         }
     }, [chartData]);
 
-  return <div ref={containerRef} style={{ width: '30%' }} />;
+  return <div ref={containerRef} />;
 };
 
 export default RegressionChart;

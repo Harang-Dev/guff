@@ -91,17 +91,24 @@ const WaveTable = () => {
         }
 
         resultData.map((items, index) => {
+            console.log(index)
+            console.log(mapData[index])
             const newActiveKey = `${tabPanes.length + index}`;
             const newTabPane = {
                 key: newActiveKey,
                 label: titles[index],
                 children: (
                     <div>
-                        {mapData.map(item => 
-                            Object.keys(item).map(key => {
-                                console.log(item[key])
-                            }) 
-                        )}
+                        <Row>
+                            {Object.keys(mapData[index]).map((key, idx) => (
+                                idx - 3 >= 0 ? (
+                                    <Col span={5} key={`${mapData[index]}-${key}`} style={{marginRight: 10}}>
+                                        <Card size="small" type="inner" title={key.toUpperCase()}>{mapData[index][key]}</Card>
+                                    </Col>
+                                ) : null
+                            ))}
+                        </Row>
+
                         <Row>
                             <Col span={11} style={{ marginBottom: 20 }}>
                                 <Divider> PPV 그래프 </Divider>

@@ -117,9 +117,6 @@ const CustomCalendar = () => {
 
   return (
     <>
-      <Card>
-        df
-      </Card>
       <Calendar
         cellRender={cellDataRender}
         onPanelChange={onPanelChange}

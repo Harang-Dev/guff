@@ -10,6 +10,9 @@ class LinearDataVO(BASE):
     linear_kg = Column(Float)
     linear_m = Column(Float)
     linear_ppv = Column(Float)
+    linear_5k_value = Column(Float)
+    linear_8t_value = Column(String)
+    linear_9t_value = Column(String)
 
     # def __init__(self, product_name):
     #     self.product_name = product_name
