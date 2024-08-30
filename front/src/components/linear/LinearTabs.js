@@ -22,6 +22,7 @@ const LinearTabs = () => {
     useEffect(() => {
         const fetchData = async() => {
             try {
+                console.log(filename)
                 const response = await axios.get(`${API_URL}/linear/linregress/${filename}`)
                 setChartData(response.data);
             } catch(error) {
@@ -44,7 +45,7 @@ const LinearTabs = () => {
                 ),
             }
             
-            const tt = {
+            const weightPerDelayTab = {
                 key: '1',
                 label: '진동 기준에 따른 이격거리별 최대 허용 지발당 장약량 (kg/delay)',
                 children: (
@@ -53,11 +54,12 @@ const LinearTabs = () => {
                             columns={columns} 
                             dataSource={dataSource} 
                             onSave={handleSave}
+                            filename={filename}
                         />
                     </div>
                 )
             }
-            setTabPanes([initialTab, tt]);
+            setTabPanes([initialTab, weightPerDelayTab]);
             setActiveKey('0');
         }
     }, [chartData])

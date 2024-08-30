@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-
 import matplotlib.pyplot as plt
+
 from scipy.stats import linregress, t
 from src.dto.LinearDTO import *
 
@@ -23,39 +23,46 @@ class LinearService:
 
         intercept, slope, std_err = self.getChartParameter(x, y)
 
-        C50 = round(10 ** intercept, 3)
-        C84 = round(C50 * 10 ** (self.getFreedom(84, len(df)) * std_err), 2)
-        C95 = round(C50 * 10 ** (self.getFreedom(95, len(df)) * std_err), 2) # getFreedom이 t값, C(n)값이 k값
+        k50 = round(10 ** intercept, 3)
 
-        tmp = {
+        t84 = self.getFreedom(84, len(df)) 
+        k84 = round(k50 * 10 ** (t84 * std_err), 2)
+
+        t95 = self.getFreedom(95, len(df))
+        k95 = round(k50 * 10 ** (t95 * std_err), 2) # getFreedom이 t값, C(n)값이 k값
+
+        lingressDTO = LinRegressDTO(**{
             'linear_file_id': fileID,
-            'linear_5k_value': float(C50), 
-            'linear_8t_value': f'[{float(self.getFreedom(84,len(df)))}, {float(C84)}]', 
-            'linear_9t_value': f'[{self.getFreedom(95, len(df))}, {float(C95)}]'
-        }
-        tempDTO = LinearDataDTO(
-            **tmp
-        )
-                            
+            'k50': k50,
+            't84': t84,
+            'k84': k84,
+            't95': t95,
+            'k95': k95,
+            'nValue': slope
+        })
+        
+        print(lingressDTO, std_err)
+        print(296.2 * 10 ** (1.645 * 0.202))
+
         srsdMin = float(df['srsd'].min() * 0.01)
         srsdMax = float(df['srsd'].max() * 100)
 
         x_values = np.logspace(np.log10(srsdMin), np.log10(srsdMax), 100)
 
-        yValueForC50 = C50 * (x_values ** slope)
-        yValueForC84 = C84 * (x_values ** slope)
-        yValueForC95 = C95 * (x_values ** slope)
+        yValueForK50 = k50 * (x_values ** slope)
+        yValueForK84 = k84 * (x_values ** slope)
+        yValueForK95 = k95 * (x_values ** slope)
 
         result = {
             'x': df['srsd'].tolist(),
             'y': df['ppv'].tolist(),
             'xValue': x_values.tolist(),
-            'c50': yValueForC50.tolist(),
-            'c84': yValueForC84.tolist(),
-            'c95': yValueForC95.tolist(),
+            'c50': yValueForK50.tolist(),
+            'c84': yValueForK84.tolist(),
+            'c95': yValueForK95.tolist(),
         }
 
-        return result, tempDTO
+        return result, lingressDTO
 
     def getChartParameter(self, x, y):
         slope, intercept, r_value, p_value, std_err = linregress(x, y)

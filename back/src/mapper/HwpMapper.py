@@ -1,9 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from src.vo.HwpFileVO import HwpFileVO
-from src.vo.HwpDataVO import HwpDataVO
-
+from src.vo.HwpVO import *
 from src.dto.HwpDTO import *
 
 

@@ -8,8 +8,6 @@ from io import BytesIO
 import os, tempfile, json
 import pandas as pd
 
-from src.dto.WaveDTO import *
-
 from src.db.connection import get_db
 from src.mapper.LinearMapper import LinearMapper
 from src.service.LinearService import LinearService
@@ -40,8 +38,14 @@ async def downloadExcelForm():
 def getLinearData(filename: str, db: Session = Depends(get_db)):
     fileID = mapper.getFileId(filename, db)
     linearData = mapper.getLinearDataList(fileID, db)
-    r, tempDTO = service.linregress(linearData, fileID)
+    r, lingressDTO = service.linregress(linearData, fileID)
 
-    mapper.updateTKvalue(fileID, tempDTO, db)
+    mapper.insertLinRegressData(lingressDTO, db)
 
     return r
+
+@linear.get('/linregress/result/{filename}', tags=['linear'])
+def getLinearResult(filename: str, db: Session = Depends(get_db)):
+    linregressData = mapper.getLinRegressData(mapper.getFileId(filename, db), db)
+
+    return linregressData.__dict__

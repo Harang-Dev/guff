@@ -1,10 +1,9 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
-from src.vo.LinearFileVO import LinearFileVO
 from src.dto.LinearDTO import *
-
-from src.vo.LinearDataVO import LinearDataVO
+from src.vo.LinearVO import *
 
 class LinearMapper:
     def insert(self, filename: str, dto: list[LinearDataDTO], db: Session):
@@ -56,17 +55,22 @@ class LinearMapper:
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
 
-    def updateTKvalue(self, fileID: int, dto: LinearDatainDB, db: Session):
+    def insertLinRegressData(self, dto: LinRegressDTO, db: Session):
         try:
-            vo = LinearDataVO(**dto.model_dump(by_alias=True))
-            records = db.query(LinearDataVO).filter(LinearDataVO.linear_file_id == vo.linear_file_id).all()
-            
-            for record in records:
-                record.linear_5k_value = dto.k5_value
-                record.linear_8t_value = dto.t8_value
-                record.linear_9t_value = dto.t9_value
-            
+            newRecord = LinearRegressionVO(**dto.model_dump())
+            db.add(newRecord)
             db.commit()
+        except IntegrityError:
+            db.rollback()
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")
 
+    def getLinRegressData(self, id, db: Session):
+        try:
+            linregressData = db.query(LinearRegressionVO).filter(LinearRegressionVO.linear_file_id == id).first()
+            if not linregressData:
+                raise HTTPException(status_code=404, detail='Data not Found')
+
+            return linregressData
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error retrieving data: {str(e)}")

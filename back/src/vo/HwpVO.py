@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, Date
+from sqlalchemy import Column, String, Integer, Float, ForeignKey
 
 BASE = declarative_base()
 
@@ -15,3 +15,7 @@ class HwpDataVO(BASE):
     noise = Column(String)
     marks = Column(String)
 
+class HwpFileVO(BASE):
+    __tablename__ = 'HwpFileName'
+    file_id = Column(Integer, primary_key=True)
+    file_name = Column(String)

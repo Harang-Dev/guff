@@ -21,6 +21,7 @@ const RegressionChart = ({ chartData }) => {
             );
 
             const allRegressionData = [].concat(...regressionData);
+            console.log(allRegressionData)
 
             const plot = new Mix(containerRef.current, {
                 autoFit: true,

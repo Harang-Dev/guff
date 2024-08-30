@@ -1,10 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from src.vo.WaveFileVO import WaveFileVO
 from src.dto.WaveDTO import *
-
-from src.vo.WaveDataVO import WaveDataVO
+from src.vo.WaveVO import *
 
 class WaveMapper:
     def insert(self, filename: str, dto: list[WaveFileDTO], db: Session):
