@@ -65,6 +65,7 @@ const WieghtPerDelayChart = ({ dataSource, onSave, filename }) => {
             children: delayColumn.map((item, index) => ({
                 title: `${item}cm/sec`,
                 dataIndex: `delay${index + 1}`,
+                render: (text, record) => text.toFixed(3),
                 align: 'center'
             }))
         }
@@ -78,38 +79,39 @@ const WieghtPerDelayChart = ({ dataSource, onSave, filename }) => {
                     <Table 
                         columns={columns}
                         dataSource={tableData}
+                        pagination={false}
+                        scroll={{ y: 700 }}
                     />
                     <Button onClick={() => setTableData([])}>값비우기</Button>
                     </div>
                 )
                 :
-                (
+                (                
                     <Form form={form} onFinish={onFinish}>
-                        <Row gutter={[16, 16]}>
-                            <Col span={4}>
-                                <Title level={5}>Start Distance</Title>
+                        <Row justify="center" gutter={[16, 16]}>
+                            <Col span={8}>
+                                <Title level={5} style={{ textAlign: 'left' }}>시작 거리</Title>
                                 <Form.Item name="startDistance" rules={[{ required: true, message: 'Start Distance is required' }]}>
-                                    <InputNumber />
+                                    <InputNumber style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
-        
-                            <Col span={4}>
-                                <Title level={5}>End Distance</Title>
+
+                            <Col span={8}>
+                                <Title level={5} style={{ textAlign: 'left' }}>종료 거리</Title>
                                 <Form.Item name="endDistance" rules={[{ required: true, message: 'End Distance is required' }]}>
-                                    <InputNumber />
+                                    <InputNumber style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
-        
-                            <Col span={4}>
-                                <Title level={5}>Interval</Title>
+
+                            <Col span={8}>
+                                <Title level={5} style={{ textAlign: 'left' }}>거리 간격</Title>
                                 <Form.Item name="interval" rules={[{ required: true, message: 'Interval is required' }]}>
-                                    <InputNumber />
+                                    <InputNumber style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
-        
-                            <Col span={24}>
-                                <Button type="primary" htmlType="submit">계산</Button>
-                                <Button onClick={() => setTableData([])}>값비우기</Button>
+
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <Button type="link" htmlType="submit" block>계산</Button>
                             </Col>
                         </Row>
                     </Form>
