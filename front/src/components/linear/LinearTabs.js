@@ -6,6 +6,8 @@ import axios from 'axios';
 import RegressionChart from './RegressionChart';
 import EditableTable from '../layout/EditableTable';
 import WieghtPerDelayChart from './WeightPerDelayChart';
+import NomoGramChart from './nomogram/NomoGramChart';
+import TTTest from './nomogram/TTTest';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -59,7 +61,29 @@ const LinearTabs = () => {
                     </div>
                 )
             }
-            setTabPanes([initialTab, weightPerDelayTab]);
+
+            const nomogramChart = {
+                key: '2',
+                label: 'Nomogram 그래프',
+                children: (
+                    <div>
+                        <NomoGramChart
+                            filename={filename}
+                        />
+                    </div>
+                )
+            }
+
+            const testChart = {
+                key: '3',
+                label: '테스트용',
+                children: (
+                    <div>
+                        <TTTest />
+                    </div>
+                )
+            }
+            setTabPanes([initialTab, weightPerDelayTab, nomogramChart, testChart]);
             setActiveKey('0');
         }
     }, [chartData])
