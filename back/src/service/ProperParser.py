@@ -13,8 +13,7 @@ class ProperParser(ParseService):
         attachedTableIdData = [[data for data in xmlData if data['table-id'] == id]for id in tableId]
 
         filteredData = [
-            sublist for sublist in attachedTableIdData
-            if any( entry['row'] in columnRows and any(keyword in entry['text'] for keyword in self.TARGET_TEXT) for entry in sublist )
+            sublist for sublist in attachedTableIdData if any( entry['row'] in columnRows and any(keyword in entry['text'] for keyword in self.TARGET_TEXT) for entry in sublist )
         ]
 
         return filteredData

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button, Space, Tabs, Row, Col, Divider, Card, Table } from 'antd';
+import { Button, Space, Tabs, Row, Col, Divider, Card, Table, Modal, Input} from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import RegressionChart from './RegressionChart';
 import EditableTable from '../layout/EditableTable';
 import WieghtPerDelayChart from './WeightPerDelayChart';
 import NomoGramChart from './nomogram/NomoGramChart';
-import TTTest from './nomogram/TTTest';
+import CompareTab from './compare/CompareTab';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -19,12 +19,16 @@ const LinearTabs = () => {
     const [activeKey, setActiveKey] = useState(0);
     const [chartData, setChartData] = useState(null);
 
-    const [dataSource, setDataSource] = useState([]);
-    
+    const [tabValue, setTabValue] = useState({
+        weight: [],
+        nomogram: [],
+        compare: [],
+    })
+
+
     useEffect(() => {
         const fetchData = async() => {
             try {
-                console.log(filename)
                 const response = await axios.get(`${API_URL}/linear/linregress/${filename}`)
                 setChartData(response.data);
             } catch(error) {
@@ -53,10 +57,8 @@ const LinearTabs = () => {
                 children: (
                     <div>
                         <WieghtPerDelayChart 
-                            columns={columns} 
-                            dataSource={dataSource} 
-                            onSave={handleSave}
                             filename={filename}
+                            delayColumn={delayColumn}
                         />
                     </div>
                 )
@@ -76,10 +78,12 @@ const LinearTabs = () => {
 
             const testChart = {
                 key: '3',
-                label: '테스트용',
+                label: '국토부 선행호기 영역 비교',
                 children: (
                     <div>
-                        <TTTest />
+                        <CompareTab
+                            filename={filename}
+                        />
                     </div>
                 )
             }
@@ -88,62 +92,15 @@ const LinearTabs = () => {
         }
     }, [chartData])
 
-    const columns = [
-        {
-            title: 'Distance (m)',
-            dataIndex: 'distance',
-        },
-        {
-            title: '진동 기준에 따른 이격거리별 최대 허용 지발당 장약량',
-            dataIndex: 'kg',
-            children: [
-                {
-                    title: '-',
-                    dataIndex: 'kg1',
-                    editable: true,
-                },
-                {
-                    title: '-',
-                    dataIndex: 'kg2',
-                    editable: true,
-                },
-                {
-                    title: '-',
-                    dataIndex: 'kg3',
-                    editable: true,
-                },
-                {
-                    title: '-',
-                    dataIndex: 'kg4',
-                    editable: true,
-                },
-                {
-                    title: '-',
-                    dataIndex: 'kg5',
-                    editable: true,
-                },
-            ],
-        },
-    ]
-
-    const handleSave = (row) => {
-        const newData = [...dataSource];
-        const index = newData.findIndex((item) => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, {
-            ...item,
-            ...row,
-        });
-
-        setDataSource(newData);
-    };
-
     return (
         <div>
             <Tabs
                 activeKey={activeKey}
                 onChange={(key) => setActiveKey(key)}
                 items={tabPanes}
+                tabBarExtraContent={
+                    <Button type="link">설정</Button>
+                }
             />
         </div>
     )

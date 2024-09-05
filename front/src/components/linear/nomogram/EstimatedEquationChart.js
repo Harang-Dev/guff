@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Row, Col, Collapse, Form, InputNumber, Typography, Button } from 'antd';
+import { Table, Row, Col, Collapse, Form, InputNumber, Typography, Button, Divider } from 'antd';
 import { Line } from '@antv/g2plot';
+
 
 const { Title } = Typography
 
@@ -90,8 +91,8 @@ const EstimatedEquationChart = ({ linearData }) => {
 							formatter: (val) => {
 								const parsedVal = parseFloat(val);
 								// 지수 표기법으로 변환
-								const exp = Math.log10(parsedVal);
-								return `10^${exp.toFixed(0)}`;
+								const exp = Math.log10(parsedVal).toFixed(0);
+								return `10^${exp}`
 							},
 						},
 					},
@@ -145,11 +146,6 @@ const EstimatedEquationChart = ({ linearData }) => {
 
     return (
     	<div>
-			<Table
-			columns={columns}
-			dataSource={data}
-			pagination={false}
-			/>
 			<Collapse ghost onChange={() => setXValues(null)}>
 				<Collapse.Panel header="그래프 보기" key="1">
 				{xValues ? 
@@ -181,7 +177,15 @@ const EstimatedEquationChart = ({ linearData }) => {
 					</Form>
 				)}
 				</Collapse.Panel>
-			</Collapse>      
+			</Collapse>
+			     
+			<Divider />
+
+			<Table
+			columns={columns}
+			dataSource={data}
+			pagination={false}
+			/> 
 		</div>
     );
 };

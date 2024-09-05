@@ -22,9 +22,10 @@ function AnalyzeResult(props) {
     const [ statisticsModalVisible, setStatisticsModalVisible ] = useState(false);
 
     useEffect(() => {
+        const encodedFilename = encodeURIComponent(filename);
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${API_URL}/parser/${filename}`);
+                const response = await axios.get(`${API_URL}/parser/${encodedFilename}`);
                 setData(response.data);
             } catch (error) {
                 message.error('한글 데이터 불러오기 실패');
@@ -33,7 +34,7 @@ function AnalyzeResult(props) {
 
         const fetchLocData = async () => {
             try {
-                const response = await axios.get(`${API_URL}/parser/${filename}/locations`);
+                const response = await axios.get(`${API_URL}/parser/${encodedFilename}/locations`);
                 setLocData(response.data);
             } catch (error) {
                 message.error('위치 데이터 불러오기 실패');

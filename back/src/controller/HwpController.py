@@ -72,12 +72,14 @@ async def parsing(
         os.unlink(tmp_file_path)  # 임시 HWP 파일 삭제
 
     # 만약 target_tag가 2개면 column_tag도 2개 그럴 땐 어떡하지? 
-    columnTag, textTag = service.findTag(xml_path, search_text)
-    xmlData = service.setTableData(columnTag, textTag)
+    columnTag, textTag, charShapeList = service.findTag(xml_path, search_text)
+    xmlData = service.setTableData(columnTag, textTag, charShapeList)
 
+    # print(xmlData)
     os.remove(xml_path)
     
     filteredXmlData = parser.getFilteredDataList(xmlData)
+    print(filteredXmlData)
     for xmlDataList in filteredXmlData:
         serialize_data.extend(parser.getSerializeList([xmldata for xmldata in xmlDataList if xmldata['text']]))
 
@@ -86,7 +88,7 @@ async def parsing(
         versionColumn = STANDARD_COLUMNS.get(version, {})
         transformedData = {newKey: data[oldKey] for oldKey, newKey in versionColumn.items() if oldKey in data}
         result.append(transformedData)
-    
+
     mapper.insert(file.filename, result, db)
 
     return file.filename
@@ -124,7 +126,7 @@ async def getStatisticsData(filename: str, db: Session = Depends(get_db)):
         for column in compareColumns:
             tmpList = [parseFloat(transLiteral(vars(item)[column])) for item in dbData if item.measurement_location == location]
             tmpDF = pd.DataFrame(tmpList)
-
+            
             if isNestedList(tmpList):
                 statisticsResult.append(column, [str(float(tmpDF[0].min(skipna=True))), str(float(tmpDF[0].max(skipna=True)))])
                 statisticsResult.append(column, [str(float(tmpDF[1].min(skipna=True))), str(float(tmpDF[1].max(skipna=True)))])

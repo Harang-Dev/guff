@@ -7,8 +7,7 @@ import EditableTable from '../layout/EditableTable';
 const { Title } = Typography; 
 const API_URL = process.env.REACT_APP_API_URL;
 
-const WieghtPerDelayChart = ({ dataSource, onSave, filename }) => {
-    const [delayColumn, setDelayColumns] = useState([0.02, 0.2, 0.254, 0.3, 0.5, 2.54]);
+const WieghtPerDelayChart = ({ filename }) => {
     const [linearData, setLinearData] = useState(null);
     const [distance, setDistance] = useState([]);
     const [tableData, setTableData] = useState([]);
