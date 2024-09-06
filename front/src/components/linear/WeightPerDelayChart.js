@@ -1,56 +1,38 @@
-import React, { useState, useEffect, useRef, Children } from 'react';
-import { Button, Space, Tabs, Row, Col, Divider, Card, Table, Input, message, Typography,Form, InputNumber } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import EditableTable from '../layout/EditableTable';
+import React, { useState, useEffect } from 'react';
+import { Button, Table, message } from 'antd';
 
-const { Title } = Typography; 
-const API_URL = process.env.REACT_APP_API_URL;
-
-const WieghtPerDelayChart = ({ filename }) => {
-    const [linearData, setLinearData] = useState(null);
+const WieghtPerDelayChart = ({ linearData, tabValue }) => {
     const [distance, setDistance] = useState([]);
     const [tableData, setTableData] = useState([]);
 
-    const [form] = Form.useForm();
-
     useEffect(() => {
-        const setLinRegressResultData = async() => {
-            try {
-                const response = await axios.get(`${API_URL}/linear/linregress/result/${filename}`);
-                setLinearData(response.data);
-            } catch (error) {
-                message.error('회귀분석 결과 조회 실패!')
-            }
+        if (tabValue) {
+            const start = tabValue.start
+            const end = tabValue.end
+            const interval = tabValue.interval
+
+            const length = Math.ceil((end - start) / interval) + 1;
+            const distanceArray = Array.from({length}, (_, index) => start + index * interval)
+
+            setDistance(distanceArray);
         }
-
-        setLinRegressResultData();
-    }, []) 
+    }, [tabValue])
 
     useEffect(() => {
-        const tempData = []
-        distance.map((item, index) => {
-            const temp = {distance: item}
-            delayColumn.map((delay, index) => {
-                temp[`delay${index + 1}`] = (delay / linearData.k95) ** (2/(-linearData.nValue)) * item ** 2
-            })
-            tempData.push(temp)
-        })
-    
-        if (tempData) setTableData(tempData); 
-        console.log(tempData);
-    }, [distance])
-
-    const onFinish = (values) => {
-        const start = values.startDistance;
-        const end = values.endDistance;
-        const interval = values.interval;
-
-        const length = Math.ceil((end - start) / interval) + 1;
-        const distanceArray = Array.from({ length }, (_, index) => start + index * interval);
-
-        setDistance(distanceArray);
-    };
+        if(linearData && distance) {
+            const tempData = distance.map((item, index) => {
+                const temp = {distance: item}
+                tabValue.delay.forEach((delay, index) => {
+                    temp[`delay${index + 1}`] = (delay / linearData.k95) ** (2/(-linearData.nValue)) * item ** 2
+                })
+                return temp; // map()에서 새로운 배열을 반환해야 하므로 temp 반환
+            });
+        
+            console.log(tempData);
+            
+            if (tempData.length > 0) setTableData(tempData); 
+        }
+    }, [linearData, tabValue, distance]) // 필요한 모든 상태를 의존성 배열에 추가
 
     const columns = [
         {
@@ -61,7 +43,7 @@ const WieghtPerDelayChart = ({ filename }) => {
         {
             title: '진동 기준에 따른 이격거리별 최대 허용 지발당 장약량 (kg/delay)',
             align: 'center',
-            children: delayColumn.map((item, index) => ({
+            children: tabValue.delay.map((item, index) => ({
                 title: `${item}cm/sec`,
                 dataIndex: `delay${index + 1}`,
                 render: (text, record) => text.toFixed(3),
@@ -72,50 +54,12 @@ const WieghtPerDelayChart = ({ filename }) => {
 
     return (
         <div>
-            {
-                tableData.length > 0 ? (
-                    <div>
-                    <Table 
-                        columns={columns}
-                        dataSource={tableData}
-                        pagination={false}
-                        scroll={{ y: 700 }}
-                    />
-                    <Button onClick={() => setTableData([])}>값비우기</Button>
-                    </div>
-                )
-                :
-                (                
-                    <Form form={form} onFinish={onFinish}>
-                        <Row justify="center" gutter={[16, 16]}>
-                            <Col span={8}>
-                                <Title level={5} style={{ textAlign: 'left' }}>시작 거리</Title>
-                                <Form.Item name="startDistance" rules={[{ required: true, message: 'Start Distance is required' }]}>
-                                    <InputNumber style={{ width: '100%' }} />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Title level={5} style={{ textAlign: 'left' }}>종료 거리</Title>
-                                <Form.Item name="endDistance" rules={[{ required: true, message: 'End Distance is required' }]}>
-                                    <InputNumber style={{ width: '100%' }} />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Title level={5} style={{ textAlign: 'left' }}>거리 간격</Title>
-                                <Form.Item name="interval" rules={[{ required: true, message: 'Interval is required' }]}>
-                                    <InputNumber style={{ width: '100%' }} />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={24} style={{ textAlign: 'center' }}>
-                                <Button type="link" htmlType="submit" block>계산</Button>
-                            </Col>
-                        </Row>
-                    </Form>
-                )
-            }
+            <Table 
+                columns={columns}
+                dataSource={tableData}
+                pagination={false}
+                scroll={{ y: 700 }}
+            />
         </div>
     )
 }

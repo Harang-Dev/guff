@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Table } from 'antd';
 
-const expandedRowRender = (expandRowData, record) => {
-
-};
-
 const CompareTable = ({ type, expandRowData }) => {    
     const columns = [
         { title: '관리기준', dataIndex: 'standard', key: 'standard'},
@@ -16,7 +12,8 @@ const CompareTable = ({ type, expandRowData }) => {
         { title: '대규모', dataIndex: 'largeScale', key: 'largeScale' },
     ];
 
-    const data = expandRowData.filter(item => item.type == type)
+    const data = expandRowData.filter(item => item.type === type)
+    console.log(data)
 
     return <Table bordered tableLayout="auto" columns={columns} dataSource={data} pagination={false} />;
 };
