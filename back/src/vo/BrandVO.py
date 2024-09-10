@@ -5,7 +5,8 @@ BASE = declarative_base()
 
 class BrandVO(BASE):
     __tablename__ = 'Brand'
-    brand_name = Column(String, primary_key=True)
+    brand_id = Column(String, primary_key=True)
+    brand_name = Column(String)
 
     def __init__(self, brand_name):
         self.brand_name = brand_name

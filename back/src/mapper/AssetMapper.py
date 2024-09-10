@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from src.vo.AssetVO import AssetVO
+from src.vo.AssetVO import AssetVO, AssetViewVO
 from src.dto.AssetDTO import *
 
 
@@ -9,25 +9,28 @@ class AssetMapper:
         db.add(new_record)
         db.commit()
 
+    def readView(self, db: Session):
+        return db.query(AssetViewVO).all()
+
     def read_all(self, db: Session):
         return db.query(AssetVO).all()
 
     def read_id(self, asset_id: int, db: Session):
         return db.query(AssetVO).filter(AssetVO.asset_id == asset_id).first()
 
-    def read_brand(self, brand_name: str, db: Session):
-        return db.query(AssetVO).filter(AssetVO.brand_name == brand_name).all()
+    def read_product(self, product_id: int, db: Session):
+        return db.query(AssetVO).filter(AssetVO.product_id == product_id).all()
 
-    def read_location(self, location_name: str, db: Session):
-        return db.query(AssetVO).filter(AssetVO.location_name == location_name).all()
+    def read_location(self, location_id: int, db: Session):
+        return db.query(AssetVO).filter(AssetVO.location_id == location_id).all()
 
     def update(self, dto: AssetDTOinDB, db: Session):
         vo = AssetVO(**dto.model_dump())
         record = db.query(AssetVO).filter(AssetVO.asset_id == vo.asset_id).first()
-        record.brand_name = vo.brand_name
+        record.product_id = vo.product_id
         record.asset_name = vo.asset_name
         record.state = vo.state
-        record.location_name = vo.location_name
+        record.location_id = vo.location_id
         record.start_date = vo.start_date
         record.end_date = vo.end_date
         record.rent_state = vo.rent_state

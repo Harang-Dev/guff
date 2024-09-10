@@ -7,9 +7,6 @@ import { Space, Table, message, Button } from 'antd';
 
 import { simpleColumns, properColumns, complicatedColumns } from './AnalyzeColumns';
 import AnalyzeStatisticsModal from './AnalyzeStatisticsModal';
-import * as XLSX from 'xlsx';
-import ReactDOMServer from 'react-dom/server'
-
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -41,10 +38,9 @@ function AnalyzeResult(props) {
             }
         };
 
-        console.log(filename)
         fetchData();
         fetchLocData();
-    }, [version]); // version이 변경될 때만 실행
+    }, [version, filename]); // version이 변경될 때만 실행
 
 
     const showStatisticsModal = () => {
@@ -52,7 +48,6 @@ function AnalyzeResult(props) {
             try {
                 const response = await axios.get(`${API_URL}/parser/${filename}/statistics`);
                 setStatisticsData(response.data);
-                console.log(response.data);
             } catch(error) {
                 message.error('통계 조회 실패');
             }
@@ -96,6 +91,8 @@ function AnalyzeResult(props) {
                 return properColumns(locData);
             case "복잡이":
                 return complicatedColumns(locData);;
+            default:
+                return null
         }
     };
 

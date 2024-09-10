@@ -26,7 +26,6 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
             } else {
                 setIsLocationDisabled(false);
             }
-            console.log(open);
         }
     }, [selectItem, form]);
 

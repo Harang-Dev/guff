@@ -129,9 +129,14 @@ const LinearTabs = () => {
             )
         }
 
-        setShowValueSeeting(true);
+
+        if (showValueSeeting) {
+            setTabPanes([...tabPanes.filter(item => item.key != 'setting'), item])
+        } else {
+            setTabPanes([...tabPanes, item])
+            setShowValueSeeting(true);
+        }
         setActiveKey('setting')
-        setTabPanes([...tabPanes, item]);
     };
 
     const handleValueSetting = (newValues, activeKey) => {
@@ -143,6 +148,7 @@ const LinearTabs = () => {
                 ...newValues
             }
         }));
+
         setTabPanes(filterPanes)
         setActiveKey(activeKey)
     };

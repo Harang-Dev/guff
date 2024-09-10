@@ -15,6 +15,11 @@ def read_all(db: Session = Depends(get_db)):
     data = mapper.read_all(db)
     return data
 
+@asset.get('/view', tags=['asset'], response_model=list[AssetViewDTO])
+def readView(db: Session = Depends(get_db)):
+    data = mapper.readView(db)
+    return data
+
 @asset.get("/{asset_id}", tags=['asset'], response_model=AssetDTOinDB)
 def read_id(asset_id: int, db: Session = Depends(get_db)):
     data = mapper.read_id(asset_id, db)

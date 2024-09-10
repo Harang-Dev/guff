@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
-import { SearchOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
-import { Table, Button, Form, Badge, Popconfirm, notification, Layout, Space } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Form, Badge, Popconfirm, notification, Space } from 'antd';
 
 import AssetUpdateModal from './AssetUpdateModal';
 import AssetReadModal from './AssetReadModal';
@@ -11,7 +11,6 @@ import AssetCreateModal from './AssetCreateModal';
 /* eslint-disable no-restricted-globals */
 
 const API_URL = process.env.REACT_APP_API_URL;
-const { Header, Content, Footer, Sider } = Layout;
 
 const EllipsisText = styled.div`
     white-space: nowrap;
@@ -23,9 +22,11 @@ const EllipsisText = styled.div`
 function AssetTable() {
     const [data, setData] = useState([]); // 서버에서 가져온 데이터를 상태로 관리
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
+    const [selectedId, setSelectedId] = useState(null);
 
     // Assetpage에 필요한 상태 관리
     const [brandFilters, setBrandFilters] = useState(null);
+    const [productsFilters, setProductsFilters] = useState(null);
     const [locationFilters, setLocationFilters] = useState(null);
 
     // 모달 관련 상태 관리
@@ -36,20 +37,13 @@ function AssetTable() {
     const [api, contextHolder] = notification.useNotification();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-
+ 
     // 처음 렌더링 할 때 필요한 데이터들 API에 요청해주는 상태 관리 함수
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${API_URL}/asset/`);
-                const brandResponse = await axios.get(`${API_URL}/brand/`); // 브랜드 API
-                const locationResponse = await axios.get(`${API_URL}/location/`); // 위치 API
-
-                setBrandFilters(brandResponse.data.map(brand => ({ text: brand.brand_name, value: brand.brand_name })));
-                setLocationFilters(locationResponse.data.map(location => ({ text: location.location_name, value: location.location_name })));
-
-                setData(response.data);
+                const response = await axios.get(`${API_URL}/asset/view`);
+                setData(response.data)
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -60,15 +54,13 @@ function AssetTable() {
 
     // 수정 모달 창 실행 함수
     const showModal = (record) => {
-        const shallowRecord = { ...record }
-        setSelectedItem(shallowRecord);
+        setSelectedId(record.asset_id);
         setIsModalVisible(true);
     };
 
     // 조회 모달 창 실행 함수
     const showReadModal = (record) => {
-        const shallowRecord = { ...record }
-        setSelectedItem(shallowRecord);
+        setSelectedItem(record);
         setReadModalVisible(true);
     }
 
@@ -92,13 +84,6 @@ function AssetTable() {
         setCreateModalVisible(false);
     };
 
-    const handleTableChange = (pagination) => {
-        setCurrentPage(pagination.current);
-        setPageSize(pagination.pageSize);
-    }
-
-    const currentData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
     // 메세지를 보내서 알림 창 띄우는 함수
     const handleNotification = (message) => {
         api.info({
@@ -111,8 +96,8 @@ function AssetTable() {
     const handleOk = async (values) => {
         try {
             const updatedItem = await form.validateFields();
-            await axios.put(`${API_URL}/asset/put/`, values);
-            const response = await axios.get(`${API_URL}/asset/`);
+            await axios.put(`${API_URL}/asset/put`, values);
+            const response = await axios.get(`${API_URL}/asset/view`);
             setData(response.data);
             setIsModalVisible(false);
 
@@ -126,15 +111,9 @@ function AssetTable() {
     const handleDelete = async (id) => {
         try{
             await axios.delete(`${API_URL}/asset/delete/${id}`);
-            const response = await axios.get(`${API_URL}/asset/`);
-            const updatedData = response.data;
-            const totalPages = Math.ceil(updatedData.length / pageSize);
-    
-            if (currentPage > totalPages) {
-                setCurrentPage(totalPages);
-            }
+            const response = await axios.get(`${API_URL}/asset/view`);
 
-            setData(updatedData);
+            setData(response.data);
             handleNotification('배터리 현황 데이터를 삭제했습니다.');
         } catch(error) {
             console.error('Error delete data: ', error);
@@ -144,9 +123,9 @@ function AssetTable() {
     // 데이터 추가를 위한 API 요청 함수
     const handleCreate = async (item) => {
         try {
-            await axios.post(`${API_URL}/asset/add/`, item);
+            await axios.post(`${API_URL}/asset/add`, item);
             
-            const response = await axios.get(`${API_URL}/asset/`);
+            const response = await axios.get(`${API_URL}/asset/view`);
             setData(response.data);
             setCreateModalVisible(false);
 
@@ -210,6 +189,14 @@ function AssetTable() {
             align: 'center',
             filters: brandFilters,
             onFilter: ( value, record ) => record.brand_name === value,
+        },
+        {
+            title: '기기 종류',
+            dataIndex: 'product_name',
+            key: 'product_name',
+            align: 'center', 
+            filters: productsFilters,
+            onFilter: ( value, record ) => record.product_name === value
         },
         {
             title: '기기 번호',
@@ -330,7 +317,7 @@ function AssetTable() {
                 open={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                selectItem={selectedItem}
+                selectItemID={selectedId}
             />
             <AssetReadModal
                 open={isReadModalVisible}

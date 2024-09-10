@@ -2,41 +2,53 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
 
-import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
+import { Modal, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
 const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
-const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
+const AssetUpdateModal = ({open, onOk, onCancel, selectItemID }) => {
     const [form] = Form.useForm();
+    const [data, setData] = useState([]);
     const [brands, setBrands] = useState([]);
     const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
-        if (selectItem) {
+        if(selectItemID) {
+            const fetchData = async() => {
+                const response = await axios.get(`${API_URL}/asset/${selectItemID}`)
+                setData({...response.data})
+            }
+
+            fetchData()
+        }
+    }, [selectItemID, open])
+
+    useEffect(() => {
+        if (data) {
             // selectItem에 넘어오는 date 값들은 String으로 이루어져있음
             // 근데 DatePicker는 moment 객체로 받아들여야해서 date.isValid에서 에러가 발생한다고함
             // 이를 해결하기 위해서 moment객체로 타입 변환을 해주면 된다함
             form.setFieldsValue({
-                ...selectItem,
-                start_date: selectItem.start_date ? dayjs(selectItem.start_date) : null,
-                end_date: selectItem.end_date ? dayjs(selectItem.end_date) : null,
-                marks: selectItem.marks || null,
+                ...data,
+                start_date: data.start_date ? dayjs(data.start_date) : null,
+                end_date: data.end_date ? dayjs(data.end_date) : null,
+                marks: data.marks || null,
             });
-            if (selectItem.state === "N") {
+            if (data.state === "N") {
                 setIsLocationDisabled(true);
                 form.setFieldValue({location_name: "사무실"});
             } else {
                 setIsLocationDisabled(false);
             }
         }
-    }, [selectItem, form]);
+    }, [data]);
 
     const fetchBrands = async () => {
         try {
-            const response = await axios.get(`${API_URL}/brand/`);
+            const response = await axios.get(`${API_URL}/product/`);
             setBrands(response.data);
         } catch(error) {
             console.error('Error fetching brands: ', error);
@@ -97,7 +109,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     <Input disabled />
                 </Form.Item>
 
-                <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
+                <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
                     <Select placeholder="Select a brand" 
                         onDropdownVisibleChange={(open) => {
                             if (open) {
@@ -106,7 +118,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                         }}
                     >
                         {brands.map(brand => (
-                            <Option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</Option>
+                            <Option key={brand.product_id} value={brand.product_id}>{brand.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -122,7 +134,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
+                <Form.Item name="location_id" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
                         placeholder="Select a location" 
                         disabled={isLocationDisabled} 
@@ -133,7 +145,7 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                         }}
                     >
                         {locations.map(location => (
-                            <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
+                            <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>

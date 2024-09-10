@@ -91,8 +91,7 @@ const WaveTable = () => {
         }
 
         resultData.map((items, index) => {
-            console.log(index)
-            console.log(mapData[index])
+
             const newActiveKey = `${tabPanes.length + index}`;
             const newTabPane = {
                 key: newActiveKey,

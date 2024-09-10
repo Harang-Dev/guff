@@ -27,9 +27,7 @@ const WieghtPerDelayChart = ({ linearData, tabValue }) => {
                 })
                 return temp; // map()에서 새로운 배열을 반환해야 하므로 temp 반환
             });
-        
-            console.log(tempData);
-            
+                    
             if (tempData.length > 0) setTableData(tempData); 
         }
     }, [linearData, tabValue, distance]) // 필요한 모든 상태를 의존성 배열에 추가

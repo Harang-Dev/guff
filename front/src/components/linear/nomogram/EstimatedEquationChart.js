@@ -62,8 +62,6 @@ const EstimatedEquationChart = ({ linearData }) => {
 				{ x: xValues.max, y: calcChartData(type.k, type.n, xValues.max), type: type.label }
 			]);
 
-			console.log(xValues.min / xValues.max)
-
 			if (containerRef.current) {
 				const linePlot = new Line(containerRef.current, {
 					data: chartData,

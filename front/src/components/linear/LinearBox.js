@@ -6,7 +6,6 @@ import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload, Select, Form, Spin } from 'antd';
 
 const API_URL = process.env.REACT_APP_API_URL;
-const { Option } = Select;
 const { Dragger } = Upload;
 
 function LinearBox(props) {
@@ -21,7 +20,6 @@ function LinearBox(props) {
         try {
             const response = await axios.post(`${API_URL}/linear/`, formData , { headers: { 'Content-Type': '/multipart/form-data' }, });
             message.success('Upload Successful');
-            console.log(response.data)
             navigate('/linear/success', { state : { filename: response.data }});
         } catch (error) {
             console.error('uploda error: ', error);

@@ -1,8 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
+import { Modal, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -16,7 +15,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
 
     const fetchBrands = async () => {
         try {
-            const response = await axios.get(`${API_URL}/brand/`);
+            const response = await axios.get(`${API_URL}/product/`);
             setBrands(response.data);
         } catch(error) {
             console.error('Error fetching brands: ', error);
@@ -45,6 +44,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
     };
 
     const handleSubmit = () => {
+        console.log(form.getFieldsValue())
         form
             .validateFields()
             .then(values => {
@@ -75,7 +75,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
             }}>
 
             <Form form={form} layout="vertical">
-                <Form.Item name="brand_name" label="제조회사" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
+                <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
                 <Select placeholder="Select a brand" 
                         onDropdownVisibleChange={(open) => {
                             if (open) {
@@ -84,7 +84,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                         }}
                     >
                         {brands.map(brand => (
-                            <Option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</Option>
+                            <Option key={brand.product_id} value={brand.product_id}>{brand.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -100,7 +100,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
+                <Form.Item name="location_id" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
                         placeholder="Select a location" 
                         disabled={isLocationDisabled} 
@@ -111,7 +111,7 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                         }}
                     >
                         {locations.map(location => (
-                            <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
+                            <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
