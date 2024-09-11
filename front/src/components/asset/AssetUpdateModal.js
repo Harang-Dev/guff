@@ -8,11 +8,9 @@ import { Option } from 'antd/es/mentions';
 const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
-const AssetUpdateModal = ({open, onOk, onCancel, selectItemID }) => {
+const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, products}) => {
     const [form] = Form.useForm();
     const [data, setData] = useState([]);
-    const [brands, setBrands] = useState([]);
-    const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
@@ -45,24 +43,6 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID }) => {
             }
         }
     }, [data]);
-
-    const fetchBrands = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/product/`);
-            setBrands(response.data);
-        } catch(error) {
-            console.error('Error fetching brands: ', error);
-        }
-    };
-
-    const fetchLocations = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/location/`);
-            setLocations(response.data);
-        } catch(error) {
-            console.error('Error fetching locations: ', error);
-        }
-    };
 
     const handleStateChange = (value) => {
         if (value === "N") {
@@ -110,15 +90,9 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID }) => {
                 </Form.Item>
 
                 <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Select placeholder="Select a brand" 
-                        onDropdownVisibleChange={(open) => {
-                            if (open) {
-                                fetchBrands();
-                            }
-                        }}
-                    >
-                        {brands.map(brand => (
-                            <Option key={brand.product_id} value={brand.product_id}>{brand.product_name}</Option>
+                    <Select placeholder="Select a brand" >
+                        {products.map(product => (
+                            <Option key={product.product_id} value={product.product_id}>{product.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -138,11 +112,6 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID }) => {
                     <Select 
                         placeholder="Select a location" 
                         disabled={isLocationDisabled} 
-                        onDropdownVisibleChange={(open) => {
-                            if(open) {
-                                fetchLocations();
-                            }
-                        }}
                     >
                         {locations.map(location => (
                             <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>

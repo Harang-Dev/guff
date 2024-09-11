@@ -7,45 +7,37 @@ import { Option } from 'antd/es/mentions';
 const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
-const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
+const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products }) => {
     const [form] = Form.useForm();
-    const [products, setProducts] = useState([]);
-    const [locations, setLocations] = useState([]);
+    const [data, setData] = useState();
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
 
     useEffect(() => {
-        if (selectItem) {
+        if (selectID) {
+            const fetchData = async() => {
+                const response = await axios.get(`${API_URL}/battery/${selectID}`);
+                setData(response.data);
+            }
+
+            fetchData()
+        }
+    },[selectID, open])
+
+    useEffect(() => {
+        if (data) {
             form.setFieldsValue({
-                ...selectItem,
-                due_date: selectItem.due_date ? dayjs(selectItem.due_date) : null,
+                ...data,
+                due_date: data.due_date ? dayjs(data.due_date) : null,
             });
 
-            if (selectItem.state == false) {
+            if (data.state == false) {
                 setIsLocationDisabled(true);
                 form.setFieldValue({location_name: "사무실"});
             } else {
                 setIsLocationDisabled(false);
             }
         }
-    }, [selectItem, form]);
-
-    const fetchProducts = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/product/`);
-            setProducts(response.data);
-        } catch(error) {
-            console.error('Error fetching products: ', error);
-        }
-    };
-
-    const fetchLocations = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/location/`);
-            setLocations(response.data);
-        } catch(error) {
-            console.error('Error fetching locations: ', error);
-        }
-    };
+    }, [data, form]);
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -92,16 +84,13 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     <Input disabled />
                 </Form.Item>
 
-                <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
+                <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
                     <Select 
                         placeholder="Select a product"
-                        onDropdownVisibleChange={(open) => {
-                            if (open) { fetchProducts(); }
-                        }}
-                        >
+                    >
 
                         {products.map(product => (
-                            <Option key={product.product_name} value={product.product_name}>{product.product_name} ({product.brand_name})</Option>
+                            <Option key={product.product_id} value={product.product_id}>{product.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -113,16 +102,13 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectItem }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
+                <Form.Item name="location_id" label="현장 이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
                         placeholder="Select a location" 
-                        disabled={isLocationDisabled}
-                        onDropdownVisibleChange={(open) => {
-                            if (open) { fetchLocations(); }
-                        }}    
+                        disabled={isLocationDisabled}   
                     >
                         {locations.map(location => (
-                            <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
+                            <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>

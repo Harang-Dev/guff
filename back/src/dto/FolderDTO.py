@@ -5,8 +5,8 @@ from typing import Union, Optional
 
 class FolderDTO(BaseModel):
     folder_name: Optional[str]
-    product_name: str
-    location_name: str
+    product_id: int
+    location_id: int
     state: bool
     due_date: Optional[date]
     marks: Optional[str]
@@ -16,3 +16,12 @@ class FolderDTOinDB(FolderDTO):
 
 class InsertFolderDTO(FolderDTO):
     pass
+
+class FolderDetailsView(BaseModel):
+    folder_id: int
+    folder_name: Optional[str]
+    product_name: str
+    location_name: str
+    state: bool
+    due_date: Optional[date]
+    marks: Optional[str]

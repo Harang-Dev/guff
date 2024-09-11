@@ -16,7 +16,12 @@ def read_all(db: Session = Depends(get_db)):
     data = mapper.read_all(db)
     return data
 
-@battery.get("/folder/{folder_id}", tags=['battery'], response_model=FolderDTOinDB)
+@battery.get('/view', tags=['battery'], response_model=list[FolderDetailsView])
+def readView(db: Session = Depends(get_db)):
+    data = mapper.read_view(db)
+    return data
+
+@battery.get("/{folder_id}", tags=['battery'], response_model=FolderDTOinDB)
 def read_id(folder_id: int, db: Session = Depends(get_db)):
     data = mapper.read_id(folder_id, db)
     return data

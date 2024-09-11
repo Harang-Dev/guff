@@ -7,29 +7,9 @@ import { Option } from 'antd/es/mentions';
 const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
-const AssetCreateModal = ({open, onOk, onCancel }) => {
+const AssetCreateModal = ({open, onOk, onCancel, locations, products }) => {
     const [form] = Form.useForm();
-    const [brands, setBrands] = useState([]);
-    const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
-
-    const fetchBrands = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/product/`);
-            setBrands(response.data);
-        } catch(error) {
-            console.error('Error fetching brands: ', error);
-        }
-    };
-
-    const fetchLocations = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/location/`);
-            setLocations(response.data);
-        } catch(error) {
-            console.error('Error fetching locations: ', error);
-        }
-    };
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -76,15 +56,9 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
 
             <Form form={form} layout="vertical">
                 <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '제조회사를 입력해주세요!'}]}>
-                <Select placeholder="Select a brand" 
-                        onDropdownVisibleChange={(open) => {
-                            if (open) {
-                                fetchBrands();
-                            }
-                        }}
-                    >
-                        {brands.map(brand => (
-                            <Option key={brand.product_id} value={brand.product_id}>{brand.product_name}</Option>
+                <Select placeholder="Select a brand" >
+                        {products.map(product => (
+                            <Option key={product.product_id} value={product.product_id}>{product.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -104,11 +78,6 @@ const AssetCreateModal = ({open, onOk, onCancel }) => {
                     <Select 
                         placeholder="Select a location" 
                         disabled={isLocationDisabled} 
-                        onDropdownVisibleChange={(open) => {
-                            if(open) {
-                                fetchLocations();
-                            }
-                        }}
                     >
                         {locations.map(location => (
                             <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>

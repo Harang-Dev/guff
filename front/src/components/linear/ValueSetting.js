@@ -7,6 +7,7 @@ const ValueSetting = ({ tabValue, activeKey, onSave }) => {
     const [form] = Form.useForm();
 
     const onFinish = (values) => {
+        console.log(values)
         const tempValue = Object.keys(values).reduce((acc, key) => {
             const value = key === "delay" || key === "metrics" ? values[key].split(",").map(num => parseFloat(num.trim())).sort() : values[key]
             acc[key] = value;
@@ -23,7 +24,7 @@ const ValueSetting = ({ tabValue, activeKey, onSave }) => {
                     {rest.flat().map((item, index) => (
                         <Col span={8} key={index}>
                             <Title level={5} style={{ textAlign: 'left' }}>{item}</Title>
-                            <Form.Item  name={item} rules={[{ required: true, message: `${item}을 입력해주세요`}]}>
+                            <Form.Item  name={item} >
                                 {item === 'delay' || item === 'metrics' ? 
                                 (
                                     <Input style={{ width: '100%'}} placeholder={'0.2, 0.3, ... 양식으로 입력해주세요'} /> 

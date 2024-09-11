@@ -24,6 +24,10 @@ class AssetMapper:
     def read_location(self, location_id: int, db: Session):
         return db.query(AssetVO).filter(AssetVO.location_id == location_id).all()
 
+    def findData(self, searchWord: str, db: Session):
+        findData = db.query(AssetViewVO).filter(AssetViewVO.asset_name.like(searchWord)).all()
+        return False if len(findData) == 0 else findData
+
     def update(self, dto: AssetDTOinDB, db: Session):
         vo = AssetVO(**dto.model_dump())
         record = db.query(AssetVO).filter(AssetVO.asset_id == vo.asset_id).first()

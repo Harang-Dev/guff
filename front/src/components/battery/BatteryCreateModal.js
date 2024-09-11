@@ -6,29 +6,9 @@ import { Option } from 'antd/es/mentions';
 const API_URL = process.env.REACT_APP_API_URL;
 const { TextArea } = Input;
 
-const BatteryCreateModal = ({open, onOk, onCancel }) => {
+const BatteryCreateModal = ({open, onOk, onCancel, locations, products }) => {
     const [form] = Form.useForm();
-    const [products, setProducts] = useState([]);
-    const [locations, setLocations] = useState([]);
     const [isLocationDisabled, setIsLocationDisabled] = useState(false);
-
-    const fetchLocations = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/location/`);
-            setLocations(response.data);
-        } catch(error) {
-            console.error('Error fetching locations: ', error);
-        }
-    };
-
-    const fetchProducts = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/product/`);
-            setProducts(response.data);
-        } catch(error) {
-            console.error('Error fetching products: ', error);
-        }
-    };
 
     const handleStateChange = (value) => {
         if (value === false) {
@@ -75,16 +55,10 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
             }}>
 
             <Form form={form} layout="vertical">
-                <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Select 
-                        placeholder="Select a product"
-                        onDropdownVisibleChange={(open) => {
-                            if (open) { fetchProducts(); }
-                        }}
-                        >
-
+                <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
+                    <Select placeholder="Select a product">
                         {products.map(product => (
-                            <Option key={product.product_name} value={product.product_name}>{product.product_name} ({product.brand_name})</Option>
+                            <Option key={product.product_id} value={product.product_id}>{product.product_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -96,16 +70,13 @@ const BatteryCreateModal = ({open, onOk, onCancel }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
+                <Form.Item name="location_id" label="현장 이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
                         placeholder="Select a location" 
                         disabled={isLocationDisabled}
-                        onDropdownVisibleChange={(open) => {
-                            if (open) { fetchLocations(); }
-                        }}    
                     >
                         {locations.map(location => (
-                            <Option key={location.location_name} value={location.location_name}>{location.location_name}</Option>
+                            <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>
                         ))}
                     </Select>
                 </Form.Item>

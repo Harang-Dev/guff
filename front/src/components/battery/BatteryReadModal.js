@@ -1,68 +1,43 @@
 
-import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
-import { Modal, Button, Input, Form, Select, Radio, DatePicker, Row, Col } from 'antd';
+import React from 'react';
+import { Modal, Button, Badge, Descriptions } from 'antd';
 
 const BatteryReadModal = ({open, onCancel, selectItem }) => {
-    const [form] = Form.useForm();
-
-    useEffect(() => {
-        if (selectItem) {
-            form.setFieldsValue({
-                ...selectItem,
-                due_date: selectItem.due_date ? dayjs(selectItem.due_date) : null,
-            });
-        }
-    }, [selectItem, form]);
+    const mappingItems = {
+        folder_id: '데이터 번호',
+        product_name: '기기 종류',
+        state: '사용 여부',
+        location_name: '현장',
+        folder_name: '폴더',
+        due_date: '교체일',
+        marks: '비고'
+    }
 
     return (
         <Modal
             title="조회"
             open={open}
-            onCancel={() => {
-                form.resetFields();
-                onCancel();
-            }}
+            onCancel={() => {onCancel();}}
             footer={[
-                <Button key="OK" type='primary' onClick={() => {
-                    form.resetFields();
-                    onCancel();
-                }}>
+                <Button key="OK" type='primary' onClick={() => {onCancel();}}>
                 OK
                 </Button>
             ]}
             >
 
-            <Form form={form} layout="vertical">
-                <Form.Item name="folder_id" label="순번">
-                    <Input disabled />
-                </Form.Item>
-
-                <Form.Item name="product_name" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Input disabled/>
-                </Form.Item>
-
-                <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '배터리 사용여부를 선택해주세요!'}]}>
-                    <Input disabled/>
-                </Form.Item>
-
-                <Form.Item name="location_name" label="현장이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
-                    <Input disabled/>
-                </Form.Item>
-
-                <Form.Item name="folder_name" label="폴더 이름" rules={[{ required: true, message: '폴더명을 입력해주세요!' }]}>
-                    <Input disabled/>
-                </Form.Item>
-
-                <Form.Item name="due_date" label="교체일">
-                    <DatePicker disabled/>
-                </Form.Item>
-
-                <Form.Item name="marks" label="비고">
-                    <Input disabled/>
-                </Form.Item>
-
-            </Form>
+            <Descriptions title="조회" bordered column={2}>
+                {selectItem 
+                    ? Object.keys(selectItem).map((key, index) => (
+                        <Descriptions.Item key={index} label={mappingItems[key]}>
+                            {key === 'rent_state' || key === 'state' ? (
+                                selectItem[key] === true ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
+                            ) : (
+                                selectItem[key]
+                            )}
+                        </Descriptions.Item>
+                    )) 
+                    : null }
+            </Descriptions>
         </Modal>
     );
 };

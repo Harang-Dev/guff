@@ -2,13 +2,13 @@ import styled from 'styled-components';
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Table, Button, Form, Badge, Popconfirm, notification, Space } from 'antd';
+import { Table, Button, Form, Badge, Popconfirm, notification, Space, Tooltip, Input, message } from 'antd';
 
 import AssetUpdateModal from './AssetUpdateModal';
 import AssetReadModal from './AssetReadModal';
 import AssetCreateModal from './AssetCreateModal';
 
-/* eslint-disable no-restricted-globals */
+const { Search } = Input;
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -24,10 +24,9 @@ function AssetTable() {
     const [selectedItem, setSelectedItem] = useState(null); // 선택된 아이템 데이터
     const [selectedId, setSelectedId] = useState(null);
 
-    // Assetpage에 필요한 상태 관리
-    const [brandFilters, setBrandFilters] = useState(null);
-    const [productsFilters, setProductsFilters] = useState(null);
-    const [locationFilters, setLocationFilters] = useState(null);
+    const [locations, setLocations] = useState();
+    const [products, setProducts] = useState();
+    const [brands, setBrands] = useState();
 
     // 모달 관련 상태 관리
     const [isCreateModalVisible, setCreateModalVisible] = useState(false);
@@ -35,8 +34,6 @@ function AssetTable() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
-
-    const [currentPage, setCurrentPage] = useState(1);
  
     // 처음 렌더링 할 때 필요한 데이터들 API에 요청해주는 상태 관리 함수
     useEffect(() => {
@@ -49,7 +46,27 @@ function AssetTable() {
             }
         };
 
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/location`);
+                setLocations(response.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/product`);
+                setProducts(response.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
         fetchData();
+        fetchLocations();
+        fetchProducts();
     }, []);
 
     // 수정 모달 창 실행 함수
@@ -159,9 +176,20 @@ function AssetTable() {
         if (!dateString) {
             return '';
         } else {
-            return date >= now && date <= endOfPeriod;
+            return (date >= now && date <= endOfPeriod);
         }
     };
+
+    const searchProduct = async (value) => {
+        if (value) {
+            try {
+                const response = await axios.get(`${API_URL}/asset/view/${value}`)
+                setData(response.data)
+            } catch (error) {
+                message.error('검색 실패!')
+            }
+        } 
+    }
 
     // 표 속성 정해주는 변수
     const columns = [
@@ -187,7 +215,10 @@ function AssetTable() {
             dataIndex: 'brand_name',
             key: 'brand_name',
             align: 'center',
-            filters: brandFilters,
+            filters: brands ? brands.map(brand => ({
+                text: brand.brand_name,
+                value: brand.brand_name
+            })) : null,
             onFilter: ( value, record ) => record.brand_name === value,
         },
         {
@@ -195,7 +226,10 @@ function AssetTable() {
             dataIndex: 'product_name',
             key: 'product_name',
             align: 'center', 
-            filters: productsFilters,
+            filters: products ? products.map(product => ({
+                text: product.product_name,
+                value: product.product_name
+            })) : null,
             onFilter: ( value, record ) => record.product_name === value
         },
         {
@@ -210,14 +244,28 @@ function AssetTable() {
             align: 'center',
             render: (text, record) => {
                 const isStartDateWithinNextSevenDays = isDateWithinNextSevenDays(record.start_date);
+                const now = new Date();
+                const start = new Date(record.start_date);
+                const end = new Date(record.end_date);
+        
+                const timeDifference = now - end;
+                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 밀리초 → 일로 변환
 
                 const startDateStyle = {
-                    color: isStartDateWithinNextSevenDays ? '#BE35FF' : 'black',
-                    fontWeight: isStartDateWithinNextSevenDays ? 'bold' : 'normal'
+                    color: isStartDateWithinNextSevenDays ? '#BE35FF' : (now > end && now > start) ? 'red' : 'black',
+                    fontWeight: isStartDateWithinNextSevenDays || (now > end && now > start ) ? 'bold' : 'normal'
                 };
-
+        
                 return (
-                    <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                    <>
+                        {startDateStyle.color === 'red' ? (
+                            <Tooltip title={`${daysDifference}일 동안 업데이트 안함`}>
+                                <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                            </Tooltip>
+                        ) : (
+                            <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                        )}
+                    </>
                 );
             },
         },
@@ -227,14 +275,28 @@ function AssetTable() {
             align: 'center',
             render: (text, record) => {
                 const isEndDateWithinNextSevenDays = isDateWithinNextSevenDays(record.end_date);
+                const now = new Date();
+                const start = new Date(record.start_date)
+                const end = new Date(record.end_date)
+
+                const timeDifference = now - end;
+                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 밀리초 → 일로 변환
 
                 const endDateStyle = {
-                    color: isEndDateWithinNextSevenDays ? '#BE35FF' : 'black',
-                    fontWeight: isEndDateWithinNextSevenDays ? 'bold' : 'normal'
+                    color: isEndDateWithinNextSevenDays ? '#BE35FF' : (now > end && now > start) ? 'red' : 'black',
+                    fontWeight: isEndDateWithinNextSevenDays || (now > end && now > start ) ? 'bold' : 'normal'
                 };
 
                 return (
-                    <span style={endDateStyle}>{formatDate(record.end_date)}</span>
+                    <>
+                        {endDateStyle.color === 'red' ? (
+                            <Tooltip title={`${daysDifference}일 동안 업데이트 안함`}>
+                                <span style={endDateStyle}>{formatDate(record.start_date)}</span>
+                            </Tooltip>
+                        ) : (
+                            <span style={endDateStyle}>{formatDate(record.start_date)}</span>
+                        )}
+                    </>
                 );
             },
         },
@@ -243,7 +305,10 @@ function AssetTable() {
             dataIndex: 'location_name',
             key: 'location_name',
             align: 'center',
-            filters: locationFilters,
+            filters: locations ? locations.map(location => ({
+                text: location.location_name,
+                value: location.location_name
+            })) : null,
             onFilter: ( value, record ) => record.location_name === value,
         },
         {
@@ -297,7 +362,8 @@ function AssetTable() {
         <div>
             {contextHolder}
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
+                <Search placeholder="기기 번호를 입력해주세요" allowClear style={{marginBottom: 10}} onSearch={searchProduct} onChange={(e) => searchProduct(e.target.value)}enterButton /> 
+                <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
             </Space>
             <Table
                 columns={columns}
@@ -312,12 +378,16 @@ function AssetTable() {
                 open={isCreateModalVisible}
                 onOk={handleCreate}
                 onCancel={handleCreateModalCancel}
+                products={products || []}
+                locations={locations || []}
             />
             <AssetUpdateModal
                 open={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 selectItemID={selectedId}
+                products={products || []}
+                locations={locations || []}
             />
             <AssetReadModal
                 open={isReadModalVisible}

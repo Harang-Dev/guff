@@ -25,6 +25,10 @@ def read_id(asset_id: int, db: Session = Depends(get_db)):
     data = mapper.read_id(asset_id, db)
     return data
 
+@asset.get("/view/{searchWord}", tags=['asset'])
+def findData(searchWord: str, db: Session = Depends(get_db)):
+    return mapper.findData(f'%{searchWord}%', db)
+
 # @asset.get("/filter/", tags=['asset'], response_model=list[AssetDTOinDB])
 # def read_brand(brand_name: Optional[str] = None, location_name: Optional[str] = None, db: Session = Depends(get_db)):
 #     if location_name:
