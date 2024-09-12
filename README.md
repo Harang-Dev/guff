@@ -18,7 +18,7 @@
 | **팀원** | 역할 |
 | -------- | ---- |
 | <img src="https://avatars.githubusercontent.com/u/90229940?v=4" width="150" height="150" alt="서현우" /> | **서현우**<br/>[@Hyunwoo-Seo](https://github.com/Hyunwoo-Seo) <br>웹 디자인 및 코드 작성 |
-| <img src="https://avatars.githubusercontent.com/u/90229940?v=4" width="150" height="150" alt="강태화" /> | **강태화**<br/>[@Mandu](https://github.com/Kooo1225) <br>DB 작성, 백엔드 API 개발, 계산 함수 구현 |
+| <img src="https://avatars.githubusercontent.com/u/54405000?v=4" width="150" height="150" alt="강태화" /> | **강태화**<br/>[@Mandu](https://github.com/Kooo1225) <br>DB 작성, 백엔드 API 개발, 계산 함수 구현 |
 
 ---
 
