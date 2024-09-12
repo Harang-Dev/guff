@@ -148,7 +148,9 @@ const EstimatedEquationChart = ({ linearData }) => {
 				<Collapse.Panel header="그래프 보기" key="1">
 				{xValues ? 
 				(
-					<div ref={containerRef} style={{ width: '100%', height: '400px', marginTop: '20px' }} />
+					<div style={{ display: 'flex', justifyContent: 'center'}}>
+						<div ref={containerRef} style={{ width: '50%' }} />
+					</div>
 				) 
 				: 
 				(
@@ -180,9 +182,9 @@ const EstimatedEquationChart = ({ linearData }) => {
 			<Divider />
 
 			<Table
-			columns={columns}
-			dataSource={data}
-			pagination={false}
+				columns={columns}
+				dataSource={data}
+				pagination={false}
 			/> 
 		</div>
     );

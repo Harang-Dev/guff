@@ -7,13 +7,19 @@ const ValueSetting = ({ tabValue, activeKey, onSave }) => {
     const [form] = Form.useForm();
 
     const onFinish = (values) => {
-        console.log(values)
         const tempValue = Object.keys(values).reduce((acc, key) => {
-            const value = key === "delay" || key === "metrics" ? values[key].split(",").map(num => parseFloat(num.trim())).sort() : values[key]
+            // 값이 undefined가 아니면 처리, undefined면 기존 값 유지
+            const value = values[key] !== undefined 
+                ? (key === "delay" || key === "metrics" 
+                    ? values[key].split(",").map(num => parseFloat(num.trim())).sort() 
+                    : values[key]
+                  )
+                : tabValue[activeKey]?.[key];  // 기존 값을 사용
+    
             acc[key] = value;
             return acc;
         }, {});
-
+    
         onSave(tempValue, activeKey); // 부모 컴포넌트로 전달
     };
 

@@ -164,19 +164,32 @@ function AssetTable() {
       };
 
     // 현재 날짜 기준 교정일, 차기교정일 하이라이팅 함수
-    const isDateWithinNextSevenDays = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const endOfPeriod = new Date(now);
-        endOfPeriod.setDate(now.getDate() + 7);
-
-        now.setHours(0, 0, 0, 0);
-        endOfPeriod.setHours(23, 59, 59, 999);
-
+    const dateHighlight = (dateString) => {
         if (!dateString) {
-            return '';
+            return ''; // dateString이 없을 때 빈 값 반환
+        }
+
+        const date = new Date(dateString);  // 교체일
+        const now = new Date();             // 현재 날짜
+        const threeDaysLater = new Date(now); // 3일 후 날짜 계산
+
+        // 현재 날짜의 시간을 00:00:00으로 설정 (하루 단위 비교를 위해)
+        now.setHours(0, 0, 0, 0);
+
+        // 3일 후 날짜의 시간을 23:59:59로 설정
+        threeDaysLater.setDate(now.getDate() + 3);
+        threeDaysLater.setHours(23, 59, 59, 999);
+
+        // 1. date가 금일 기준 3일 이내인지 확인
+        const isWithinNextThreeDays = date >= now && date <= threeDaysLater;
+
+        // 2. date가 이미 과거인지 확인
+        const isPastDate = date < now;
+
+        if (isPastDate) {
+            return "overdue"
         } else {
-            return (date >= now && date <= endOfPeriod);
+            return isWithinNextThreeDays
         }
     };
 
@@ -189,6 +202,28 @@ function AssetTable() {
                 message.error('검색 실패!')
             }
         } 
+    }
+
+    const downloadExcel = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/asset/download/excel`, {
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.setAttribute('download', `계측기 현황.xlsx`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+        } catch (error) {
+            
+        }
     }
 
     // 표 속성 정해주는 변수
@@ -243,27 +278,24 @@ function AssetTable() {
             key: 'start_date',
             align: 'center',
             render: (text, record) => {
-                const isStartDateWithinNextSevenDays = isDateWithinNextSevenDays(record.start_date);
-                const now = new Date();
-                const start = new Date(record.start_date);
-                const end = new Date(record.end_date);
-        
-                const timeDifference = now - end;
-                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 밀리초 → 일로 변환
+                const sDate = dateHighlight(record.start_date)
+                const eDate = dateHighlight(record.end_date)
 
-                const startDateStyle = {
-                    color: isStartDateWithinNextSevenDays ? '#BE35FF' : (now > end && now > start) ? 'red' : 'black',
-                    fontWeight: isStartDateWithinNextSevenDays || (now > end && now > start ) ? 'bold' : 'normal'
-                };
+                console.log(sDate, eDate)
+
+                const result = {
+                    color: sDate === true ? '#BE35FF' : (sDate === "overdue" && eDate === "overdue") ? 'red' : 'black',
+                    fontWeight: sDate === true ? 'bold' : 'normal',
+                }
         
                 return (
                     <>
-                        {startDateStyle.color === 'red' ? (
-                            <Tooltip title={`${daysDifference}일 동안 업데이트 안함`}>
-                                <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                        {result.color === 'red' ? (
+                            <Tooltip title={`교정일 수정 후 업데이트 필요함`}>
+                                <span style={result}>{formatDate(record.start_date)}</span>
                             </Tooltip>
                         ) : (
-                            <span style={startDateStyle}>{formatDate(record.start_date)}</span>
+                            <span style={result}>{formatDate(record.start_date)}</span>
                         )}
                     </>
                 );
@@ -274,27 +306,22 @@ function AssetTable() {
             key: 'end_date',
             align: 'center',
             render: (text, record) => {
-                const isEndDateWithinNextSevenDays = isDateWithinNextSevenDays(record.end_date);
-                const now = new Date();
-                const start = new Date(record.start_date)
-                const end = new Date(record.end_date)
+                const sDate = dateHighlight(record.start_date)
+                const eDate = dateHighlight(record.end_date)
 
-                const timeDifference = now - end;
-                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 밀리초 → 일로 변환
-
-                const endDateStyle = {
-                    color: isEndDateWithinNextSevenDays ? '#BE35FF' : (now > end && now > start) ? 'red' : 'black',
-                    fontWeight: isEndDateWithinNextSevenDays || (now > end && now > start ) ? 'bold' : 'normal'
-                };
-
+                const result = {
+                    color: eDate === true ? '#BE35FF' : (sDate === "overdue" && eDate === "overdue") ? 'red' : 'black',
+                    fontWeight: eDate === true ? 'bold' : 'normal',
+                }
+        
                 return (
                     <>
-                        {endDateStyle.color === 'red' ? (
-                            <Tooltip title={`${daysDifference}일 동안 업데이트 안함`}>
-                                <span style={endDateStyle}>{formatDate(record.start_date)}</span>
+                        {result.color === 'red' ? (
+                            <Tooltip title={`차기 교정일 수정 후 업데이트 필요함`}>
+                                <span style={result}>{formatDate(record.end_date)}</span>
                             </Tooltip>
                         ) : (
-                            <span style={endDateStyle}>{formatDate(record.start_date)}</span>
+                            <span style={result}>{formatDate(record.end_date)}</span>
                         )}
                     </>
                 );
@@ -364,6 +391,7 @@ function AssetTable() {
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
                 <Search placeholder="기기 번호를 입력해주세요" allowClear style={{marginBottom: 10}} onSearch={searchProduct} onChange={(e) => searchProduct(e.target.value)}enterButton /> 
                 <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal} style={{marginBottom: 10}}>데이터 등록</Button>
+                <Button type="primary" icon={<PlusOutlined />} onClick={downloadExcel} style={{marginBottom: 10}}>데이터 다운로드</Button>
             </Space>
             <Table
                 columns={columns}

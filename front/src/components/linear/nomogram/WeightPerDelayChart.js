@@ -116,7 +116,9 @@ const WeightPerDelayChart = ({ linearData, standardWave, distance }) => {
         <div>
             <Collapse defaultActiveKey={['1']} ghost>
                 <Collapse.Panel header="그래프 보기" key="1">
-                    <div ref={containerRef} style={{ width: '100%', height: '400px', marginTop: '20px' }} />
+                    <div style={{ display: 'flex', justifyContent: 'center'}}>
+                        <div ref={containerRef} style={{ width: '50%', height: '400px', marginTop: '20px' }} />
+                    </div>
                 </Collapse.Panel>
             </Collapse>
             <Divider />

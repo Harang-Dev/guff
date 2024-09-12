@@ -10,6 +10,7 @@ class FolderDTO(BaseModel):
     state: bool
     due_date: Optional[date]
     marks: Optional[str]
+    replace_cycle: Optional[int]
 
 class FolderDTOinDB(FolderDTO):
     folder_id: int
@@ -25,3 +26,4 @@ class FolderDetailsView(BaseModel):
     state: bool
     due_date: Optional[date]
     marks: Optional[str]
+    replace_cycle: Optional[int]

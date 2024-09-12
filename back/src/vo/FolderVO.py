@@ -12,6 +12,7 @@ class FolderVO(BASE):
     location_id = Column(Integer)
     due_date = Column(Date)
     marks = Column(String)
+    replace_cycle = Column(Integer)
 
     def __repr__(self):
         return f"Folder(folder_id={self.folder_id}, folder_name={self.folder_name}, location_id={self.location_name}, due_date={self.due_date})>"
@@ -25,3 +26,4 @@ class FolderViewVO(BASE):
     state = Column(Boolean)
     due_date = Column(String)
     marks = Column(String)
+    replace_cycle = Column(Integer)

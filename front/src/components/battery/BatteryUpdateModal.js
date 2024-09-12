@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { Modal, Input, Form, Select, DatePicker } from 'antd';
+import { Modal, Input, Form, Select, DatePicker, InputNumber, Row, Col } from 'antd';
 import { Option } from 'antd/es/mentions';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -86,7 +86,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products
 
                 <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
                     <Select 
-                        placeholder="Select a product"
+                        placeholder="기기 종류를 선택해주세요"
                     >
 
                         {products.map(product => (
@@ -96,7 +96,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products
                 </Form.Item>
 
                 <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '배터리 사용여부를 선택해주세요!'}]}>
-                    <Select placeholder="Select a state" onChange={handleStateChange}>
+                    <Select placeholder="사용 여부를 선택해주세요" onChange={handleStateChange}>
                         <Option value={true}>Y</Option>
                         <Option value={false}>N</Option>
                     </Select>
@@ -104,7 +104,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products
 
                 <Form.Item name="location_id" label="현장 이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
-                        placeholder="Select a location" 
+                        placeholder="현장을 선택해주세요" 
                         disabled={isLocationDisabled}   
                     >
                         {locations.map(location => (
@@ -114,12 +114,22 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products
                 </Form.Item>
 
                 <Form.Item name="folder_name" label="폴더 이름">
-                    <Input placeholder='Input folder name' disabled={isLocationDisabled}/>
+                    <Input placeholder='폴더 이름을 입력해주세요' disabled={isLocationDisabled}/>
                 </Form.Item>
 
-                <Form.Item name="due_date" label="교체일">
-                    <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
-                </Form.Item>
+                <Row>
+                    <Col span={12}>
+                        <Form.Item name="replace_cycle" label="교체 주기">
+                            <InputNumber style={{ width: '80%'}} placeholder='교체 주기를 입력해주세요' disabled={isLocationDisabled}/>
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                        <Form.Item name="due_date" label="교체일">
+                            <DatePicker style={{ width: '80%'}} format='YYYY-MM-DD' disabled={isLocationDisabled}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
 
                 <Form.Item name="marks" label="비고">
                     <TextArea rows={4} placeholder='비고를 작성해주세요'/>

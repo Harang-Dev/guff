@@ -1,6 +1,6 @@
 export const bColumn = (Item) => [
     {
-        title: '장비명',
+        title: '기기 종류',
         dataIndex: 'product_name',
         key: "product_name",
         align: 'center',
@@ -16,6 +16,9 @@ export const bColumn = (Item) => [
         dataIndex: 'due_date',
         key: "due_date",
         align: 'center',
+        render: (text, record) => {
+            
+        }
     },
 ]
 

@@ -30,6 +30,7 @@ class FolderMapper:
         record.due_date = vo.due_date
         record.marks = vo.marks
         record.state = vo.state
+        record.replace_cycle = vo.replace_cycle
         db.commit()
 
     def delete(self, folder_id: int, db: Session):

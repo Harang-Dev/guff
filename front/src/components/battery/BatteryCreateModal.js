@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Modal, Input, Form, DatePicker, Select } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Input, Form, DatePicker, Select, InputNumber, Col, Row } from 'antd';
 import { Option } from 'antd/es/mentions';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -54,9 +53,13 @@ const BatteryCreateModal = ({open, onOk, onCancel, locations, products }) => {
                 onCancel();
             }}>
 
-            <Form form={form} layout="vertical">
+<Form form={form} layout="vertical">
+                <Form.Item name="folder_id" label="순번">
+                    <Input disabled />
+                </Form.Item>
+
                 <Form.Item name="product_id" label="기기 종류" rules={[{ required: true, message: '기기종류를 선택해주세요!'}]}>
-                    <Select placeholder="Select a product">
+                    <Select placeholder="기기 종류를 선택해주세요" >
                         {products.map(product => (
                             <Option key={product.product_id} value={product.product_id}>{product.product_name}</Option>
                         ))}
@@ -64,7 +67,7 @@ const BatteryCreateModal = ({open, onOk, onCancel, locations, products }) => {
                 </Form.Item>
 
                 <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '배터리 사용여부를 선택해주세요!'}]}>
-                    <Select placeholder="Select a state" onChange={handleStateChange}>
+                    <Select placeholder="사용 여부를 선택해주세요" onChange={handleStateChange}>
                         <Option value={true}>Y</Option>
                         <Option value={false}>N</Option>
                     </Select>
@@ -72,8 +75,8 @@ const BatteryCreateModal = ({open, onOk, onCancel, locations, products }) => {
 
                 <Form.Item name="location_id" label="현장 이름" rules={[{ required: true, message: '현장을 입력해주세요!' }]}>
                     <Select 
-                        placeholder="Select a location" 
-                        disabled={isLocationDisabled}
+                        placeholder="현장을 선택해주세요" 
+                        disabled={isLocationDisabled}   
                     >
                         {locations.map(location => (
                             <Option key={location.location_id} value={location.location_id}>{location.location_name}</Option>
@@ -81,13 +84,24 @@ const BatteryCreateModal = ({open, onOk, onCancel, locations, products }) => {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="folder_name" label="폴더 이름" >
-                    <Input placeholder='Input folder name' disabled={isLocationDisabled}/>
+                <Form.Item name="folder_name" label="폴더 이름">
+                    <Input placeholder='폴더 이름을 입력해주세요' disabled={isLocationDisabled}/>
                 </Form.Item>
 
-                <Form.Item name="due_date" label="교체일">
-                    <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
-                </Form.Item>
+                <Row>
+                    <Col span={12}>
+                        <Form.Item name="replace_cycle" label="교체 주기">
+                            <InputNumber style={{ width: '80%'}} placeholder='교체 주기를 입력해주세요' disabled={isLocationDisabled}/>
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                        <Form.Item name="due_date" label="교체일">
+                            <DatePicker style={{ width: '80%'}} format='YYYY-MM-DD' disabled={isLocationDisabled}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+
 
                 <Form.Item name="marks" label="비고">
                     <TextArea rows={4} placeholder='비고를 작성해주세요'/>

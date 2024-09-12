@@ -38,8 +38,8 @@ class HwpService:
         for rows, id in zip(tableRow, [id.get('table-id') for id in tableControl]):
             for row in [ tag for row in rows for tag in row.findall('.//TableCell') ]:
                 charShapeIndex = [True if charShapeList[int(id)].get('underline') == 'line_through' else False for id in [t.get('charshape-id') for t in row.findall('.//Text')]]
-                
-                if all(charShapeIndex):
+            
+                if charShapeIndex and all(charShapeIndex):
                     text = "발파 데이터 아님"
                 else:
                     text = "".join(t.text for t in row.findall('.//Text') if t.text)
@@ -52,7 +52,7 @@ class HwpService:
                     'colspan': int(row.get('colspan')),
                     'text': text,
                 }
-                print(data)
+                
                 xml_list.append(data)
 
         return xml_list

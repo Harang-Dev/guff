@@ -79,7 +79,7 @@ async def parsing(
     os.remove(xml_path)
     
     filteredXmlData = parser.getFilteredDataList(xmlData)
-    print(filteredXmlData)
+
     for xmlDataList in filteredXmlData:
         serialize_data.extend(parser.getSerializeList([xmldata for xmldata in xmlDataList if xmldata['text']]))
 
@@ -157,8 +157,6 @@ async def download_excel(filename: str, version: str, db: Session = Depends(get_
     df.rename(columns=mapping, inplace=True)
 
     df = transExcel(waveSpeed, waveLevel, noise, df, version)
-    for i in df:
-        print(i)
     with pd.ExcelWriter(f'{filename}.xlsx') as writer:
         for location, group in df.groupby(mapping['measurement_location']):
             group.to_excel(writer, sheet_name=location, index=False)

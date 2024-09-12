@@ -160,7 +160,7 @@ const LinearTabs = () => {
                 onChange={(key) => setActiveKey(key)}
                 items={tabPanes}
                 tabBarExtraContent={
-                    activeKey != 0 ? <Button type="link" onClick={handleClick}>설정</Button> : null
+                    (activeKey !== '0' && activeKey !== 'setting') ? <Button type="link" onClick={handleClick}>설정</Button> : null
                 }
             />
         </div>

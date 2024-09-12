@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from "axios";
 
 import { PlusOutlined } from '@ant-design/icons';
-import { Table, Button, Form, Badge, Popconfirm, notification, Layout, Space } from 'antd';
+import { Table, Button, Form, Badge, Popconfirm, notification, Tooltip, Space } from 'antd';
 import BatteryUpdateModal from './BatteryUpdateModal';
 import BatteryCreateModal from './BatteryCreateModal';
 import BatteryReadModal from './BatteryReadModal';
@@ -153,19 +153,34 @@ function BatteryTable() {
       };
 
     // 현재 날짜 기준 교정일, 차기교정일 하이라이팅 함수
-    const isDateWithinNextSevenDays = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const endOfPeriod = new Date(now);
-        endOfPeriod.setDate(now.getDate() + 7);
-
-        now.setHours(0, 0, 0, 0);
-        endOfPeriod.setHours(23, 59, 59, 999);
-
+    const isDateWithinNextSevenDays = (dateString, replace_cycle) => {
         if (!dateString) {
             return '';
+        }
+
+        const date = new Date(dateString);  // 교체일
+        const now = new Date();
+        const replaceDate = new Date(date); // 교체 주기 기준으로 계산할 날짜 복사본 생성
+        replaceDate.setDate(replaceDate.getDate() + replace_cycle); // 교체 주기 더하기
+
+        const endOfPeriod = new Date(replaceDate);
+        endOfPeriod.setDate(replaceDate.getDate() - 1); // 하루 전날 계산
+
+        now.setHours(0, 0, 0, 0); // 현재 시간을 00:00:00으로 설정
+        replaceDate.setHours(23, 59, 59, 999); // 교체일의 시간을 끝으로 설정
+
+        // 교체 주기 지난 경우 확인
+        const isPastReplaceCycle = now > replaceDate;
+
+        // 현재 날짜가 교체 주기 당일 및 하루 전날 사이에 있는지 확인
+        const isWithinPeriod = now >= endOfPeriod && now <= replaceDate;
+
+        console.log(dateString, isWithinPeriod)
+        // 교체 주기가 지났다면 'overdue'를 반환, 아직 남아있다면 true/false 반환
+        if (isPastReplaceCycle) {
+            return 'overdue';  // 교체 주기 지난 경우
         } else {
-            return date >= now && date <= endOfPeriod;
+            return isWithinPeriod;
         }
     };
 
@@ -217,19 +232,34 @@ function BatteryTable() {
             align: 'center',
         },
         {
+            title: '교체 주기',
+            dataIndex: 'replace_cycle',
+            key: 'replace_cycle',
+            align: 'center',
+            render: (text, record) => { return `${text}일`}
+        },
+        {
             title: '교체일',
             key: 'due_date',
             align: 'center',
             render: (text, record) => {
-                const isStartDateWithinNextSevenDays = isDateWithinNextSevenDays(record.due_date);
+                const isStartDateWithinNextSevenDays = isDateWithinNextSevenDays(record.due_date, record.replace_cycle);
 
                 const startDateStyle = {
-                    color: isStartDateWithinNextSevenDays ? '#BE35FF' : 'black',
+                    color: isStartDateWithinNextSevenDays === true ? '#BE35FF' : isStartDateWithinNextSevenDays === 'overdue' ? 'red' : 'black',
                     fontWeight: isStartDateWithinNextSevenDays ? 'bold' : 'normal'
                 };
 
                 return (
-                    <span style={startDateStyle}>{formatDate(record.due_date)}</span>
+                    <>
+                        {startDateStyle.color === 'red' ? (
+                            <Tooltip title={`교체 후 업데이트 필요함`}>
+                                <span style={startDateStyle}>{formatDate(record.due_date)}</span>
+                            </Tooltip>
+                        ) : (
+                            <span style={startDateStyle}>{formatDate(record.due_date)}</span>
+                        )}
+                    </>
                 );
             },
         },

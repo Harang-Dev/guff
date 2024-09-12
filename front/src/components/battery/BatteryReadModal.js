@@ -9,6 +9,7 @@ const BatteryReadModal = ({open, onCancel, selectItem }) => {
         state: '사용 여부',
         location_name: '현장',
         folder_name: '폴더',
+        replace_cycle: '교체 주기',
         due_date: '교체일',
         marks: '비고'
     }

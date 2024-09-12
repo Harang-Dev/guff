@@ -14,11 +14,11 @@ const AssetCreateModal = ({open, onOk, onCancel, locations, products }) => {
     const handleStateChange = (value) => {
         if (value === false) {
             setIsLocationDisabled(true);
-            form.setFieldsValue({ location_name: "사무실" });
+            form.setFieldsValue({ location_id: 8 });
             form.setFieldsValue({ rent_state: false });
         } else {
             setIsLocationDisabled(false);
-            form.setFieldsValue({ location_name: null });
+            form.setFieldsValue({ location_id: null });
             form.setFieldsValue({ rent_state: false });
         }
     };
@@ -67,7 +67,7 @@ const AssetCreateModal = ({open, onOk, onCancel, locations, products }) => {
                     <Input />
                 </Form.Item>
 
-                <Form.Item name="state" label="State" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
+                <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
                     <Select placeholder="Select a state" onChange={handleStateChange}>
                         <Option value={true}>사용</Option>
                         <Option value={false}>미사용</Option>

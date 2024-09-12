@@ -33,11 +33,13 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
                 ...data,
                 start_date: data.start_date ? dayjs(data.start_date) : null,
                 end_date: data.end_date ? dayjs(data.end_date) : null,
+                // state: data.state === true ? 'Y' : 'N',
                 marks: data.marks || null,
+                
             });
             if (data.state === "N") {
                 setIsLocationDisabled(true);
-                form.setFieldValue({location_name: "사무실"});
+                form.setFieldValue({location_id: 8});
             } else {
                 setIsLocationDisabled(false);
             }
@@ -47,11 +49,11 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
     const handleStateChange = (value) => {
         if (value === "N") {
             setIsLocationDisabled(true);
-            form.setFieldsValue({ location_name: "사무실" });
+            form.setFieldsValue({ location_id: 8 });
             form.setFieldsValue({ rent_state: false });
         } else {
             setIsLocationDisabled(false);
-            form.setFieldsValue({ location_name: null });
+            form.setFieldsValue({ location_id: null });
             form.setFieldsValue({ rent_state: false });
         }
     };
@@ -101,10 +103,10 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
                     <Input />
                 </Form.Item>
 
-                <Form.Item name="state" label="State" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
+                <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
                     <Select placeholder="Select a state" onChange={handleStateChange}>
-                        <Option value="Y">Y</Option>
-                        <Option value="N">N</Option>
+                        <Option value="Y">사용</Option>
+                        <Option value="N">미사용</Option>
                     </Select>
                 </Form.Item>
 
@@ -122,13 +124,13 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
                 <Row gutter={16}>
                     <Col span={8}>
                         <Form.Item name="start_date" label="교정일">
-                            <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
+                            <DatePicker format='YYYY-MM-DD' />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="end_date" label="차기교정일">
-                            <DatePicker format='YYYY-MM-DD' disabled={isLocationDisabled}/>
+                            <DatePicker format='YYYY-MM-DD' />
                         </Form.Item>
                     </Col>
 
