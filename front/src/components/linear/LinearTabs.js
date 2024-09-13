@@ -67,7 +67,7 @@ const LinearTabs = () => {
                 key: '0',
                 label: '전체 그래프',
                 children: (
-                    <div className='TabsChild'>
+                    <div className='TabsChild' style={{display: 'flex', justifyContent: 'center'}}>
                         <RegressionChart chartData={chartData} style={{marginTop: 100}}/>
                     </div>
                 ),
@@ -131,7 +131,7 @@ const LinearTabs = () => {
 
 
         if (showValueSeeting) {
-            setTabPanes([...tabPanes.filter(item => item.key != 'setting'), item])
+            setTabPanes([...tabPanes.filter(item => item.key !== 'setting'), item])
         } else {
             setTabPanes([...tabPanes, item])
             setShowValueSeeting(true);
@@ -140,7 +140,7 @@ const LinearTabs = () => {
     };
 
     const handleValueSetting = (newValues, activeKey) => {
-        const filterPanes = tabPanes.filter(item => item.key != 'setting')
+        const filterPanes = tabPanes.filter(item => item.key !=='setting')
         
         setTabValue((prevTabValue) => ({
             ...prevTabValue,

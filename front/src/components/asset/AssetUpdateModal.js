@@ -37,17 +37,17 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
                 marks: data.marks || null,
                 
             });
-            if (data.state === "N") {
+            if (data.state === false) {
                 setIsLocationDisabled(true);
                 form.setFieldValue({location_id: 8});
             } else {
                 setIsLocationDisabled(false);
             }
         }
-    }, [data]);
+    }, [data, form]);
 
     const handleStateChange = (value) => {
-        if (value === "N") {
+        if (value === false) {
             setIsLocationDisabled(true);
             form.setFieldsValue({ location_id: 8 });
             form.setFieldsValue({ rent_state: false });
@@ -105,8 +105,8 @@ const AssetUpdateModal = ({open, onOk, onCancel, selectItemID, locations, produc
 
                 <Form.Item name="state" label="사용 여부" rules={[{ required: true, message: '사용 현황을 입력해주세요!'}]}>
                     <Select placeholder="Select a state" onChange={handleStateChange}>
-                        <Option value="Y">사용</Option>
-                        <Option value="N">미사용</Option>
+                        <Option value={true}>사용</Option>
+                        <Option value={false}>미사용</Option>
                     </Select>
                 </Form.Item>
 

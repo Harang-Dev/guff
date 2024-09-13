@@ -34,7 +34,16 @@ const RegressionChart = ({ chartData }) => {
                             xField: 'x',
                             yField: 'y',
                             seriesField: 'type',
-                            colorField: 'type',
+                            color: (item) => {
+                                if (item.type === '50% 추정선') {
+                                    return 'red';
+                                } else if (item.type === '84% 추정선') {
+                                    return 'black';
+                                } else {
+                                    return 'orange';
+                                }
+                            },
+                            // colorField: (item) => item.type === '50% 추정선' ? 'black' : item.type === '84% 추정선' ? 'green' : 'red',
                             lineStyle: (item) => item.type === '84% 추정선' ? { lineDash: [4, 4] } : {},
                             xAxis: {
                                 type: 'log',
@@ -84,7 +93,11 @@ const RegressionChart = ({ chartData }) => {
         }
     }, [chartData]);
 
-  return <div ref={containerRef} />;
+  return (
+    
+    <div ref={containerRef} style={{ width: '50%' }}/>
+    
+  )
 };
 
 export default RegressionChart;

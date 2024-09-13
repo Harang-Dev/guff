@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Space, Table, message, Button } from 'antd';
 
 import { simpleColumns, properColumns, complicatedColumns } from './AnalyzeColumns';
@@ -99,7 +99,7 @@ function AnalyzeResult(props) {
     return (
         <div>
             <Space style={{display: 'flex', justifyContent: 'flex-end'}}>
-                <Button type="primary" icon={<PlusOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button>
+                <Button type="primary" icon={<InfoCircleOutlined />} onClick={showStatisticsModal} style={{marginBottom: 10}}>통계 조회</Button>
                 <Button type="primary" icon={<PlusOutlined />} onClick={download} style={{marginBottom: 10}} >다운로드</Button>
             </Space>
 

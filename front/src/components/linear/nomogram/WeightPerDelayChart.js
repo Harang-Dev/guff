@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Space, Table, Collapse, Divider } from 'antd';
+import { Table, Collapse, Divider } from 'antd';
 import { Scatter } from '@antv/g2plot';
 
 const WeightPerDelayChart = ({ linearData, standardWave, distance }) => {
@@ -20,7 +20,7 @@ const WeightPerDelayChart = ({ linearData, standardWave, distance }) => {
         }))
 
         setData(transformData);
-    }, [linearData])
+    }, [linearData, distance, standardWave])
 
     useEffect(() => {
         if (data) {
@@ -47,17 +47,26 @@ const WeightPerDelayChart = ({ linearData, standardWave, distance }) => {
                 },
                 colorField: 'type', // seriesField에 따라 색상을 다르게 설정
                 size: 8,
-                pointStyle: {
-                    fillOpacity: 1,
-                },
                 xAxis: {
                     title: {
                         text: '이격거리 (m)',
+                        style: {
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            fill: '#000',
+                            fontFamily: 'Lucida Console',
+                        }
                     },
                 },
                 yAxis: {
                     title: {
                         text: '장약량 (kg/delay)',
+                        style: {
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            fill: '#000',
+                            fontFamily: 'Lucida Console',
+                        }
                     },
                 },
                 legend: {

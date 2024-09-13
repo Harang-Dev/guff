@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Table, Button, Form, Badge, Popconfirm, notification, Space, Tooltip, Input, message } from 'antd';
+import { Table, Button, Badge, Popconfirm, notification, Space, Tooltip, Input, message } from 'antd';
 
 import AssetUpdateModal from './AssetUpdateModal';
 import AssetReadModal from './AssetReadModal';
@@ -32,7 +32,6 @@ function AssetTable() {
     const [isCreateModalVisible, setCreateModalVisible] = useState(false);
     const [isReadModalVisible, setReadModalVisible] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
  
     // 처음 렌더링 할 때 필요한 데이터들 API에 요청해주는 상태 관리 함수
@@ -112,7 +111,6 @@ function AssetTable() {
     // 데이터 수정을 위한 API 요청 함수
     const handleOk = async (values) => {
         try {
-            const updatedItem = await form.validateFields();
             await axios.put(`${API_URL}/asset/put`, values);
             const response = await axios.get(`${API_URL}/asset/view`);
             setData(response.data);
@@ -237,7 +235,7 @@ function AssetTable() {
                 { text: '사용', value: true },
                 { text: '미사용', value: false },
             ],
-            onFilter: (value, record) => record.state == value,
+            onFilter: (value, record) => record.state === value,
             render: (text, record) => {
                 const state_badge = record.state === true ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
                 return (
@@ -277,40 +275,16 @@ function AssetTable() {
             title: '교정일',
             key: 'start_date',
             align: 'center',
-            render: (text, record) => {
-                const sDate = dateHighlight(record.start_date)
-                const eDate = dateHighlight(record.end_date)
-
-                console.log(sDate, eDate)
-
-                const result = {
-                    color: sDate === true ? '#BE35FF' : (sDate === "overdue" && eDate === "overdue") ? 'red' : 'black',
-                    fontWeight: sDate === true ? 'bold' : 'normal',
-                }
-        
-                return (
-                    <>
-                        {result.color === 'red' ? (
-                            <Tooltip title={`교정일 수정 후 업데이트 필요함`}>
-                                <span style={result}>{formatDate(record.start_date)}</span>
-                            </Tooltip>
-                        ) : (
-                            <span style={result}>{formatDate(record.start_date)}</span>
-                        )}
-                    </>
-                );
-            },
         },
         {
             title: '차기교정일',
             key: 'end_date',
             align: 'center',
             render: (text, record) => {
-                const sDate = dateHighlight(record.start_date)
                 const eDate = dateHighlight(record.end_date)
 
                 const result = {
-                    color: eDate === true ? '#BE35FF' : (sDate === "overdue" && eDate === "overdue") ? 'red' : 'black',
+                    color: eDate === true ? '#BE35FF' :   eDate === "overdue" ? 'red' : 'black',
                     fontWeight: eDate === true ? 'bold' : 'normal',
                 }
         
@@ -347,7 +321,7 @@ function AssetTable() {
                 { text: '임대', value: true },
                 { text: '비임대', value: false },
             ],
-            onFilter: (value, record) => record.rent_state == value,
+            onFilter: (value, record) => record.rent_state === value,
             render: (text, record) => {
                 const rent_badge = record.rent_state === true ? <Badge dot color='green'></Badge> : <Badge dot color='red'></Badge>
                 return (

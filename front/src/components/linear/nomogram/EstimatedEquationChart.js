@@ -20,14 +20,6 @@ const EstimatedEquationChart = ({ linearData }) => {
       return (k * Math.pow(num, n));
     }
 
-	// const calcChartData = (k, n, num) => {
-	// 	let yValue = k * Math.pow(num, n);
-	// 	if (yValue < 1e-6) {
-	// 	  yValue = 0;  // 너무 작은 값은 0으로 처리
-	// 	}
-	// 	return yValue;
-	//   }
-
     useEffect(() => {
         const transformData = [
             {
@@ -67,12 +59,45 @@ const EstimatedEquationChart = ({ linearData }) => {
 					data: chartData,
 					xField: 'x',
 					yField: 'y',
+					color: (item) => {
+						if (item.type === '국토교통부(84%)') {
+							return 'red';
+						} else if (item.type === '시험발파(84%)') {
+							return 'black';
+						} else {
+							return 'orange';
+						}
+					},			
+					lineStyle: (item) => {
+						if (item.type === '국토교통부(84%)') {
+							return {
+								lineDash: [4, 4], // dashed line for '국토교통부(84%)'
+								stroke: 'red', // ensure the correct color
+							};
+						} else if (item.type === '시험발파(84%)') {
+							return {
+								lineDash: [], // solid line for '시험발파(84%)'
+								stroke: 'black',
+							};
+						} else {
+							return {
+								lineDash: [], // solid line for other types
+								stroke: 'orange',
+							};
+						}
+					},					
 					seriesField: 'type',
 					xAxis: {
 						tickCount: 10,
 						type: 'log',
 						title: {
 							text: 'Square root scaled distance (m/kg^1/2)',
+							style: {
+								fontSize: 16,
+								fontWeight: 'bold',
+								fill: '#000',
+								fontFamily: 'Lucida Console',
+							}
 						},
 						min: xValues.min,
 						max: xValues.max,
@@ -82,6 +107,12 @@ const EstimatedEquationChart = ({ linearData }) => {
 						type: 'log',
 						title: {
 							text: 'P.P.V (cm/sec)',
+							style: {
+								fontSize: 16,
+								fontWeight: 'bold',
+								fill: '#000',
+								fontFamily: 'Lucida Console',
+							}
 						},
 						max: xValues.max,
 						min: xValues.min / xValues.max,
@@ -96,9 +127,6 @@ const EstimatedEquationChart = ({ linearData }) => {
 					},
 					
 					smooth: true,
-					lineStyle: {
-						lineWidth: 2,
-					},
 					point: {
 						size: 5,
 						shape: 'circle',
