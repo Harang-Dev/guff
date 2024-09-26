@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button, Tabs, } from 'antd';
+import { Button, Tabs, message } from 'antd';
 import axios from 'axios';
 import RegressionChart from './RegressionChart';
 import WieghtPerDelayChart from './WeightPerDelayChart';
 import NomoGramChart from './nomogram/NomoGramChart';
 import CompareTab from './compare/CompareTab';
-import ValueSeeting from './ValueSetting';
+import SettingModal from './SettingModal';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -15,10 +15,11 @@ const LinearTabs = () => {
     const { filename } = location.state || {};
 
     const [linearData, setLinearData] = useState(null);
-    const [tabPanes, setTabPanes] = useState([]);
-    const [activeKey, setActiveKey] = useState(0);
     const [chartData, setChartData] = useState(null);
-    const [showValueSeeting, setShowValueSeeting] = useState(false);
+
+    const [activeKey, setActiveKey] = useState('main');
+    const [showModal, setShowModal] = useState(false);
+    const [tabPanes, setTabPanes] = useState(null);
 
     const [tabValue, setTabValue] = useState({
         weight: {
@@ -44,7 +45,7 @@ const LinearTabs = () => {
                 const response = await axios.get(`${API_URL}/linear/linregress/${filename}`)
                 setChartData(response.data);
             } catch(error) {
-                console.log(error)
+                message.error('그래프 데이터 조회 실패')
             }
         }
 
@@ -53,7 +54,7 @@ const LinearTabs = () => {
                 const response = await axios.get(`${API_URL}/linear/linregress/result/${filename}`);
                 setLinearData(response.data);
             } catch(error) {
-                console.log(error)
+                message.error('선형회귀 데이터 조회 실패')
             }
         }
         
@@ -62,9 +63,10 @@ const LinearTabs = () => {
     }, [filename]);
 
     useEffect(() => {
+        console.log(`In useEffect`, tabValue)
         if(chartData && linearData) {
             const initialTab = {
-                key: '0',
+                key: 'main',
                 label: '전체 그래프',
                 children: (
                     <div className='TabsChild' style={{display: 'flex', justifyContent: 'center'}}>
@@ -99,7 +101,7 @@ const LinearTabs = () => {
                 )
             }
 
-            const testChart = {
+            const compareChart = {
                 key: 'compare',
                 label: '국토부 선행호기 영역 비교',
                 children: (
@@ -111,47 +113,32 @@ const LinearTabs = () => {
                     </div>
                 )
             }
-            setTabPanes([initialTab, weightPerDelayTab, nomogramChart, testChart]);
-            setActiveKey('0');
+            setTabPanes([initialTab, weightPerDelayTab, nomogramChart, compareChart]);
+            setActiveKey('main');
         }
     }, [chartData, filename, tabValue, linearData])
 
-    const handleClick = () => {
-        const item = {
-            key: 'setting',
-            label: '설정',
-            children: (
-                <ValueSeeting 
-                    tabValue={tabValue} 
-                    activeKey={activeKey} 
-                    onSave={handleValueSetting}
-                />
-            )
-        }
-
-
-        if (showValueSeeting) {
-            setTabPanes([...tabPanes.filter(item => item.key !== 'setting'), item])
-        } else {
-            setTabPanes([...tabPanes, item])
-            setShowValueSeeting(true);
-        }
-        setActiveKey('setting')
-    };
-
-    const handleValueSetting = (newValues, activeKey) => {
-        const filterPanes = tabPanes.filter(item => item.key !=='setting')
-        
-        setTabValue((prevTabValue) => ({
-            ...prevTabValue,
+    const updateTabValue = (item, arrayName) => {        
+        const testData = {
+            ...tabValue,
             [activeKey]: {
-                ...newValues
+                ...item,
+                [arrayName]: item[arrayName]?.map(row => row.map(value => !isNaN(value) ? Number(value) : value)) // 배열 값을 숫자로 변환
             }
-        }));
-
-        setTabPanes(filterPanes)
-        setActiveKey(activeKey)
-    };
+        }
+        
+        setTabValue(testData);
+        
+        // setTabValue((prevTabValue) => ({
+        //     ...prevTabValue, // 이전 상태를 복사
+        //     [activeKey]: {
+        //         ...item, // item의 기존 데이터 복사
+        //         [arrayName]: item[arrayName]?.map(row => row.map(value => !isNaN(value) ? Number(value) : value)) // 배열 값을 숫자로 변환
+        //     }
+        // }));
+    
+        setShowModal(false);
+    }
 
     return (
         <div>
@@ -160,8 +147,16 @@ const LinearTabs = () => {
                 onChange={(key) => setActiveKey(key)}
                 items={tabPanes}
                 tabBarExtraContent={
-                    (activeKey !== '0' && activeKey !== 'setting') ? <Button type="link" onClick={handleClick}>설정</Button> : null
+                    (activeKey !== 'main' && activeKey !== 'setting') ? <Button type="link" onClick={() => setShowModal(true)}>설정</Button> : null
                 }
+            />
+
+            <SettingModal
+                modalStatus={showModal}
+                onOK={updateTabValue}
+                onCancel={() => setShowModal(false)}
+                tabValue={activeKey !== 'main' ? tabValue[activeKey] : tabValue}
+                activeKey={activeKey}
             />
         </div>
     )

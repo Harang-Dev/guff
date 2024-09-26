@@ -220,7 +220,7 @@ function AssetTable() {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
         } catch (error) {
-            
+            message.error('엑셀 다운로드 실패')
         }
     }
 
@@ -275,6 +275,7 @@ function AssetTable() {
             title: '교정일',
             key: 'start_date',
             align: 'center',
+            render: (text, record) => { return (formatDate(record.start_date))}
         },
         {
             title: '차기교정일',

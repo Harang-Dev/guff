@@ -49,7 +49,7 @@ const BatteryUpdateModal = ({open, onOk, onCancel, selectID, locations, products
         }
     };
 
-    const handleSubmit = () => {
+    const  handleSubmit = () => {
         form
             .validateFields()
             .then(values => {

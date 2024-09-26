@@ -98,7 +98,6 @@ function BatteryTable() {
 
     const handleCreate = async (item) => {
         try {
-            const createItem = await form.validateFields();
             await axios.post(`${API_URL}/battery/add`, item);
 
             const response = await axios.get(`${API_URL}/battery/view`);
