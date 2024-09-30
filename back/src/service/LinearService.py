@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from scipy.stats import linregress, t
 from src.dto.LinearDTO import *
@@ -40,10 +39,7 @@ class LinearService:
             'k95': k95,
             'nValue': slope
         })
-        
-        print(lingressDTO, std_err)
-        print(296.2 * 10 ** (1.645 * 0.202))
-
+    
         srsdMin = float(df['srsd'].min() * 0.01)
         srsdMax = float(df['srsd'].max() * 100)
 

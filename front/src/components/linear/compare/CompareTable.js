@@ -13,7 +13,6 @@ const CompareTable = ({ type, expandRowData }) => {
     ];
 
     const data = expandRowData.filter(item => item.type === type)
-    console.log(data)
 
     return <Table bordered tableLayout="auto" columns={columns} dataSource={data} pagination={false} />;
 };

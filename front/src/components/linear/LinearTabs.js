@@ -63,7 +63,6 @@ const LinearTabs = () => {
     }, [filename]);
 
     useEffect(() => {
-        console.log(`In useEffect`, tabValue)
         if(chartData && linearData) {
             const initialTab = {
                 key: 'main',
@@ -113,8 +112,12 @@ const LinearTabs = () => {
                     </div>
                 )
             }
+
+            if (!activeKey || activeKey === 'main') {
+                setActiveKey('main');
+            }
+
             setTabPanes([initialTab, weightPerDelayTab, nomogramChart, compareChart]);
-            setActiveKey('main');
         }
     }, [chartData, filename, tabValue, linearData])
 
@@ -123,20 +126,11 @@ const LinearTabs = () => {
             ...tabValue,
             [activeKey]: {
                 ...item,
-                [arrayName]: item[arrayName]?.map(row => row.map(value => !isNaN(value) ? Number(value) : value)) // 배열 값을 숫자로 변환
+                [arrayName]: item[arrayName]?.map(row => row.map(value => !isNaN(value) ? Number(value) : value)).flat() // 배열 값을 숫자로 변환
             }
         }
-        
+        console.log({...item})
         setTabValue(testData);
-        
-        // setTabValue((prevTabValue) => ({
-        //     ...prevTabValue, // 이전 상태를 복사
-        //     [activeKey]: {
-        //         ...item, // item의 기존 데이터 복사
-        //         [arrayName]: item[arrayName]?.map(row => row.map(value => !isNaN(value) ? Number(value) : value)) // 배열 값을 숫자로 변환
-        //     }
-        // }));
-    
         setShowModal(false);
     }
 

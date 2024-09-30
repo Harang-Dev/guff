@@ -33,19 +33,19 @@ const SettingModal = ({ modalStatus, onOK, onCancel, tabValue, activeKey }) => {
                 if (activeKey === 'weight') {
                     setArrayName('delay');
                     setTitle('지발당 장약량 그래프 설정');
-                } else if ( activeKey === 'compare') {
+                } else if (activeKey === 'compare') {
                     setArrayName('metrics');
-                    setTitle('비교 그래프 설정')
+                    setTitle('비교 그래프 설정');
                 } else {
-                    setTitle('Nomogram 그래프 설정')
+                    setTitle('Nomogram 그래프 설정');
                 }
-            }
-        } else {
-            return () => {
-                console.log('Cleaning up...')
+    
+                // 새로운 값을 설정해줍니다.
+                form.setFieldsValue({ ...tabValue });
             }
         }
-    }, [modalStatus, activeKey])
+    }, [modalStatus, activeKey, tabValue]);
+    
     
     const handleSubmit = () => {
         // form의 기본 값 가져오기
@@ -64,7 +64,7 @@ const SettingModal = ({ modalStatus, onOK, onCancel, tabValue, activeKey }) => {
                 values[arrayName] = arrayData[arrayName];
             }
         }
-
+        console.log(values)
         form.resetFields()
         onOK(values, arrayName)
     };
@@ -90,13 +90,16 @@ const SettingModal = ({ modalStatus, onOK, onCancel, tabValue, activeKey }) => {
                 title={title}
                 open={modalStatus}
                 onOk={handleSubmit}
-                onCancel={onCancel}
+                onCancel={() => {
+                    form.resetFields()
+                    onCancel()
+                }}
             >
-                <Form form={form} layout='vertical' variant='filled'>
+                <Form form={form} layout='vertical' variant='filled' >
                     <Row gutter={[16, 16]}>
                         {Object.keys(tabValue).map(key => key !== 'delay' && key !== 'metrics' ? (
                             <Col>
-                                <Form.Item name={key} label={itemDict[key]}>
+                                <Form.Item name={key || 'defaultName'} label={itemDict[key]}>
                                     <InputNumber />
                                 </Form.Item>
                             </Col>
@@ -106,7 +109,7 @@ const SettingModal = ({ modalStatus, onOK, onCancel, tabValue, activeKey }) => {
                     </Row>
                 
                     {activeKey !== 'nomogram' ? (
-                        <Form.Item name={arrayName} label={itemDict[arrayName]}>
+                        <Form.Item name={arrayName || 'defaultName'} label={itemDict[arrayName]}>
                             <HotTable
                                 ref={hotRef}  // ref를 HotTable에 올바르게 설정
                                 data={[tabValue[`${arrayName}`]]}

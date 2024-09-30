@@ -74,7 +74,7 @@ const CustomCalendar = () => {
       key: '1',
       label: (
         <div onClick={() => showDrawer(date, false)}>
-          이벤트 생성 {date.format('YYYY-MM-DD')}
+          이벤트 생성
         </div>
       ),
       icon: <SmileOutlined />,

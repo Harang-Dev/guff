@@ -24,7 +24,6 @@ const AssetCreateModal = ({open, onOk, onCancel, locations, products }) => {
     };
 
     const handleSubmit = () => {
-        console.log(form.getFieldsValue())
         form
             .validateFields()
             .then(values => {

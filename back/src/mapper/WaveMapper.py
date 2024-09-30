@@ -33,9 +33,6 @@ class WaveMapper:
                 ) for data in dto
             ]
 
-            for i in data_list:
-                print(vars(i))
-                print()
             db.bulk_save_objects(data_list)
             db.commit()
         except Exception as e:

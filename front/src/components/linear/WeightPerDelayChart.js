@@ -13,7 +13,6 @@ const WieghtPerDelayChart = ({ linearData, tabValue }) => {
 
             const length = Math.ceil((end - start) / interval) + 1;
             const distanceArray = Array.from({length}, (_, index) => start + index * interval)
-
             setDistance(distanceArray);
         }
     }, [tabValue])

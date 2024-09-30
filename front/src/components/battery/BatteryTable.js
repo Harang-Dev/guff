@@ -174,7 +174,6 @@ function BatteryTable() {
         // 현재 날짜가 교체 주기 당일 및 하루 전날 사이에 있는지 확인
         const isWithinPeriod = now >= endOfPeriod && now <= replaceDate;
 
-        console.log(dateString, isWithinPeriod)
         // 교체 주기가 지났다면 'overdue'를 반환, 아직 남아있다면 true/false 반환
         if (isPastReplaceCycle) {
             return 'overdue';  // 교체 주기 지난 경우
