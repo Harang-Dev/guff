@@ -1,0 +1,11 @@
+.ant-drawer-content-wrapper {
+  width: 350px !important;
+}
+
+.ant-picker-calendar .ant-picker-cell{
+  cursor: default !important;
+}
+
+.ant-dropdown-trigger {
+  min-height: 100% !important;
+}

@@ -1,0 +1,8 @@
+.highlight-col {
+    background-color: #e6f7ff; /* 배경색 설정 */
+    color: #1890ff; /* 텍스트 색상 설정 */
+  }
+  
+.ant-table-tbody > tr > td.highlight-col {
+background-color: #e6f7ff !important;
+}

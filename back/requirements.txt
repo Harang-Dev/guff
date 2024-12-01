@@ -1,0 +1,10 @@
+fastapi[all]
+sqlalchemy
+mysql-connector-python
+pyhwp
+lxml
+six
+openpyxl
+pandas
+dependency-injector
+scipy
